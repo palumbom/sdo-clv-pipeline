@@ -26,5 +26,6 @@ dependencies = [
     "scipy",
     "reproject",
     "scikit-image",
-    "pyshtools"
+    "pyshtools",
+    "jax"
 ]

@@ -194,58 +194,45 @@ def plot_mask(mask, outdir=None, fname=None):
         plt.show()
     return None
 
-def label_moats_on_sun(mask, outdir=None, fname=None):
-        # merge the penumbra
-        mask_copy = np.copy(mask.regions)
-        mask_copy[mask_copy >= 3] -= 1
+def label_spots_on_sun(mask, outdir=None, fname=None):
+    # get spot mask and letters for labels from separate file
+    data = np.load('moats_data.npz', allow_pickle=True)  # allow_pickle for arrays of arrays
+    area_idx_array = data['area_idx_arr']
+    letters = data['letters']
 
-        # get cmap
-        cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white"])
-        cmap.set_bad(color="white")
-        norm = colors.BoundaryNorm([0, 1, 2, 3, 4, 5], ncolors=cmap.N, clip=True)
+    # get the mask array and shape
+    mask_copy = np.copy(mask.regions)
+    mask_copy[mask_copy >= 3] -= 1      # merge penumbra
+    h, w = mask_copy.shape             # height and width
 
-        # get the WCS
-        wcs = mask.wcs
+    overlay = np.full((h, w), np.nan)               # create overlay array with same shape
+    for i, spot_mask in enumerate(area_idx_array):  # for each spot mask, find pixels in the spot and give them a number
+        y, x = np.where(spot_mask)
+        overlay[y, x] = i
 
-        # plot the sun
-        fig = plt.figure(figsize=(6.4, 4.8))
-        ax1 = fig.add_subplot(111, projection=wcs)
-        img = ax1.imshow(mask_copy - 0.5, cmap=cmap, norm=norm, origin="lower", interpolation=None)
-        sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
-                                                                    color="k", alpha=0.5, ls="--", lw=0.5)
-        limb = ax1.contour(mask.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
-        clb = fig.colorbar(img, ticks=[0.5, 1.5, 2.5, 3.5, 4.5])
-        clb.ax.set_yticklabels([r"${\rm Umbra}$", r"${\rm Penumbra}$", r"${\rm Quiet\ Sun}$", r"${\rm Network}$", r"${\rm Plage}$"])
-        ax1.invert_xaxis()
-        ax1.invert_yaxis()
-        ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")
-        ax1.set_ylabel(r"${\rm Helioprojective\ Latitude}$")
-        # ax1.text(1400, 4000, mask.date_obs, fontsize=10, c="black")
-        ax1.grid(False)
+    # plot original mask in greyscale
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(mask_copy, cmap='gray', origin='lower')
+    # color spots
+    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_array))
+    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.7)
 
-        data = np.load('moats_data.npz')
-        print(data.files)
-        area_idx_arr = data['area_idx_arr']
-        letters = data['letters']
-        print(letters)
+    # check they are the same
+    # print("Number of spots:", len(area_idx_array))
+    # print("Number of letters:", len(letters))
 
-        moat_colors = plt.cm.tab20.colors
+    for i, spot_mask in enumerate(area_idx_array):
+        y, x = np.where(spot_mask)
+        # get center
+        x_center = np.mean(x)
+        y_center = np.mean(y)
+        label = letters[i]
+        ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
+                color='black', fontsize=10, weight='bold')
 
-        for i, (spot_idxs, label) in enumerate(zip(area_idx_arr, letters)):
-            color = moat_colors[i%len(moat_colors)]
-            x, y = np.unravel_index(spot_idxs, mask.regions.shape)
-            ax1.scatter(x,y, color=color, transform=ax1.get_transform('pixel'))
-
-            x_center = np.mean(x)
-            y_center = np.mean(y)
-            ax1.text(x_center, y_center, label, transform=ax1.get_transform('pixel'))
-
-        # figure out the filename
-        if outdir is not None:
-            if fname is None:
-                fname = "mask_" + mask.date_obs + ".pdf"
-            fig.savefig(outdir + fname, bbox_inches="tight", dpi=500)
-            plt.clf(); plt.close()
-        else:
-            plt.show()
-        return None
+    ax.set_title("Colored Spots with Labels")
+    ax.set_xlim(0, w)
+    ax.set_ylim(0, h)
+    plt.gca().invert_yaxis()
+    plt.gca().invert_xaxis()
+    plt.show()

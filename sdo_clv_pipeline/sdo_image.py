@@ -528,7 +528,7 @@ class SunMask(object):
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 10000):
+            if (max_area > 2000):
                 print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
@@ -558,7 +558,7 @@ class SunMask(object):
                 #print(avg_int_arr)
 
         letters = []
-        for i in range (1, len(areas)):
+        for i in range (0, len(areas)):
             label = ascii_letters[i%52]
             letters.append(label)
         x = dilation_arr
@@ -571,7 +571,6 @@ class SunMask(object):
         
         load_and_plot('moats_data.npz')
 
-       
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0
         self.regions[ind_iso] = 4 # quiet sun

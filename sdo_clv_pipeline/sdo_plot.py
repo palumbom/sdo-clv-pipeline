@@ -194,7 +194,7 @@ def plot_mask(mask, outdir=None, fname=None):
         plt.show()
     return None
 
-def label_spots_on_sun(mask, outdir=None, fname=None):
+def label_moats_on_sun(mask, outdir=None, fname=None):
     # get spot mask and letters for labels from separate file
     data = np.load('moats_data.npz', allow_pickle=True)  # allow_pickle for arrays of arrays
     area_idx_array = data['area_idx_arr']
@@ -235,4 +235,5 @@ def label_spots_on_sun(mask, outdir=None, fname=None):
     ax.set_ylim(0, h)
     plt.gca().invert_yaxis()
     plt.gca().invert_xaxis()
+    os.remove('moats_data.npz')
     plt.show()

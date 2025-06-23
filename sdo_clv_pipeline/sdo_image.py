@@ -515,7 +515,7 @@ class SunMask(object):
 
 
         # save original array first
-        save_arr = areas_pix
+        save_arr = areas_pix.copy()
 
         # set up list of lists for layered plot
         vels = []
@@ -525,19 +525,23 @@ class SunMask(object):
         mus =[]
         area_idx_arr = []
 
+        i = 0
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 2000):
+            if (max_area > 10000):
                 print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
+                # areas[i] = max_area
                 areas.append(max_area)
                 area_idx_arr.append(max_area_idx)
+                # area_idx_arr[i] = max_area_idx
                 # get average mu of the region
                 mu_arr = np.array(con.mu[max_area_idx])
                 avg_mu = np.average(mu_arr)
                 mus.append(avg_mu)
+                # mus[i] = avg_mu
                 print(avg_mu)
 
                 # don't double count
@@ -548,19 +552,20 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
                 dilation_arr, avg_vel_arr = SunMask.plot_vel(self, dop, idx_new, structure)  # x and y values for layered vel plot
+                # vels[i] = avg_vel_arr
                 vels.append(avg_vel_arr)
                 #print(avg_vel_arr)
                 dilation_arr, avg_mag_arr = SunMask.plot_mag(self, mag, idx_new, structure)  # x and y values for layered mag plot
+                # mags[i] = avg_mag_arr
                 mags.append(avg_mag_arr)
                 #print(avg_mag_arr)
                 dilation_arr, avg_int_arr = SunMask.plot_int(self, con, idx_new, structure)  # x and y values for layered int plot
+                # ints[i] = avg_mag_arr
                 ints.append(avg_int_arr)
                 #print(avg_int_arr)
+                i += 1
 
-        letters = []
-        for i in range (0, len(areas)):
-            label = ascii_letters[i%52]
-            letters.append(label)
+        letters = [ascii_letters[i%52] for i in range(len(areas))]
         x = dilation_arr
         
         # moats = np.array(moats, dtype = object)
@@ -614,9 +619,7 @@ class SunMask(object):
 
         # set-up x axis for dilations plots
         max_dilations = 90  # how many dilations?
-        dilation_arr = []   
-        for i in range (1, max_dilations+1):
-            dilation_arr.append(i)
+        dilation_arr = [i for i in range (1, max_dilations+1)]   
 
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
@@ -648,9 +651,7 @@ class SunMask(object):
 
         # set-up x axis for dilations plots
         max_dilations = 90  # how many dilations?
-        dilation_arr = []   
-        for i in range (1, max_dilations+1):
-            dilation_arr.append(i)
+        dilation_arr = [i for i in range (1, max_dilations+1)]
 
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
@@ -688,9 +689,7 @@ class SunMask(object):
         
         # set-up x axis for dilations plots
         max_dilations = 90  # how many dilations? 
-        dilation_arr = []   
-        for i in range (1, max_dilations+1):
-            dilation_arr.append(i)
+        dilation_arr = [i for i in range (1, max_dilations+1)]
         
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)

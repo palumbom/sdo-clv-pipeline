@@ -521,15 +521,15 @@ class SunMask(object):
         vels = []
         mags = []
         ints = []
+        # areas = np.zeros((len(rprops),))
         areas = []
         mus =[]
         area_idx_arr = []
 
-        i = 0
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 10000):
+            if (max_area > 1000):
                 print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
@@ -551,25 +551,37 @@ class SunMask(object):
                 # plt.imshow(idx_new) 
                 # plt.colorbar()
                 # plt.show() # visualize that region
-                dilation_arr, avg_vel_arr = SunMask.plot_vel(self, dop, idx_new, structure)  # x and y values for layered vel plot
+                dilation_arr, avg_vel_arr, dilated_spots = SunMask.plot_vel(self, dop, idx_new, max_area, structure)  # x and y values for layered vel plot
                 # vels[i] = avg_vel_arr
                 vels.append(avg_vel_arr)
                 #print(avg_vel_arr)
-                dilation_arr, avg_mag_arr = SunMask.plot_mag(self, mag, idx_new, structure)  # x and y values for layered mag plot
+                dilation_arr, avg_mag_arr, dilated_spots = SunMask.plot_mag(self, mag, idx_new, max_area, structure)  # x and y values for layered mag plot
                 # mags[i] = avg_mag_arr
                 mags.append(avg_mag_arr)
                 #print(avg_mag_arr)
-                dilation_arr, avg_int_arr = SunMask.plot_int(self, con, idx_new, structure)  # x and y values for layered int plot
+                dilation_arr, avg_int_arr, dilated_spots = SunMask.plot_int(self, con, idx_new, max_area, structure)  # x and y values for layered int plot
                 # ints[i] = avg_mag_arr
                 ints.append(avg_int_arr)
                 #print(avg_int_arr)
-                i += 1
+
+        sum = 0
+        for i in dilated_spots:
+            sum +=  i
+        print(np.shape(sum))
+        # print(len(labels))
+        # print(np.shape(labels))      
+        # print(len(dilated_spots))
+        # print(np.shape(dilated_spots))
+        # new_labels = ndimage.label(sum, structure=structure)
+        # print(np.shape(labels))
+        # print(np.shape(new_labels)) 
 
         letters = [ascii_letters[i%52] for i in range(len(areas))]
         x = dilation_arr
         
         # moats = np.array(moats, dtype = object)
-        np.savez('moats_data.npz', x=x, vels=vels, mags=mags, ints=ints, areas=areas, mus=mus, area_idx_arr=area_idx_arr, letters=letters)
+        np.savez_compressed('moats_data.npz', x=x, vels=vels, mags=mags, ints=ints, 
+                 areas=areas, mus=mus, area_idx_arr=area_idx_arr, letters=letters, dilated_spots=dilated_spots)
 
         import sdo_clv_pipeline.plot_moats_data as plot_moats_data
         from sdo_clv_pipeline.plot_moats_data import load_and_plot
@@ -615,11 +627,7 @@ class SunMask(object):
     def is_plage(self):
         return self.regions == 6
     
-    def plot_vel(self, dop, max_area_idx, structure):
-
-        # set-up x axis for dilations plots
-        max_dilations = 90  # how many dilations?
-        dilation_arr = [i for i in range (1, max_dilations+1)]   
+    def plot_vel(self, dop, max_area_idx, max_area, structure):  
 
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
@@ -634,7 +642,7 @@ class SunMask(object):
 
         # y axis
         prev_dilation = dilated_idx
-        while dilation_count < max_dilations:
+        while (dilation_count < int(np.sqrt(max_area/pi))):
             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
@@ -644,14 +652,16 @@ class SunMask(object):
             avg_vel_arr.append(avg_vel)
             dilation_count += 1 # update dilation count
             prev_dilation = new_dilated_idx
-
-        return(dilation_arr, avg_vel_arr)
-    
-    def plot_mag(self, mag, max_area_idx, structure):
+        dilated_spots = []
+        dilated_spots.append(prev_dilation)
 
         # set-up x axis for dilations plots
-        max_dilations = 90  # how many dilations?
-        dilation_arr = [i for i in range (1, max_dilations+1)]
+        dilation_arr = [i for i in range (1, dilation_count+1)]
+        # print(len(dilation_arr))
+        # print(len(avg_vel_arr))
+        return(dilation_arr, avg_vel_arr, dilated_spots)
+    
+    def plot_mag(self, mag, max_area_idx, max_area, structure):
 
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
@@ -666,7 +676,7 @@ class SunMask(object):
 
         # y axis
         prev_dilation = dilated_idx
-        while dilation_count < max_dilations:
+        while dilation_count < int(np.sqrt(max_area/pi)):
             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
@@ -677,19 +687,21 @@ class SunMask(object):
             dilation_count += 1 # update dilation count
             prev_dilation = new_dilated_idx
         inv_mag_arr = []
+        dilated_spots = []
+        dilated_spots.append(prev_dilation)
+
+        # set-up x axis for dilations plots
+        dilation_arr = [i for i in range (1, dilation_count+1)]
+
         if (avg_mag_arr[5] < 0):
             for n in avg_mag_arr:
                 n = -1*n
                 inv_mag_arr.append(n)
-            return (dilation_arr, inv_mag_arr)
+            return (dilation_arr, inv_mag_arr, dilated_spots)
         else:
-            return (dilation_arr, avg_mag_arr)
+            return (dilation_arr, avg_mag_arr, dilated_spots)
     
-    def plot_int(self, con, max_area_idx, structure):
-        
-        # set-up x axis for dilations plots
-        max_dilations = 90  # how many dilations? 
-        dilation_arr = [i for i in range (1, max_dilations+1)]
+    def plot_int(self, con, max_area_idx, max_area, structure):
         
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
@@ -704,7 +716,7 @@ class SunMask(object):
 
         # y axis
         prev_dilation = dilated_idx
-        while dilation_count < max_dilations:
+        while dilation_count < int(np.sqrt(max_area/pi)):
             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)   
             idx_new = np.logical_and(idx_new, self.regions != 1)
@@ -715,9 +727,14 @@ class SunMask(object):
             avg_int_arr.append(avg_int)
             dilation_count += 1 # update dilation count
             prev_dilation = new_dilated_idx
+        dilated_spots = []
+        dilated_spots.append(prev_dilation)
+
+        # set-up x axis for dilations plots
+        dilation_arr = [i for i in range (1, dilation_count+1)]
 
 
-        return(dilation_arr, avg_int_arr)
+        return(dilation_arr, avg_int_arr, dilated_spots)
     
 
         

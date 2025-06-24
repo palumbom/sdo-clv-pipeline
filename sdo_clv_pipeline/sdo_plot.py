@@ -209,7 +209,6 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     for i, spot_mask in enumerate(area_idx_array):  # for each spot mask, find pixels in the spot and give them a number
         y, x = np.where(spot_mask)
         overlay[y, x] = i
-
     # plot original mask in greyscale
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.imshow(mask_copy, cmap='gray', origin='lower')
@@ -231,6 +230,45 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
                 color='black', fontsize=10, weight='bold')
 
     ax.set_title("Colored Spots with Labels")
+    ax.set_xlim(0, w)
+    ax.set_ylim(0, h)
+    plt.gca().invert_yaxis()
+    plt.gca().invert_xaxis()
+    os.remove('moats_data.npz')
+    plt.show()
+
+    dilated_spots = data['dilated_spots']
+
+    # get the mask array and shape
+    mask_copy = np.copy(mask.regions)
+    mask_copy[mask_copy >= 3] -= 1      # merge penumbra
+    h, w = mask_copy.shape             # height and width
+
+    overlay = np.full((h, w), np.nan)               # create overlay array with same shape
+    for i, spot_mask in enumerate(dilated_spots):  # for each spot mask, find pixels in the spot and give them a number
+        y, x = np.where(spot_mask)
+        overlay[y, x] = i
+    # plot original mask in greyscale
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(mask_copy, cmap='gray', origin='lower')
+    # color spots
+    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_array))
+    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.4)
+
+    # check they are the same
+    # print("Number of spots:", len(area_idx_array))
+    # print("Number of letters:", len(letters))
+
+    for i, spot_mask in enumerate(dilated_spots):
+        y, x = np.where(spot_mask)
+        # get center
+        x_center = np.mean(x)
+        y_center = np.mean(y)
+        label = letters[i]
+        ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
+                color='black', fontsize=10, weight='bold')
+
+    ax.set_title("Colored Moats with Labels")
     ax.set_xlim(0, w)
     ax.set_ylim(0, h)
     plt.gca().invert_yaxis()

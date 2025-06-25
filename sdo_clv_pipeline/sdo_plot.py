@@ -197,7 +197,7 @@ def plot_mask(mask, outdir=None, fname=None):
 def label_moats_on_sun(mask, outdir=None, fname=None):
     # get spot mask and letters for labels from separate file
     data = np.load('moats_data.npz', allow_pickle=True)  # allow_pickle for arrays of arrays
-    area_idx_array = data['area_idx_arr']
+    area_idx_arr = data['area_idx_arr']
     letters = data['letters']
 
     # get the mask array and shape
@@ -206,21 +206,21 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     h, w = mask_copy.shape             # height and width
 
     overlay = np.full((h, w), np.nan)               # create overlay array with same shape
-    for i, spot_mask in enumerate(area_idx_array):  # for each spot mask, find pixels in the spot and give them a number
+    for i, spot_mask in enumerate(area_idx_arr):  # for each spot mask, find pixels in the spot and give them a number
         y, x = np.where(spot_mask)
         overlay[y, x] = i
     # plot original mask in greyscale
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.imshow(mask_copy, cmap='gray', origin='lower')
     # color spots
-    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_array))
+    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_arr))
     ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.7)
 
     # check they are the same
     # print("Number of spots:", len(area_idx_array))
     # print("Number of letters:", len(letters))
 
-    for i, spot_mask in enumerate(area_idx_array):
+    for i, spot_mask in enumerate(area_idx_arr):
         y, x = np.where(spot_mask)
         # get center
         x_center = np.mean(x)
@@ -252,11 +252,11 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.imshow(mask_copy, cmap='gray', origin='lower')
     # color spots
-    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_array))
+    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_arr))
     ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.4)
 
     # check they are the same
-    # print("Number of spots:", len(area_idx_array))
+    # print("Number of spots:", len(area_idx_arr))
     # print("Number of letters:", len(letters))
 
     for i, spot_mask in enumerate(dilated_spots):
@@ -273,5 +273,5 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     ax.set_ylim(0, h)
     plt.gca().invert_yaxis()
     plt.gca().invert_xaxis()
-    os.remove('moats_data.npz')
+    # os.remove('moats_data.npz')
     plt.show()

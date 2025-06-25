@@ -525,11 +525,12 @@ class SunMask(object):
         areas = []
         mus =[]
         area_idx_arr = []
+        dilated_spots = []
 
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 1000):
+            if (max_area > 8000):
                 print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
@@ -551,26 +552,42 @@ class SunMask(object):
                 # plt.imshow(idx_new) 
                 # plt.colorbar()
                 # plt.show() # visualize that region
-                dilation_arr, avg_vel_arr, dilated_spots = SunMask.plot_vel(self, dop, idx_new, max_area, structure)  # x and y values for layered vel plot
+
+                dilation_arr, avg_vel_arr, dilated_spots = SunMask.plot_vel(dilated_spots, self, dop, idx_new, max_area, structure)  # x and y values for layered vel plot
                 # vels[i] = avg_vel_arr
                 vels.append(avg_vel_arr)
                 #print(avg_vel_arr)
-                dilation_arr, avg_mag_arr, dilated_spots = SunMask.plot_mag(self, mag, idx_new, max_area, structure)  # x and y values for layered mag plot
+                dilation_arr, avg_mag_arr = SunMask.plot_mag(self, mag, idx_new, max_area, structure)  # x and y values for layered mag plot
                 # mags[i] = avg_mag_arr
                 mags.append(avg_mag_arr)
                 #print(avg_mag_arr)
-                dilation_arr, avg_int_arr, dilated_spots = SunMask.plot_int(self, con, idx_new, max_area, structure)  # x and y values for layered int plot
+                dilation_arr, avg_int_arr = SunMask.plot_int(self, con, idx_new, max_area, structure)  # x and y values for layered int plot
                 # ints[i] = avg_mag_arr
                 ints.append(avg_int_arr)
                 #print(avg_int_arr)
 
+        max_length = len(np.max(dilated_spots))
+        for arr in dilated_spots:
+            dilated_spots = np.pad(dilated_spots, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+
+        max_length = len(np.max(vels))
+        for arr in vels:
+            if len(vels) < max_length:
+                vels = np.pad(vels, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+        for arr in mags:
+            if len(mags) < max_length:
+                mags = np.pad(mags, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+        for arr in ints:
+            if len(ints) < max_length:
+                ints = np.pad(ints, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+        
         sum = 0
         for i in dilated_spots:
             sum +=  i
         print(np.shape(sum))
         # print(len(labels))
         # print(np.shape(labels))      
-        # print(len(dilated_spots))
+        print(len(dilated_spots))
         # print(np.shape(dilated_spots))
         # new_labels = ndimage.label(sum, structure=structure)
         # print(np.shape(labels))
@@ -586,7 +603,7 @@ class SunMask(object):
         import sdo_clv_pipeline.plot_moats_data as plot_moats_data
         from sdo_clv_pipeline.plot_moats_data import load_and_plot
         
-        load_and_plot('moats_data.npz')
+        load_and_plot()
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0
@@ -598,6 +615,15 @@ class SunMask(object):
 
         # set values beyond mu_thresh to nan
         self.regions[np.logical_or(con.mu <= con.mu_thresh, np.isnan(con.mu))] = np.nan
+
+        # fig, ax = plt.subplots()
+        # colors = ['r', 'g', 'b']
+        # print(len(dilated_spots))
+        # for i in range(0, len(dilated_spots)+1):
+        #     ax.imshow(dilated_spots[i], alpha=0.4)
+        # ax.set_title("Regions and overlaps")
+        # plt.show()
+
         return None
 
 
@@ -627,8 +653,8 @@ class SunMask(object):
     def is_plage(self):
         return self.regions == 6
     
-    def plot_vel(self, dop, max_area_idx, max_area, structure):  
-
+    
+    def plot_vel(dilated_spots, self, dop, max_area_idx, max_area, structure):  
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
@@ -652,7 +678,6 @@ class SunMask(object):
             avg_vel_arr.append(avg_vel)
             dilation_count += 1 # update dilation count
             prev_dilation = new_dilated_idx
-        dilated_spots = []
         dilated_spots.append(prev_dilation)
 
         # set-up x axis for dilations plots
@@ -687,8 +712,6 @@ class SunMask(object):
             dilation_count += 1 # update dilation count
             prev_dilation = new_dilated_idx
         inv_mag_arr = []
-        dilated_spots = []
-        dilated_spots.append(prev_dilation)
 
         # set-up x axis for dilations plots
         dilation_arr = [i for i in range (1, dilation_count+1)]
@@ -697,9 +720,9 @@ class SunMask(object):
             for n in avg_mag_arr:
                 n = -1*n
                 inv_mag_arr.append(n)
-            return (dilation_arr, inv_mag_arr, dilated_spots)
+            return (dilation_arr, inv_mag_arr)
         else:
-            return (dilation_arr, avg_mag_arr, dilated_spots)
+            return (dilation_arr, avg_mag_arr)
     
     def plot_int(self, con, max_area_idx, max_area, structure):
         
@@ -727,14 +750,13 @@ class SunMask(object):
             avg_int_arr.append(avg_int)
             dilation_count += 1 # update dilation count
             prev_dilation = new_dilated_idx
-        dilated_spots = []
-        dilated_spots.append(prev_dilation)
+        
 
         # set-up x axis for dilations plots
         dilation_arr = [i for i in range (1, dilation_count+1)]
 
 
-        return(dilation_arr, avg_int_arr, dilated_spots)
+        return(dilation_arr, avg_int_arr)
     
 
         

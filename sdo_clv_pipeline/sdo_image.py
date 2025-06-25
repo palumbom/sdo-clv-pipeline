@@ -566,19 +566,20 @@ class SunMask(object):
                 ints.append(avg_int_arr)
                 #print(avg_int_arr)
 
-        max_length = len(np.max(dilated_spots))
-        for arr in dilated_spots:
-            dilated_spots = np.pad(dilated_spots, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+        # padding lists
+        # max_length = np.max(dilated_spots)
+        # for arr in dilated_spots:
+        #     dilated_spots = np.pad(dilated_spots, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
 
-        max_length = len(np.max(vels))
+        max_length = np.max(vels)
         for arr in vels:
-            if len(vels) < max_length:
+            if arr < max_length:
                 vels = np.pad(vels, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
         for arr in mags:
-            if len(mags) < max_length:
+            if arr < max_length:
                 mags = np.pad(mags, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
         for arr in ints:
-            if len(ints) < max_length:
+            if arr < max_length:
                 ints = np.pad(ints, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
         
         sum = 0

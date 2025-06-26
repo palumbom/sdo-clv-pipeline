@@ -40,6 +40,8 @@ def load_and_plot():
     moats.append(areas) # 3
     moats.append(mus)   # 4
 
+    print(np.shape(x))
+
     for j in range (0, 3):
         print ("trying to plot...")
         # layered plots for different moats
@@ -57,7 +59,7 @@ def load_and_plot():
             color = cmap(norm(thetas[i]))
             label = ascii_letters[i%52]
             letters.append(label)
-            plt.plot(x, moats[j][i], color = color)
+            plt.plot(x[i], moats[j][i], color = color)
             # marker
             mark_dilation = np.sqrt(areas[i] / np.pi)
             vel_at_mark = np.interp(mark_dilation, x, moats[j][i])
@@ -85,7 +87,7 @@ def load_and_plot():
         for i in range (0, len(areas)):
             color = cmap(norm(areas[i]))
             label = ascii_letters[i%52] 
-            plt.plot(x, moats[j][i], color = color)
+            plt.plot(x[i], moats[j][i], color = color)
             # marker
             mark_dilation = np.sqrt(areas[i] / np.pi)
             vel_at_mark = np.interp(mark_dilation, x, moats[j][i])

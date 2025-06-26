@@ -522,6 +522,7 @@ class SunMask(object):
         mags = []
         ints = []
         # areas = np.zeros((len(rprops),))
+        x = []
         areas = []
         mus =[]
         area_idx_arr = []
@@ -565,37 +566,31 @@ class SunMask(object):
                 # ints[i] = avg_mag_arr
                 ints.append(avg_int_arr)
                 #print(avg_int_arr)
+                x.append(dilation_arr)
+
 
         # padding lists
-        # max_length = np.max(dilated_spots)
-        # for arr in dilated_spots:
-        #     dilated_spots = np.pad(dilated_spots, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+        max_length_y = max(len(arr) for arr in vels)
+        max_length_x = max(len(arr) for arr in x)
 
-        max_length = np.max(vels)
-        for arr in vels:
-            if arr < max_length:
-                vels = np.pad(vels, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
-        for arr in mags:
-            if arr < max_length:
-                mags = np.pad(mags, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
-        for arr in ints:
-            if arr < max_length:
-                ints = np.pad(ints, (0,max_length - len(arr)), 'constant', constant_values=np.nan)
+        def pad_max_len(data, max_length):
+            return np.array(data + [np.nan] * (max_length - len(data)), dtype=float)
         
-        sum = 0
-        for i in dilated_spots:
-            sum +=  i
-        print(np.shape(sum))
-        # print(len(labels))
-        # print(np.shape(labels))      
-        print(len(dilated_spots))
-        # print(np.shape(dilated_spots))
-        # new_labels = ndimage.label(sum, structure=structure)
-        # print(np.shape(labels))
-        # print(np.shape(new_labels)) 
+        vels = np.vstack([pad_max_len(vels, max_length_y) for arr in vels])
+        mags = np.vstack([pad_max_len(mags, max_length_y) for arr in mags])
+        ints = np.vstack([pad_max_len(ints, max_length_y) for arr in ints])
+        x = np.vstack([pad_max_len(x, max_length_x) for arr in x])
+
+        print("padded")
+        for i, arr in enumerate(vels):
+            print(type(arr), np.shape(arr))
+        
+        # print(len(dilated_spots))
+        print(np.shape(dilated_spots))
+        print(np.shape(vels))
+        print(np.shape(x))
 
         letters = [ascii_letters[i%52] for i in range(len(areas))]
-        x = dilation_arr
         
         # moats = np.array(moats, dtype = object)
         np.savez_compressed('moats_data.npz', x=x, vels=vels, mags=mags, ints=ints, 
@@ -669,7 +664,7 @@ class SunMask(object):
 
         # y axis
         prev_dilation = dilated_idx
-        while (dilation_count < int(np.sqrt(max_area/pi))):
+        while (dilation_count < float(np.sqrt(max_area/pi))):
             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
@@ -702,7 +697,7 @@ class SunMask(object):
 
         # y axis
         prev_dilation = dilated_idx
-        while dilation_count < int(np.sqrt(max_area/pi)):
+        while dilation_count < float(np.sqrt(max_area/pi)):
             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
@@ -740,7 +735,7 @@ class SunMask(object):
 
         # y axis
         prev_dilation = dilated_idx
-        while dilation_count < int(np.sqrt(max_area/pi)):
+        while dilation_count < float(np.sqrt(max_area/pi)):
             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)   
             idx_new = np.logical_and(idx_new, self.regions != 1)

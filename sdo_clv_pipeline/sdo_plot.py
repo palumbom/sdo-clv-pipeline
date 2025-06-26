@@ -252,7 +252,7 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     ax.imshow(mask_copy, cmap='Greys_r', origin='lower')
     # color spots
     cmap_overlay = plt.cm.get_cmap('rainbow', len(area_idx_arr))
-    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.9)
+    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.6)
 
     # check they are the same
     # print("Number of spots:", len(area_idx_arr))
@@ -264,8 +264,8 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
         x_center = np.mean(x)
         y_center = np.mean(y)
         label = letters[i]
-        ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
-                color='black', fontsize=8, weight='bold')
+        # ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
+        #         color='black', fontsize=9)
 
     ax.set_title("Colored Moats with Labels")
     ax.set_xlim(0, w)

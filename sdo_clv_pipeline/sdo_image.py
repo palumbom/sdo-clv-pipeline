@@ -497,8 +497,9 @@ class SunMask(object):
 
         # label each penumbra island and include umbra so we only expand outwards
         binary_img = (self.regions == 2) | (self.regions == 3)|(self.regions == 1) # get penumbra and umbra 
-        structure = ndimage.generate_binary_structure(2,2) # binary structure (rank, connectivity)
-        labels, nlabels = ndimage.label(binary_img, structure=structure) # label each island of umbra and penumbra
+        corners = ndimage.generate_binary_structure(2,2) # binary structure (rank, connectivity)
+        no_corners = ndimage.generate_binary_structure(2,1)
+        labels, nlabels = ndimage.label(binary_img, structure=corners) # label each island of umbra and penumbra
 
         plt.imshow(labels)
         plt.colorbar()
@@ -531,7 +532,7 @@ class SunMask(object):
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 8000):
+            if (max_area > 1000):
                 print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
@@ -554,15 +555,15 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
 
-                dilation_arr, avg_vel_arr, dilated_spots = SunMask.plot_vel(dilated_spots, self, dop, idx_new, max_area, structure)  # x and y values for layered vel plot
+                dilation_arr, avg_vel_arr, dilated_spots = SunMask.plot_vel(dilated_spots, self, dop, idx_new, max_area, corners, no_corners)  # x and y values for layered vel plot
                 # vels[i] = avg_vel_arr
                 vels.append(avg_vel_arr)
                 #print(avg_vel_arr)
-                dilation_arr, avg_mag_arr = SunMask.plot_mag(self, mag, idx_new, max_area, structure)  # x and y values for layered mag plot
+                dilation_arr, avg_mag_arr = SunMask.plot_mag(self, mag, idx_new, max_area, corners, no_corners)  # x and y values for layered mag plot
                 # mags[i] = avg_mag_arr
                 mags.append(avg_mag_arr)
                 #print(avg_mag_arr)
-                dilation_arr, avg_int_arr = SunMask.plot_int(self, con, idx_new, max_area, structure)  # x and y values for layered int plot
+                dilation_arr, avg_int_arr = SunMask.plot_int(self, con, idx_new, max_area, corners, no_corners)  # x and y values for layered int plot
                 # ints[i] = avg_mag_arr
                 ints.append(avg_int_arr)
                 #print(avg_int_arr)
@@ -580,14 +581,14 @@ class SunMask(object):
         ints = np.vstack([pad_max_len(arr, max_length_y) for arr in ints])
         x = np.vstack([pad_max_len(arr, max_length_x) for arr in x])
 
-        print("padded")
-        for i, arr in enumerate(vels):
-            print(type(arr), np.shape(arr))
+        # print("padded")
+        # for i, arr in enumerate(vels):
+        #     print(type(arr), np.shape(arr))
         
         # print(len(dilated_spots))
-        print(np.shape(dilated_spots))
-        print(np.shape(vels))
-        print(np.shape(x))
+        # print(np.shape(dilated_spots))
+        # print(np.shape(vels))
+        # print(np.shape(x))
 
         letters = [ascii_letters[i%52] for i in range(len(areas))]
         
@@ -649,63 +650,74 @@ class SunMask(object):
         return self.regions == 6
     
     
-    def plot_vel(dilated_spots, self, dop, max_area_idx, max_area, structure):  
+    def plot_vel(dilated_spots, self, dop, max_area_idx, max_area, corners, no_corners):  
+        
         # first dilation
-        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
+        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
-        dilation = np.logical_xor(dilated_idx, idx_new) # dilated area - area = only outline left 
-        vel_arr = np.array(dop.v_corr[dilation])
+        #dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
+        vel_arr = np.array(dop.v_corr[idx_new])
         avg_vel = np.average(vel_arr)
         avg_vel_arr = []
         avg_vel_arr.append(avg_vel)
         dilation_count = 1
 
         # y axis
-        prev_dilation = dilated_idx
+        floor = 0
+        prev_dilation = np.logical_or(idx_new, max_area_idx)
         while (dilation_count < float(np.sqrt(max_area/pi))):
-            new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
+            if np.floor((0.293 * dilation_count)+2) == (floor+1) :
+                floor = floor((0.293* dilation_count) +2)
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate no corners
+            else:
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
-            new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
-            vel_arr = np.array(dop.v_corr[new_dilation]) 
+            # new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
+            vel_arr = np.array(dop.v_corr[idx_new]) 
             avg_vel = np.average(vel_arr)
             avg_vel_arr.append(avg_vel)
             dilation_count += 1 # update dilation count
-            prev_dilation = new_dilated_idx
-        dilated_spots.append(prev_dilation)
+            prev_dilation = np.logical_or(idx_new, prev_dilation)
+
+        moat = np.logical_xor(prev_dilation, max_area_idx)
+        dilated_spots.append(moat)
 
         # set-up x axis for dilations plots
         dilation_arr = [i for i in range (1, dilation_count+1)]
-        # print(len(dilation_arr))
-        # print(len(avg_vel_arr))
         return(dilation_arr, avg_vel_arr, dilated_spots)
     
-    def plot_mag(self, mag, max_area_idx, max_area, structure):
+    def plot_mag(self, mag, max_area_idx, max_area, corners, no_corners):
 
         # first dilation
-        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
+        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
-        dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
-        mag_arr = np.array(mag.image[dilation])
+        # dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
+        mag_arr = np.array(mag.image[idx_new])
         avg_mag = np.average(mag_arr)
         avg_mag_arr = []
         avg_mag_arr.append(avg_mag)
         dilation_count = 1
 
         # y axis
-        prev_dilation = dilated_idx
+        floor = 0
+        prev_dilation = np.logical_or(idx_new, max_area_idx)
         while dilation_count < float(np.sqrt(max_area/pi)):
-            new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
+            if np.floor((0.293 * dilation_count)+2) == (floor+1) :
+                floor = floor((0.293* dilation_count) +2)
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate no corners
+            else:
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
-            new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
-            mag_arr = np.array(mag.image[new_dilation]) 
+            # new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
+            mag_arr = np.array(mag.image[idx_new]) 
             avg_mag = np.average(mag_arr)
             avg_mag_arr.append(avg_mag)
             dilation_count += 1 # update dilation count
-            prev_dilation = new_dilated_idx
+            prev_dilation = np.logical_or(idx_new, prev_dilation)
         inv_mag_arr = []
 
         # set-up x axis for dilations plots
@@ -719,34 +731,38 @@ class SunMask(object):
         else:
             return (dilation_arr, avg_mag_arr)
     
-    def plot_int(self, con, max_area_idx, max_area, structure):
+    def plot_int(self, con, max_area_idx, max_area, corners, no_corners):
         
         # first dilation
-        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = structure)
+        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
-        dilation = np.logical_xor(dilated_idx, max_area_idx) # dilated area - area = only outline left 
-        int_arr = np.array(con.image[dilation])
+        # dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
+        int_arr = np.array(con.image[idx_new])
         avg_int = np.average(int_arr)
         avg_int_arr = []
         avg_int_arr.append(avg_int)
         dilation_count = 1
 
         # y axis
-        prev_dilation = dilated_idx
+        floor = 0
+        prev_dilation = np.logical_or(idx_new, max_area_idx)
         while dilation_count < float(np.sqrt(max_area/pi)):
-            new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = structure)   # dilate
+            if np.floor((0.293 * dilation_count)+2) == (floor+1) :
+                floor = floor((0.293* dilation_count) +2)
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate no corners
+            else:
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)   
             idx_new = np.logical_and(idx_new, self.regions != 1)
-            new_dilation = np.logical_xor(new_dilated_idx, prev_dilation)   # new outline, only that ring
+            # new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
             # new_dilation = np.logical_xor(new_dilated_idx, max_area_idx) # new outline including previous dilations
-            int_arr = np.array(con.image[new_dilation]) 
+            int_arr = np.array(con.image[idx_new]) 
             avg_int = np.average(int_arr)
             avg_int_arr.append(avg_int)
             dilation_count += 1 # update dilation count
-            prev_dilation = new_dilated_idx
+            prev_dilation = np.logical_or(idx_new, prev_dilation)
         
-
         # set-up x axis for dilations plots
         dilation_arr = [i for i in range (1, dilation_count+1)]
 

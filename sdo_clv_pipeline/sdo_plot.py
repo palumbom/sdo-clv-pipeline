@@ -249,10 +249,10 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
         overlay[y, x] = i
     # plot original mask in greyscale
     fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(mask_copy, cmap='gray', origin='lower')
+    ax.imshow(mask_copy, cmap='Greys_r', origin='lower')
     # color spots
-    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_arr))
-    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.4)
+    cmap_overlay = plt.cm.get_cmap('rainbow', len(area_idx_arr))
+    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.9)
 
     # check they are the same
     # print("Number of spots:", len(area_idx_arr))
@@ -265,7 +265,7 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
         y_center = np.mean(y)
         label = letters[i]
         ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
-                color='black', fontsize=10, weight='bold')
+                color='black', fontsize=8, weight='bold')
 
     ax.set_title("Colored Moats with Labels")
     ax.set_xlim(0, w)

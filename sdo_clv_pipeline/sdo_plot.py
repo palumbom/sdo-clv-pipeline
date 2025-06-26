@@ -234,7 +234,6 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     ax.set_ylim(0, h)
     plt.gca().invert_yaxis()
     plt.gca().invert_xaxis()
-    os.remove('moats_data.npz')
     plt.show()
 
     dilated_spots = data['dilated_spots']

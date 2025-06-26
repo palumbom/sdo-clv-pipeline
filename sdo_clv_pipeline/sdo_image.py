@@ -568,7 +568,6 @@ class SunMask(object):
                 #print(avg_int_arr)
                 x.append(dilation_arr)
 
-
         # padding lists
         max_length_y = max(len(arr) for arr in vels)
         max_length_x = max(len(arr) for arr in x)
@@ -576,10 +575,10 @@ class SunMask(object):
         def pad_max_len(data, max_length):
             return np.array(data + [np.nan] * (max_length - len(data)), dtype=float)
         
-        vels = np.vstack([pad_max_len(vels, max_length_y) for arr in vels])
-        mags = np.vstack([pad_max_len(mags, max_length_y) for arr in mags])
-        ints = np.vstack([pad_max_len(ints, max_length_y) for arr in ints])
-        x = np.vstack([pad_max_len(x, max_length_x) for arr in x])
+        vels = np.vstack([pad_max_len(arr, max_length_y) for arr in vels])
+        mags = np.vstack([pad_max_len(arr, max_length_y) for arr in mags])
+        ints = np.vstack([pad_max_len(arr, max_length_y) for arr in ints])
+        x = np.vstack([pad_max_len(arr, max_length_x) for arr in x])
 
         print("padded")
         for i, arr in enumerate(vels):

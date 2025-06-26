@@ -62,7 +62,7 @@ def load_and_plot():
             plt.plot(x[i], moats[j][i], color = color)
             # marker
             mark_dilation = np.sqrt(areas[i] / np.pi)
-            vel_at_mark = np.interp(mark_dilation, x, moats[j][i])
+            vel_at_mark = np.interp(mark_dilation, x[i], moats[j][i])
             plt.plot(mark_dilation, vel_at_mark, marker='o', color=color, markersize=5)
             # letter
             plt.text(mark_dilation+0.2, vel_at_mark+0.5, f' {label}', fontsize=9)
@@ -90,7 +90,7 @@ def load_and_plot():
             plt.plot(x[i], moats[j][i], color = color)
             # marker
             mark_dilation = np.sqrt(areas[i] / np.pi)
-            vel_at_mark = np.interp(mark_dilation, x, moats[j][i])
+            vel_at_mark = np.interp(mark_dilation, x[i], moats[j][i])
             plt.plot(mark_dilation, vel_at_mark, marker='o', color=color, markersize=5)
             # letter
             plt.text(mark_dilation+0.2, vel_at_mark+0.5, f' {label}', fontsize=9)

@@ -267,7 +267,7 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
         # ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
         #         color='black', fontsize=9)
 
-    ax.set_title("Colored Moats with Labels")
+    ax.set_title("Moats to Solanki Radius")
     ax.set_xlim(0, w)
     ax.set_ylim(0, h)
     plt.gca().invert_yaxis()

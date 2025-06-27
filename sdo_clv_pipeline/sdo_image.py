@@ -653,7 +653,7 @@ class SunMask(object):
     def plot_vel(dilated_spots, self, dop, max_area_idx, max_area, corners, no_corners):  
         
         # first dilation
-        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = corners)
+        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
         #dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
@@ -667,11 +667,11 @@ class SunMask(object):
         floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
-            if np.floor((0.293 * dilation_count)+2) == (floor+1) :
+            if np.floor((0.293 * dilation_count)+3) == (floor+1) :
                 floor = floor((0.293* dilation_count) +2)
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate no corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate with corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
             # new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
@@ -691,7 +691,7 @@ class SunMask(object):
     def plot_mag(self, mag, max_area_idx, max_area, corners, no_corners):
 
         # first dilation
-        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = corners)
+        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
         # dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
@@ -705,11 +705,11 @@ class SunMask(object):
         floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while dilation_count < float(1.2*np.sqrt(max_area/pi)):
-            if np.floor((0.293 * dilation_count)+2) == (floor+1) :
+            if np.floor((0.293 * dilation_count)+3) == (floor+1) :
                 floor = floor((0.293* dilation_count) +2)
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate no corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate with corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
             # new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring
@@ -734,7 +734,7 @@ class SunMask(object):
     def plot_int(self, con, max_area_idx, max_area, corners, no_corners):
         
         # first dilation
-        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = corners)
+        dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
         # dilation = np.logical_xor(idx_new, max_area_idx) # dilated area - area = only outline left 
@@ -748,11 +748,11 @@ class SunMask(object):
         floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while dilation_count < float(1.2*np.sqrt(max_area/pi)):
-            if np.floor((0.293 * dilation_count)+2) == (floor+1) :
+            if np.floor((0.293 * dilation_count)+3) == (floor+1) :
                 floor = floor((0.293* dilation_count) +2)
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate no corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate with corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)   
             idx_new = np.logical_and(idx_new, self.regions != 1)
             # new_dilation = np.logical_xor(idx_new, prev_dilation)   # new outline, only that ring

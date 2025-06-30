@@ -667,8 +667,8 @@ class SunMask(object):
         floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
-            if np.floor((0.35 * dilation_count)+3) == (floor+1) :
-                floor = floor((0.35* dilation_count) +3)
+            if np.floor((1.5 * dilation_count)+3) == (floor+1) :
+                floor = floor((1.5 * dilation_count) +3)
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
@@ -705,8 +705,8 @@ class SunMask(object):
         floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while dilation_count < float(1.2*np.sqrt(max_area/pi)):
-            if np.floor((0.35 * dilation_count)+3) == (floor+1) :
-                floor = floor((0.35* dilation_count) +3)
+            if np.floor((1.5 * dilation_count)+3) == (floor+1) :
+                floor = floor((1.5* dilation_count) +3)
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
@@ -748,8 +748,8 @@ class SunMask(object):
         floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while dilation_count < float(1.2*np.sqrt(max_area/pi)):
-            if np.floor((0.35 * dilation_count)+3) == (floor+1) :
-                floor = floor((0.35* dilation_count) +3)
+            if np.floor((1.5 * dilation_count)+3) == (floor+1) :
+                floor = floor((1.5 * dilation_count) +3)
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners

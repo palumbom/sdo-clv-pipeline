@@ -532,8 +532,8 @@ class SunMask(object):
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 10000):
-                print(max_area)
+            if (max_area > 1000):
+                #print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
                 # areas[i] = max_area
@@ -545,7 +545,7 @@ class SunMask(object):
                 avg_mu = np.average(mu_arr)
                 mus.append(avg_mu)
                 # mus[i] = avg_mu
-                print(avg_mu)
+                # print(avg_mu)
 
                 # don't double count
                 idx_new = np.logical_and(max_area_idx, self.regions != 2)
@@ -664,11 +664,11 @@ class SunMask(object):
         dilation_count = 1
 
         # y axis
-        floor = 0
+        #current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
-            if np.floor((1.5 * dilation_count)+3) == (floor+1) :
-                floor = floor((1.5 * dilation_count) +3)
+            if dilation_count % 3 == 0 :
+                #current_floor = np.floor((0.99 * dilation_count) +2)
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
@@ -701,13 +701,13 @@ class SunMask(object):
         avg_mag_arr.append(avg_mag)
         dilation_count = 1
 
-        # y axis
-        floor = 0
+       # y axis
+        #current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
-        while dilation_count < float(1.2*np.sqrt(max_area/pi)):
-            if np.floor((1.5 * dilation_count)+3) == (floor+1) :
-                floor = floor((1.5* dilation_count) +3)
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
+        while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
+            if dilation_count % 3 == 0 :
+                #current_floor = np.floor((0.99 * dilation_count) +2)
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)  # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
@@ -745,12 +745,12 @@ class SunMask(object):
         dilation_count = 1
 
         # y axis
-        floor = 0
+        #current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
-        while dilation_count < float(1.2*np.sqrt(max_area/pi)):
-            if np.floor((1.5 * dilation_count)+3) == (floor+1) :
-                floor = floor((1.5 * dilation_count) +3)
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
+        while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
+            if dilation_count % 3 == 0 :
+                #current_floor = np.floor((0.99 * dilation_count) +2)
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)  # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)   

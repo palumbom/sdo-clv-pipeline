@@ -664,11 +664,12 @@ class SunMask(object):
         dilation_count = 1
 
         # y axis
-        #current_floor = 0
+        current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
+        # dilation_count % 3 == 0 
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
-            if dilation_count % 3 == 0 :
-                #current_floor = np.floor((0.99 * dilation_count) +2)
+            if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
+                current_floor = np.floor((0.209)* (dilation_count +3))
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
@@ -702,11 +703,11 @@ class SunMask(object):
         dilation_count = 1
 
        # y axis
-        #current_floor = 0
+        current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
-            if dilation_count % 3 == 0 :
-                #current_floor = np.floor((0.99 * dilation_count) +2)
+            if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
+                current_floor = np.floor((0.209)* (dilation_count +3))
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)  # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
@@ -745,11 +746,11 @@ class SunMask(object):
         dilation_count = 1
 
         # y axis
-        #current_floor = 0
+        current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx)
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))):
-            if dilation_count % 3 == 0 :
-                #current_floor = np.floor((0.99 * dilation_count) +2)
+            if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
+                current_floor = np.floor((0.209)* (dilation_count +3))
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)  # dilate no corners
             else:
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners

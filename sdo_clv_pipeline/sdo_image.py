@@ -529,11 +529,13 @@ class SunMask(object):
         area_idx_arr = []
         dilated_spots = []
 
+        maximum_area = np.max(areas_pix) # get the max value in the array
+
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 10000):
-                #print(max_area)
+            if (max_area == maximum_area):
+                print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
                 # areas[i] = max_area
@@ -598,8 +600,10 @@ class SunMask(object):
 
         import sdo_clv_pipeline.plot_moats_data as plot_moats_data
         from sdo_clv_pipeline.plot_moats_data import load_and_plot
+        from sdo_clv_pipeline.plot_moats_data import plot_loop
         
         load_and_plot()
+        #plot_loop()
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0

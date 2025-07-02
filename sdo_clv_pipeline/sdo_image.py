@@ -532,7 +532,7 @@ class SunMask(object):
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area > 1000):
+            if (max_area > 10000):
                 #print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
@@ -648,7 +648,6 @@ class SunMask(object):
 
     def is_plage(self):
         return self.regions == 6
-    
     
     def plot_vel(dilated_spots, self, dop, max_area_idx, max_area, corners, no_corners):  
         

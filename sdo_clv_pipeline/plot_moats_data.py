@@ -42,7 +42,7 @@ def load_and_plot():
 
     # print(np.shape(x))
 
-    for j in range (0, 3):
+    for j in range (0, 3): # vel, mag, int
         print ("trying to plot...")
         # layered plots for different moats
         thetas = []
@@ -56,6 +56,7 @@ def load_and_plot():
         sm.set_array([])
         letters = []
         for i in range (0, len(thetas)):
+            print(thetas[i])
             color = cmap(norm(thetas[i]))
             label = ascii_letters[i%52]
             letters.append(label)
@@ -68,7 +69,7 @@ def load_and_plot():
             plt.text(mark_dilation+0.2, vel_at_mark+0.5, f' {label}', fontsize=9)
         plt.colorbar(sm, label='Average Theta (rad)', ax=plt.gca())
         plt.xlabel("# of Dilations")
-        if j == 0:
+        if j == 0: 
             plt.ylabel("Average Velocity (m/s)")
             plt.title("Average Velocity vs # of Dilations")
         elif j == 1:
@@ -107,50 +108,32 @@ def load_and_plot():
             plt.title("Average Intensity vs # of Dilations")
         plt.show()
 
-def plot_loop():
+def plot_loop(moat_vals, moat_dilations, moat_thetas, moat_areas):
 
-    data = np.load("moats_data.npz")
-
-    x = data['x']
-    vels = data['vels']
-    mags = data['mags'] 
-    ints = data['ints']
-    areas = data['areas']
-    mus = data['mus']
-    moats = []
-    moats.append(vels)  # 0 
-    moats.append(mags)  # 1
-    moats.append(ints)  # 2 
-    moats.append(areas) # 3
-    moats.append(mus)   # 4
-
-    for j in range (0, 3):
+    for j in range (0, 3): # vel, mag, int
         print ("trying to plot...")
-        # layered plots for different time
-        thetas = []
-        # plot avg velocities / dilations, mu
-        for i in mus:
-            i = np.arccos(i)
-            thetas.append(i)
+        # layered plots for different moats
         cmap = cm.plasma
-        norm = colors.Normalize(vmin=min(thetas), vmax=np.max(thetas))
+        norm = colors.Normalize(vmin=min(moat_thetas), vmax=np.max(moat_thetas))
         sm = cm.ScalarMappable(norm=norm, cmap=cmap)
         sm.set_array([])
         letters = []
-        for i in range (0, len(thetas)):
-            color = cmap(norm(thetas[i]))
-            label = ascii_letters[i%52]
+        for i in range (0, len(moat_thetas)):
+            print(moat_thetas[i])
+            color = cmap(norm(moat_thetas[i]))
+            #label = ascii_letters[i%52]
+            label = f"{moat_thetas[i]:.3f}"
             letters.append(label)
-            plt.plot(x[i], moats[j][i], color = color)
+            plt.plot(moat_dilations[i], moat_vals[j][i], color = color)
             # marker
-            mark_dilation = np.sqrt(areas[i] / np.pi)
-            vel_at_mark = np.interp(mark_dilation, x[i], moats[j][i])
+            mark_dilation = np.sqrt(moat_areas[i] / np.pi)
+            vel_at_mark = np.interp(mark_dilation, moat_dilations[i], moat_vals[j][i])
             plt.plot(mark_dilation, vel_at_mark, marker='o', color=color, markersize=5)
             # letter
             plt.text(mark_dilation+0.2, vel_at_mark+0.5, f' {label}', fontsize=9)
         plt.colorbar(sm, label='Average Theta (rad)', ax=plt.gca())
         plt.xlabel("# of Dilations")
-        if j == 0:
+        if j == 0: 
             plt.ylabel("Average Velocity (m/s)")
             plt.title("Average Velocity vs # of Dilations")
         elif j == 1:
@@ -159,7 +142,7 @@ def plot_loop():
         else:
             plt.ylabel("Average Intensity (ergs / s / Hz / m^2)")
             plt.title("Average Intensity vs # of Dilations")
-    plt.show()
+        plt.show()
 
         # # plot avg velocities / dilations, area
         # cmap = cm.plasma

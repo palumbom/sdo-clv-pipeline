@@ -529,11 +529,14 @@ class SunMask(object):
         dilated_spots = []
 
         maximum_area = np.max(areas_pix) # get the max value in the array
+        # for rprop in rprops:
+        #     print(rprop.label)
 
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if max_area == maximum_area:
+            if (rprop.label == 19):
+                print(rprop.label)
                 print(max_area)
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area

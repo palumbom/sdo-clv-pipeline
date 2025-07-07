@@ -130,7 +130,7 @@ def plot_loop(moat_vals, moat_dilations, moat_thetas, moat_areas):
             vel_at_mark = np.interp(mark_dilation, moat_dilations[i], moat_vals[j][i])
             plt.plot(mark_dilation, vel_at_mark, marker='o', color=color, markersize=5)
             # letter
-            plt.text(mark_dilation+0.2, vel_at_mark+0.5, f' {label}', fontsize=9)
+            plt.text(mark_dilation+1, vel_at_mark+0.5, f' {label}', fontsize=7)
         plt.colorbar(sm, label='Average Theta (rad)', ax=plt.gca())
         plt.xlabel("# of Dilations")
         if j == 0: 

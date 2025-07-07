@@ -119,7 +119,7 @@ def plot_loop(moat_vals, moat_dilations, moat_thetas, moat_areas):
         sm.set_array([])
         letters = []
         for i in range (0, len(moat_thetas)):
-            print(moat_thetas[i])
+            # print(moat_thetas[i])
             color = cmap(norm(moat_thetas[i]))
             #label = ascii_letters[i%52]
             label = f"{moat_thetas[i]:.3f}"
@@ -142,6 +142,7 @@ def plot_loop(moat_vals, moat_dilations, moat_thetas, moat_areas):
         else:
             plt.ylabel("Average Intensity (ergs / s / Hz / m^2)")
             plt.title("Average Intensity vs # of Dilations")
+        plt.tight_layout()
         plt.show()
 
         # # plot avg velocities / dilations, area

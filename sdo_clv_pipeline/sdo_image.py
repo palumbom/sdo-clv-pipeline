@@ -535,7 +535,7 @@ class SunMask(object):
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (rprop.label == 19):
+            if (max_area == maximum_area):
                 print(rprop.label)
                 print(max_area)
                 # get pixels in that region

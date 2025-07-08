@@ -369,7 +369,7 @@ def calculate_pixel_area(lat, lon):
     return pix_area
 
 class SunMask(object):
-    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals):
+    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter):
         # check argument order/names are correct
         assert con.is_continuum()
         assert mag.is_magnetogram()
@@ -391,7 +391,7 @@ class SunMask(object):
         self.ff = np.nansum(self.w_active[con.mu >= con.mu_thresh]) / npix
 
         # identify regions
-        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals)
+        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter)
 
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix
@@ -413,7 +413,7 @@ class SunMask(object):
         # self.lon = np.copy(other_image.lon)
         return None
 
-    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals):
+    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter):
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
 
@@ -532,10 +532,13 @@ class SunMask(object):
         # for rprop in rprops:
         #     print(rprop.label)
 
+        a_label = [36, 17, 19, 15, 37, 49]
+        b_label = [71, 86, 81, 62, 52, 36, 39, 26]
+
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (max_area == maximum_area):
+            if (rprop.label == b_label[counter]):
                 print(rprop.label)
                 print(max_area)
                 # get pixels in that region

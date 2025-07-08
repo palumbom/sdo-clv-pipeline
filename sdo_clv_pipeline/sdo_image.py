@@ -369,7 +369,7 @@ def calculate_pixel_area(lat, lon):
     return pix_area
 
 class SunMask(object):
-    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter):
+    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels):
         # check argument order/names are correct
         assert con.is_continuum()
         assert mag.is_magnetogram()
@@ -391,7 +391,7 @@ class SunMask(object):
         self.ff = np.nansum(self.w_active[con.mu >= con.mu_thresh]) / npix
 
         # identify regions
-        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter)
+        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels)
 
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix
@@ -413,7 +413,7 @@ class SunMask(object):
         # self.lon = np.copy(other_image.lon)
         return None
 
-    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter):
+    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels):
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
 
@@ -538,7 +538,7 @@ class SunMask(object):
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area                 
-            if (rprop.label == b_label[counter]):
+            if (max_area == maximum_area):
                 print(rprop.label)
                 print(max_area)
                 # get pixels in that region
@@ -562,7 +562,7 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
 
-                dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, max_area, corners, no_corners)
+                dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, max_area, corners, no_corners, moat_avg_vels)
 
                 vels.append(avg_vel_arr)
                 moat_vels.append(avg_vel_arr)
@@ -667,12 +667,14 @@ class SunMask(object):
     def is_plage(self):
         return self.regions == 6
 
-    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, max_area, corners, no_corners):
+    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, max_area, corners, no_corners, moat_avg_vels):
         
+
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
+        moat_pixels = idx_new
         
         vel_arr = np.array(dop.v_corr[idx_new])
         avg_vel = np.average(vel_arr)
@@ -703,6 +705,7 @@ class SunMask(object):
             
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
+            moat_pixels = np.logical_xor(moat_pixels, idx_new)
     
             vel_arr = np.array(dop.v_corr[idx_new]) 
             avg_vel = np.average(vel_arr)
@@ -718,6 +721,12 @@ class SunMask(object):
 
             dilation_count += 1 # update dilation count
             prev_dilation = np.logical_or(idx_new, prev_dilation)
+            
+        # get average velocity of whole moat
+        tot_vel_arr = np.array(dop.v_corr[moat_pixels])
+        tot_avg_vel = np.average(tot_vel_arr)
+        moat_avg_vels.append(tot_avg_vel)
+
 
         moat = np.logical_xor(prev_dilation, max_area_idx)
         dilated_spots.append(moat)
@@ -731,9 +740,9 @@ class SunMask(object):
             for n in avg_mag_arr:
                 n = -1*n
                 inv_mag_arr.append(n)
-            return (dilation_arr, avg_vel_arr, inv_mag_arr, avg_int_arr, dilated_spots)
+            return (dilation_arr, avg_vel_arr, inv_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels)
         else:
-            return (dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots)
+            return (dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels)
 
     
     # def plot_vel(dilated_spots, self, dop, max_area_idx, max_area, corners, no_corners):  

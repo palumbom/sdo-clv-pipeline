@@ -674,7 +674,7 @@ class SunMask(object):
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
-        moat_pixels = idx_new
+        
         
         vel_arr = np.array(dop.v_corr[idx_new])
         avg_vel = np.average(vel_arr)
@@ -705,7 +705,6 @@ class SunMask(object):
             
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
-            moat_pixels = np.logical_xor(moat_pixels, idx_new)
     
             vel_arr = np.array(dop.v_corr[idx_new]) 
             avg_vel = np.average(vel_arr)
@@ -721,6 +720,7 @@ class SunMask(object):
 
             dilation_count += 1 # update dilation count
             prev_dilation = np.logical_or(idx_new, prev_dilation)
+            moat_pixels = np.logical_and(prev_dilation, idx_new)
             
         # get average velocity of whole moat
         tot_vel_arr = np.array(dop.v_corr[moat_pixels])

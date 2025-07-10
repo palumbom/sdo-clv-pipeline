@@ -178,7 +178,7 @@ def plot_avg_vel (moat_avg_vels, moat_thetas):
     plt.scatter(moat_thetas, moat_avg_vels)
     plt.xlabel("Theta (rad)")
     plt.ylabel("Moat Total Average Velocity (m/s)")
-    plt.title("Avergae Velocity of Moat vs Theta")
+    plt.title("Average Velocity of Moat vs Theta")
     plt.tight_layout()
     plt.show()
 

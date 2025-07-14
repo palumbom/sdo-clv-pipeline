@@ -122,7 +122,10 @@ def plot_loop(moat_vals, moat_dilations, moat_thetas, moat_areas):
             # print(moat_thetas[i])
             color = cmap(norm(moat_thetas[i]))
             #label = ascii_letters[i%52]
-            label = f"{moat_thetas[i]:.3f}"
+            if moat_vals[5][i] == 1:
+                label = f"*{moat_thetas[i]:.3f}"
+            else:
+                label = f"{moat_thetas[i]:.3f}"
             letters.append(label)
             plt.plot(moat_dilations[i], moat_vals[j][i], color = color)
             # marker
@@ -173,9 +176,15 @@ def plot_loop(moat_vals, moat_dilations, moat_thetas, moat_areas):
         #     plt.title("Average Intensity vs # of Dilations")
         # plt.show()
 
-def plot_avg_vel (moat_avg_vels, moat_thetas):
-            
-    plt.scatter(moat_thetas, moat_avg_vels)
+def plot_avg_vel (moat_avg_vels, moat_thetas, moat_vals):
+    
+    for i in range (0, len(moat_thetas)):
+            if moat_vals[5][i] == 1:
+                label = f"*{moat_thetas[i]:.3f}"
+            else:
+                label = f"{moat_thetas[i]:.3f}"
+            plt.scatter(moat_thetas, moat_avg_vels)
+            plt.text(moat_thetas[i], moat_avg_vels[i], f' {label}', fontsize=7)
     plt.xlabel("Theta (rad)")
     plt.ylabel("Moat Total Average Velocity (m/s)")
     plt.title("Average Velocity of Moat vs Theta")

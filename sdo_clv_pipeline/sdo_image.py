@@ -622,7 +622,8 @@ class SunMask(object):
         load_and_plot()
         #plot_loop()
 
-        moat_pixels = np.any(dilated_spots, axis=0).astype(int)
+        # set moat pixels
+        moat_pixels = np.any(dilated_spots, axis=0).astype(bool)
         print("len moat pixels=", len(moat_pixels))
         print("shape moat pixels=", np.shape(moat_pixels))
         self.regions[moat_pixels] = 7 # moat
@@ -718,7 +719,7 @@ class SunMask(object):
         # y axis
         current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx) 
-        while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.9):
+        while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.97):
             if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
                 current_floor = np.floor((0.209)* (dilation_count +3))
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners

@@ -161,9 +161,9 @@ def plot_mask(mask, outdir=None, fname=None):
     mask_copy[mask_copy >= 3] -= 1
 
     # get cmap
-    cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white"])
+    cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white", "blue"])
     cmap.set_bad(color="white")
-    norm = colors.BoundaryNorm([0, 1, 2, 3, 4, 5], ncolors=cmap.N, clip=True)
+    norm = colors.BoundaryNorm([0, 1, 2, 3, 4, 5, 6], ncolors=cmap.N, clip=True)
 
     # get the WCS
     wcs = mask.wcs
@@ -175,8 +175,8 @@ def plot_mask(mask, outdir=None, fname=None):
     sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
                                                                  color="k", alpha=0.5, ls="--", lw=0.5)
     limb = ax1.contour(mask.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
-    clb = fig.colorbar(img, ticks=[0.5, 1.5, 2.5, 3.5, 4.5])
-    clb.ax.set_yticklabels([r"${\rm Umbra}$", r"${\rm Penumbra}$", r"${\rm Quiet\ Sun}$", r"${\rm Network}$", r"${\rm Plage}$"])
+    clb = fig.colorbar(img, ticks=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5])
+    clb.ax.set_yticklabels([r"${\rm Umbra}$", r"${\rm Penumbra}$", r"${\rm Quiet\ Sun}$", r"${\rm Network}$", r"${\rm Plage}$", r"${\rm Moat}$"])
     ax1.invert_xaxis()
     ax1.invert_yaxis()
     ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")

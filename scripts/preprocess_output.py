@@ -8,6 +8,7 @@ import pandas as pd
 
 from sdo_clv_pipeline.paths import root
 
+
 def mask_all_zero_rows(df, return_idx=False):
     idx = (df.v_hat == 0.0) & (df.v_phot == 0.0) & (df.v_conv == 0.0) & (df.v_quiet == 0.0)
     if return_idx:
@@ -64,7 +65,7 @@ if not os.path.isdir(datadir + "processed/"):
 outdir = datadir + "processed/"
 
 # read in and sort by mjd
-df_all = pd.read_csv(datadir + "region_output.csv")
+df_all = pd.read_csv(datadir + "\\region_output.csv")
 df_all.sort_values(by=["mjd", "region", "lo_mu"], inplace=True)
 df_all.drop_duplicates()
 df_all.reset_index(drop=True, inplace=True)

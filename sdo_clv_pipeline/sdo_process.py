@@ -17,7 +17,12 @@ import multiprocessing as mp
 def is_quality_data(sdo_image):
     return sdo_image.quality == 0
 
-def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False):
+def reduce_sdo_images(
+    con_file, mag_file, dop_file, aia_file,
+    moat_vels, moat_mags, moat_ints, moat_dilations,
+    moat_thetas, moat_areas, moat_vals, counter,
+    moat_avg_vels, symbol, mu_thresh=0.1
+):
     assert exists(con_file)
     assert exists(mag_file)
     assert exists(dop_file)
@@ -76,7 +81,7 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
 
     # identify regions for thresholding
     try:
-        mask = SunMask(con, mag, dop, aia)
+        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol)
         mask.mask_low_mu(mu_thresh)
     except:
         print("\t >>> Region identification failed, skipping " + iso, flush=True)
@@ -84,7 +89,7 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
 
     return con, mag, dop, aia, mask
 
-def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False):
+def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, mu_thresh=0.1, fit_cbs=False):
     assert exists(con_file)
     assert exists(mag_file)
     assert exists(aia_file)
@@ -134,8 +139,9 @@ def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1
 
     # identify regions for thresholding
     try:
-        mask = SunMask(con, mag, dop, aia)
+        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol)
         mask.mask_low_mu(mu_thresh)
+        counter += 1
     except:
         print("\t >>> Region identification failed, skipping " + iso, flush=True)
         return None
@@ -150,10 +156,10 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
     return None
 
 
-def process_data_set(con_file, mag_file, dop_file, aia_file,
+def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, 
                      mu_thresh=0.1, n_rings=10, suffix=None, datadir=None):
 
-    # figure out data directories
+    #figure out data directories
     if not isdir(datadir):
         os.mkdir(datadir)
 
@@ -176,9 +182,11 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
 
     # reduce the data set
     try:
-        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file,
-                                                     dop_file, aia_file,
-                                                      mu_thresh=mu_thresh)
+        con, mag, dop, aia, mask = reduce_sdo_images(
+    con_file, mag_file, dop_file, aia_file,
+    moat_vels, moat_mags, moat_ints, moat_dilations,
+    moat_thetas, moat_areas, moat_vals, counter,
+    moat_avg_vels, symbol)
     except:
         return None
 
@@ -210,6 +218,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
 
     # loop over the mu annuli
     mu_grid = np.linspace(mu_thresh, 1.0, n_rings)
+
     regions = [1, 2, 2.5, 3, 4, 5, 6, 7]
     for j in range(n_rings-1):
         # mu values for annuli

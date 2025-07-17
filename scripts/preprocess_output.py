@@ -87,6 +87,7 @@ idx = dist[dist > 2.0 * v_conv_rolling_std].index
 """
 
 # make dfs by mu
+moat = df_all[df_all.region == 7.0]
 plage = df_all[df_all.region == 6.0]
 network = df_all[df_all.region == 5.0]
 quiet_sun = df_all[df_all.region == 4.0]
@@ -96,6 +97,12 @@ blu_penumbrae = df_all[df_all.region == 2.0]
 umbrae = df_all[df_all.region == 1.0]
 
 # mask rows where all vels are 0.0 (i.e., region isn't present in that annulus)
+moat = mask_all_zero_rows(moat)
+moat.reset_index(drop=True, inplace=True)
+moat.to_csv(outdir + "moat.csv", index=False)
+# moat_daily = daily_bin(moat)
+# moat_daily.to_csv(outdir + "moat_daily.csv", index=False)
+
 plage = mask_all_zero_rows(plage)
 plage.reset_index(drop=True, inplace=True)
 plage.to_csv(outdir + "plage.csv", index=False)
@@ -137,3 +144,5 @@ umbrae.reset_index(drop=True, inplace=True)
 umbrae.to_csv(outdir + "umbrae.csv", index=False)
 # umbrae_daily = daily_bin(umbrae)
 # umbrae_daily.to_csv(outdir + "umbrae_daily.csv", index=False)
+
+

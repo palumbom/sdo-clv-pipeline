@@ -721,7 +721,7 @@ class SunMask(object):
         # y axis
         current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx) 
-        while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.97):
+        while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.55):
             if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
                 current_floor = np.floor((0.209)* (dilation_count +3))
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners

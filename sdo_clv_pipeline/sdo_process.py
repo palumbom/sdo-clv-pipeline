@@ -182,8 +182,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
         fname1 = tmpdir + "thresholds_" + suffix + ".csv"
         fname2 = tmpdir + "region_output_" + suffix + ".csv"
 
-        # check if the files exist, create otherwise
-        for file in (fname1, fname2):
+    # check if the files exist, create otherwise
+    for file in (fname1, fname2):
             if not exists(file):
                 create_file(file)
 

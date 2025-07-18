@@ -371,6 +371,8 @@ def calculate_pixel_area(lat, lon):
 class SunMask(object):
     def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol):
         # check argument order/names are correct
+        print("Entered SunMask.__init__")
+        
         assert con.is_continuum()
         assert mag.is_magnetogram()
         assert dop.is_dopplergram()

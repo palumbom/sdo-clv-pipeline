@@ -21,7 +21,7 @@ def reduce_sdo_images(
     con_file, mag_file, dop_file, aia_file,
     moat_vels, moat_mags, moat_ints, moat_dilations,
     moat_thetas, moat_areas, moat_vals, counter,
-    moat_avg_vels, symbol, mu_thresh=0.1
+    moat_avg_vels, symbol, mu_thresh=0.1, fit_cbs=False
 ):
     assert exists(con_file)
     assert exists(mag_file)
@@ -63,24 +63,31 @@ def reduce_sdo_images(
         return None
 
     # correct magnetogram for foreshortening
+    print("correct mag")
     mag.correct_magnetogram()
 
     # calculate differential rot., meridional circ., obs. vel, grav. redshift, cbs
+    print("correct dop")
     dop.correct_dopplergram(fit_cbs=fit_cbs)
 
     # check that the dopplergram correction went well
+    print("checking")
     if np.nanmax(np.abs(dop.v_rot)) < 1000.0:
         print("\t >>> Dopplergram correction failed, skipping " + iso, flush=True)
         return None
-
+    
+    print("set to nan")
     # set values to nan for mu less than mu_thresh
     con.mask_low_mu(mu_thresh)
     dop.mask_low_mu(mu_thresh)
     mag.mask_low_mu(mu_thresh)
     aia.mask_low_mu(mu_thresh)
 
+    print("mask")
+
     # identify regions for thresholding
     try:
+        print("About to construct SunMask")
         mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol)
         mask.mask_low_mu(mu_thresh)
     except:

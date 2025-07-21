@@ -30,6 +30,7 @@ def find_data(indir, globexp=""):
     mag_files, mag_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.m_720s.{globexp}*.magnetogram.fits")))
     dop_files, dop_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.v_720s.{globexp}*.Dopplergram.fits")))
     aia_files, aia_dates = sort_data(glob.glob(os.path.join(indir, f"aia_lev1_1700a_{globexp}*t*_image_lev1*")))
+    # aia_files, aia_dates = sort_data(glob.glob(indir + "*aia*" + globexp + ".fits"))
 
     print("File counts:")
     print("CON:", len(con_dates))

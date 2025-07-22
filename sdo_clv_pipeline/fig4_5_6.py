@@ -11,7 +11,7 @@ import pandas as pd
 paths = os.path.abspath(os.path.join(os.getcwd(), "..", "data"))
 plotdir = os.path.join(paths, "figures")
 os.makedirs(plotdir, exist_ok=True)
-datadir = os.path.join(paths, "data")
+datadir = paths
 os.makedirs(datadir, exist_ok=True)
 staticdir = os.path.join(paths, "static")
 os.makedirs(staticdir, exist_ok=True)
@@ -21,11 +21,12 @@ project = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)
 src_dir = os.path.join(project, "src")
 scripts_dir = os.path.join(project, "scripts")
 
-# plt.style.use(os.path.join(src_dir, "my.mplstyle"))
-# plt.ioff()
 
 with open(os.path.join(scripts_dir, "preprocess_output.py")) as f:
     exec(f.read())
+
+# plt.style.use(os.path.join(src_dir, "my.mplstyle"))
+# plt.ioff()
 
 # # use style
 # plt.style.use(str(paths.src) + "/" + "my.mplstyle"); plt.ioff()

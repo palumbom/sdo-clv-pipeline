@@ -7,17 +7,31 @@ import os, sys, pdb, csv, glob
 import pandas as pd
 
 # get paths
-from showyourwork.paths import user as Paths
-paths = Paths()
-plotdir = str(paths.figures) + "/"
-datadir = str(paths.data) + "/"
-staticdir = str(paths.static) + "/"
+# from showyourwork.paths import user as Paths
+paths = os.path.abspath(os.path.join(os.getcwd(), "..", "data"))
+plotdir = os.path.join(paths, "figures")
+os.makedirs(plotdir, exist_ok=True)
+datadir = os.path.join(paths, "data")
+os.makedirs(datadir, exist_ok=True)
+staticdir = os.path.join(paths, "static")
+os.makedirs(staticdir, exist_ok=True)
 
-# use style
-plt.style.use(str(paths.src) + "/" + "my.mplstyle"); plt.ioff()
+project = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-# consolidate output
-exec(open(str(paths.scripts) + "/" + "preprocess_output.py").read())
+src_dir = os.path.join(project, "src")
+scripts_dir = os.path.join(project, "scripts")
+
+# plt.style.use(os.path.join(src_dir, "my.mplstyle"))
+# plt.ioff()
+
+with open(os.path.join(scripts_dir, "preprocess_output.py")) as f:
+    exec(f.read())
+
+# # use style
+# plt.style.use(str(paths.src) + "/" + "my.mplstyle"); plt.ioff()
+
+# # consolidate output
+# exec(open(str(paths.scripts) + "/" + "preprocess_output.py").read())
 
 # get color palette (seaborn colorblind hex)
 colors = ['#0173b2', '#de8f05', '#029e73', '#d55e00', '#cc78bc',

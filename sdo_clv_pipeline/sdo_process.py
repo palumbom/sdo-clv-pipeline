@@ -176,11 +176,11 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
         fname2 = os.path.join(datadir, "region_output.csv")
     else:
         # make tmp directory
-        tmpdir = datadir + "tmp/"
+        tmpdir = os.path.join(datadir,"tmp/")
 
         # filenames
-        fname1 = tmpdir + "thresholds_" + suffix + ".csv"
-        fname2 = tmpdir + "region_output_" + suffix + ".csv"
+        fname1 = os.path.join(tmpdir, "thresholds_", suffix, ".csv")
+        fname2 = os.apth.join(tmpdir, "region_output_", suffix, ".csv")
 
     # check if the files exist, create otherwise
     for file in (fname1, fname2):

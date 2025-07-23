@@ -56,16 +56,20 @@ def daily_bin(df):
     return df_out
 
 # sort out paths
-datadir = str(root / "data") + "/"
+datadir = os.path.abspath(os.path.join(os.getcwd(), "..", "data"))
 
 # make directory for processed output
-if not os.path.isdir(datadir + "processed/"):
-    os.mkdir(datadir + "processed/")
+if not os.path.isdir(os.path.join(datadir, "processed")):
+    os.mkdir(os.path.join(datadir, "processed"))
 
-outdir = datadir + "processed/"
+outdir = os.path.join(datadir, "processed")
+
+print(datadir)
+print(outdir)
 
 # read in and sort by mjd
-df_all = pd.read_csv(datadir + "\\region_output.csv")
+# df_all = pd.read_csv(os.path.join(datadir, "region_output.csv"))
+df_all = pd.read_csv("C:\\Users\\srugi\\Documents\\sdo-clv-pipeline\\data\\region_output.csv")
 df_all.sort_values(by=["mjd", "region", "lo_mu"], inplace=True)
 df_all.drop_duplicates()
 df_all.reset_index(drop=True, inplace=True)
@@ -73,7 +77,7 @@ df_all.reset_index(drop=True, inplace=True)
 # get full disk only
 df_full_disk = df_all[(np.isnan(df_all.lo_mu)) & np.isnan(df_all.region)]
 df_full_disk.reset_index(drop=True, inplace=True)
-df_full_disk.to_csv(outdir + "full_disk.csv", index=False)
+df_full_disk.to_csv(os.path.join(outdir, "full_disk.csv"), index=False)
 # full_disk_daily = daily_bin(df_full_disk)
 # full_disk_daily.to_csv(outdir + "full_disk_daily.csv", index=False)
 
@@ -100,49 +104,49 @@ umbrae = df_all[df_all.region == 1.0]
 # mask rows where all vels are 0.0 (i.e., region isn't present in that annulus)
 moat = mask_all_zero_rows(moat)
 moat.reset_index(drop=True, inplace=True)
-moat.to_csv(outdir + "moat.csv", index=False)
+moat.to_csv(os.path.join(outdir, "moat.csv"), index=False)
 # moat_daily = daily_bin(moat)
 # moat_daily.to_csv(outdir + "moat_daily.csv", index=False)
 
 plage = mask_all_zero_rows(plage)
 plage.reset_index(drop=True, inplace=True)
-plage.to_csv(outdir + "plage.csv", index=False)
+plage.to_csv(os.path.join(outdir, "plage.csv"), index=False)
 # plage_daily = daily_bin(plage)
 # plage_daily.to_csv(outdir + "plage_daily.csv", index=False)
 
 network = mask_all_zero_rows(network)
 network.reset_index(drop=True, inplace=True)
-network.to_csv(outdir + "network.csv", index=False)
+network.to_csv(os.path.join(outdir, "network.csv"), index=False)
 # network_daily = daily_bin(network)
 # network_daily.to_csv(outdir + "network_daily.csv", index=False)
 
 quiet_sun = mask_all_zero_rows(quiet_sun)
 quiet_sun.reset_index(drop=True, inplace=True)
-quiet_sun.to_csv(outdir + "quiet_sun.csv", index=False)
+quiet_sun.to_csv(os.path.join(outdir, "quiet_sun.csv"), index=False)
 # quiet_sun_daily = daily_bin(quiet_sun)
 # quiet_sun_daily.to_csv(outdir + "quiet_sun_daily.csv", index=False)
 
 red_penumbrae = mask_all_zero_rows(red_penumbrae)
 red_penumbrae.reset_index(drop=True, inplace=True)
-red_penumbrae.to_csv(outdir + "red_penumbrae.csv", index=False)
+red_penumbrae.to_csv(os.path.join(outdir, "red_penumbrae.csv"), index=False)
 # red_penumbrae_daily = daily_bin(red_penumbrae)
 # red_penumbrae_daily.to_csv(outdir + "red_penumbrae_daily.csv", index=False)
 
 all_penumbrae = mask_all_zero_rows(all_penumbrae)
 all_penumbrae.reset_index(drop=True, inplace=True)
-all_penumbrae.to_csv(outdir + "penumbrae.csv", index=False)
+all_penumbrae.to_csv(os.path.join(outdir, "penumbrae.csv"), index=False)
 # all_penumbrae_daily = daily_bin(all_penumbrae)
 # all_penumbrae_daily.to_csv(outdir + "penumbrae_daily.csv", index=False)
 
 blu_penumbrae = mask_all_zero_rows(blu_penumbrae)
 blu_penumbrae.reset_index(drop=True, inplace=True)
-blu_penumbrae.to_csv(outdir + "blu_penumbrae.csv", index=False)
+blu_penumbrae.to_csv(os.path.join(outdir, "blu_penumbrae.csv"), index=False)
 # blu_penumbrae_daily = daily_bin(blu_penumbrae)
 # blu_penumbrae_daily.to_csv(outdir + "blu_penumbrae_daily.csv", index=False)
 
 umbrae = mask_all_zero_rows(umbrae)
 umbrae.reset_index(drop=True, inplace=True)
-umbrae.to_csv(outdir + "umbrae.csv", index=False)
+umbrae.to_csv(os.path.join(outdir, "umbrae.csv"), index=False)
 # umbrae_daily = daily_bin(umbrae)
 # umbrae_daily.to_csv(outdir + "umbrae_daily.csv", index=False)
 

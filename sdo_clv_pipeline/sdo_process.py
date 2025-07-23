@@ -172,8 +172,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
 
     # name output files
     if suffix is None:
-        fname1 = datadir + "thresholds.csv"
-        fname2 = datadir + "region_output.csv"
+        fname1 = os.path.join(datadir, "thresholds.csv")
+        fname2 = os.path.join(datadir, "region_output.csv")
     else:
         # make tmp directory
         tmpdir = datadir + "tmp/"

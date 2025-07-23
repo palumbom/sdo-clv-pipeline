@@ -9,12 +9,15 @@ import pandas as pd
 # get paths
 # from showyourwork.paths import user as Paths
 paths = os.path.abspath(os.path.join(os.getcwd(), "..", "data"))
+print(paths)
 plotdir = os.path.join(paths, "figures")
 os.makedirs(plotdir, exist_ok=True)
 datadir = paths
 os.makedirs(datadir, exist_ok=True)
-staticdir = os.path.join(paths, "static")
-os.makedirs(staticdir, exist_ok=True)
+
+datafile = 'C:\\Users\\srugi\\Documents\\sdo-clv-pipeline\\data\\region_output.csv'
+# staticdir = os.path.join(paths, "static")
+# os.makedirs(staticdir, exist_ok=True)
 
 project = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
@@ -22,8 +25,8 @@ src_dir = os.path.join(project, "src")
 scripts_dir = os.path.join(project, "scripts")
 
 
-with open(os.path.join(scripts_dir, "preprocess_output.py")) as f:
-    exec(f.read())
+# with open(datafile) as f:
+#     exec(f.read())
 
 # plt.style.use(os.path.join(src_dir, "my.mplstyle"))
 # plt.ioff()
@@ -45,6 +48,7 @@ rp_color = "tab:red" # colors[3]
 bp_color = "tab:blue" # colors[9]
 pu_color = "sienna" # colors[5]
 um_color = "tab:gray" # colors[7]
+mt_color = "tab:green" 
 
 pl_marker = "s"
 nw_marker = "p"
@@ -53,6 +57,7 @@ rp_marker = "v"
 bp_marker = "^"
 pu_marker = "X"
 um_marker = "D"
+mt_marker = "*"
 
 
 def calc_region_stats(region_df, colname="v_hat"):
@@ -74,18 +79,19 @@ def calc_region_stats(region_df, colname="v_hat"):
         reg_avg[i] = np.mean(region_df[colname][idx])
         reg_std[i] = np.std(region_df[colname][idx])
         reg_err[i] = reg_avg[i]/np.sqrt(len(region_df[colname][idx]))
-    return reg_avg, reg_std, reg_err
+    return reg_avg, reg_std, np.abs(reg_err)
 
 # read in by region
-df_vels_full = pd.read_csv(datadir + "full_disk.csv")
-plage = pd.read_csv(datadir + "plage.csv")
-network = pd.read_csv(datadir + "network.csv")
-quiet_sun = pd.read_csv(datadir + "quiet_sun.csv")
-penumbrae = pd.read_csv(datadir + "penumbrae.csv")
-red_penumbrae = pd.read_csv(datadir + "red_penumbrae.csv")
-blu_penumbrae = pd.read_csv(datadir + "blu_penumbrae.csv")
-umbrae = pd.read_csv(datadir + "umbrae.csv")
-moat = pd.read_csv(datadir + "moat.csv")
+df_vels_full = pd.read_csv(os.path.join(datadir, "processed", "full_disk.csv"))
+# print(df_vels_full)
+plage = pd.read_csv(os.path.join(datadir, "processed", "plage.csv"))
+network = pd.read_csv(os.path.join(datadir, "processed", "network.csv"))
+quiet_sun = pd.read_csv(os.path.join(datadir, "processed", "quiet_sun.csv"))
+penumbrae = pd.read_csv(os.path.join(datadir, "processed", "penumbrae.csv"))
+red_penumbrae = pd.read_csv(os.path.join(datadir, "processed", "red_penumbrae.csv"))
+blu_penumbrae = pd.read_csv(os.path.join(datadir, "processed", "blu_penumbrae.csv"))
+umbrae = pd.read_csv(os.path.join(datadir, "processed", "umbrae.csv"))
+moat = pd.read_csv(os.path.join(datadir, "processed", "moat.csv"))
 
 # get centers of mu bins
 lo_mus = np.unique(plage.lo_mu)
@@ -118,7 +124,7 @@ def clv_plot(fname=None):
 
 
     # write out table
-    tabfile1 = datadir + ("v_hat_table.tex")
+    tabfile1 = os.path.join(datadir, "processed", "v_hat_table.tex")
     df_v_hat = pd.DataFrame()
     df_v_hat["mu"] = np.round(mu_bin, decimals=2)
     df_v_hat["v_avg_qs"] = np.round(quiet_sun_avg, decimals=2)
@@ -131,9 +137,9 @@ def clv_plot(fname=None):
     df_v_hat["v_std_um"] = np.round(umbrae_std, decimals=2)
     df_v_hat["v_avg_pu"] = np.round(penumbrae_avg, decimals=2)
     df_v_hat["v_std_pu"] = np.round(penumbrae_std, decimals=2)
-    df_v_hat["v_avg_pu"] = np.round(moat_avg, decimals=2)
-    df_v_hat["v_std_pu"] = np.round(moat_std, decimals=2)
-    df_v_hat.to_latex(buf=tabfile1, na_rep="-", index=False, float_format="%.2f")
+    df_v_hat["v_avg_mt"] = np.round(moat_avg, decimals=2)
+    df_v_hat["v_std_mt"] = np.round(moat_std, decimals=2)
+    # df_v_hat.to_latex(buf=tabfile1, na_rep="-", index=False, float_format="%.2f")
 
     # polyfit each of them
     mu_fit = np.linspace(0.15, 0.95, num=100)
@@ -157,7 +163,7 @@ def clv_plot(fname=None):
     moat_fit = np.polyfit(mu_bin, moat_avg, w=moat_wts, deg=5)
 
     # plot v_hat
-    axs[0,0].errorbar(mu_bin, quiet_sun_avg, yerr=quiet_sun_err, fmt=qs_marker, capsize=capsize,
+    axs[0,0].errorbar(mu_bin, quiet_sun_avg, yerr=np.abs(quiet_sun_err), fmt=qs_marker, capsize=capsize,
                       capthick=capthick, elinewidth=elinewidth, color=qs_color, label=r"${\rm Quiet\ Sun}$")
     axs[0,0].fill_between(mu_bin, quiet_sun_avg - quiet_sun_std, quiet_sun_avg + quiet_sun_std, color=qs_color, alpha=0.5)
     # axs[0,0].plot(mu_fit, np.polyval(qs_fit, mu_fit), color=qs_color, ls="--")
@@ -191,9 +197,9 @@ def clv_plot(fname=None):
     axs[1,0].fill_between(mu_bin, umbrae_avg - umbrae_std, umbrae_avg + umbrae_std, color=um_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(umbrae_fit, mu_fit), color=um_color, ls="--")
 
-    axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=um_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=um_color, label=r"${\rm Moat}$")
-    axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=um_color, alpha=0.4)
+    axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+                      capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
     # get stats for v_conv
@@ -206,7 +212,7 @@ def clv_plot(fname=None):
     plage_avg, plage_std, plage_err = calc_region_stats(plage, colname="v_conv")
     moat_avg, moat_std, moat_err = calc_region_stats(moat, colname="v_conv")
 
-    tabfile2 = datadir + ("v_conv_table.tex")
+    tabfile2 = os.path.join(datadir, "v_conv_table.tex")
     df_v_conv = pd.DataFrame()
     df_v_conv["mu"] = mu_bin
     df_v_conv["v_avg_nw"] = network_avg
@@ -217,9 +223,9 @@ def clv_plot(fname=None):
     df_v_conv["v_std_um"] = umbrae_std
     df_v_conv["v_avg_pu"] = penumbrae_avg
     df_v_conv["v_std_pu"] = penumbrae_std
-    df_v_conv["v_avg_pu"] = moat_avg
-    df_v_conv["v_std_pu"] = moat_std
-    df_v_conv.to_latex(buf=tabfile2, na_rep="-", index=False, float_format="%.2f")
+    df_v_conv["v_avg_mt"] = moat_avg
+    df_v_conv["v_std_mt"] = moat_std
+    # df_v_conv.to_latex(buf=tabfile2, na_rep="-", index=False, float_format="%.2f")
 
     # polyfit each of them
     umbrae_wts = 1.0 / (umbrae_std)
@@ -270,9 +276,9 @@ def clv_plot(fname=None):
     axs[1,1].fill_between(mu_bin, umbrae_avg - umbrae_std, umbrae_avg + umbrae_std, color=um_color, alpha=0.4)
     # axs[1,1].plot(mu_fit, np.polyval(umbrae_fit, mu_fit), color=um_color, ls="--")
 
-    axs[1,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=um_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=um_color, label=r"${\rm Moat}$")
-    axs[1,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=um_color, alpha=0.4)
+    axs[1,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+                 capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    axs[1,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
     # axs[1,1].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
 
@@ -310,7 +316,7 @@ def clv_plot(fname=None):
                handletextpad=0.15, bbox_to_anchor=(0.51, 0.95))
 
     # save the figure
-    plt.savefig(plotdir + fname, bbox_inches="tight")
+    plt.savefig(os.path.join(plotdir, fname), bbox_inches="tight")
     plt.clf(); plt.close()
     return None
 
@@ -424,7 +430,7 @@ for i in range(n_mu_samps):
 # save the figure
 fig.supxlabel(xlabel, fontsize=16, y=0.04)
 fig.supylabel(r"${\rm Probability\ Density}$", fontsize=16, x=0.05)
-fig.savefig(plotdir + "fig5.pdf", bbox_inches="tight")
+fig.savefig(os.path.join(plotdir, "fig5.pdf"), bbox_inches="tight")
 plt.clf(); plt.close()
 
 # create figure objects
@@ -495,5 +501,5 @@ for i in range(n_mu_samps):
 # set axes labels
 fig.supxlabel(xlabel, fontsize=16)
 fig.supylabel(r"${\rm Probability\ Density}$", fontsize=16, x=0.05)
-fig.savefig(plotdir + "fig6.pdf", bbox_inches="tight")
+fig.savefig(os.path.join(plotdir, "fig6.pdf"), bbox_inches="tight")
 plt.clf(); plt.close()

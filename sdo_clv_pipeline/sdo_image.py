@@ -698,8 +698,6 @@ class SunMask(object):
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
         idx_new = np.logical_and(idx_new, self.regions != 1)
-        # moat_pixels = idx_new
-        
         
         vel_arr = np.array(dop.v_corr[idx_new])
         avg_vel = np.average(vel_arr)
@@ -721,7 +719,7 @@ class SunMask(object):
         # y axis
         current_floor = 0
         prev_dilation = np.logical_or(idx_new, max_area_idx) 
-        while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.65):
+        while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.97):
             if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
                 current_floor = np.floor((0.209)* (dilation_count +3))
                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
@@ -730,7 +728,6 @@ class SunMask(object):
             
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)
-            # moat_pixels = np.logical_or(moat_pixels, idx_new)
     
             vel_arr = np.array(dop.v_corr[idx_new]) 
             avg_vel = np.average(vel_arr)
@@ -747,7 +744,7 @@ class SunMask(object):
             dilation_count += 1 # update dilation count
             prev_dilation = np.logical_or(idx_new, prev_dilation)
             # moat_pixels = np.logical_and(prev_dilation, idx_new)
-            
+
         # get average velocity of whole moat
         # tot_vel_arr = np.array(dop.v_corr[moat_pixels])
         # tot_avg_vel = np.average(tot_vel_arr)
@@ -757,6 +754,67 @@ class SunMask(object):
         # tot_vel_arr = np.array(dop.v_corr[moat])
         # tot_avg_vel = np.average(tot_vel_arr)
         # moat_avg_vels.append(tot_avg_vel)
+
+        # redo dilation if overlapping moat
+        if np.any(np.logical_and(moat, np.any(dilated_spots, axis=0))):
+            # first dilation
+            dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
+            idx_new = np.logical_and(dilated_idx, self.regions != 2)
+            idx_new = np.logical_and(idx_new, self.regions != 1)
+            
+            vel_arr = np.array(dop.v_corr[idx_new])
+            avg_vel = np.average(vel_arr)
+            avg_vel_arr = []
+
+            mag_arr = np.array(mag.image[idx_new])
+            avg_mag = np.average(mag_arr)
+            avg_mag_arr = []
+
+            int_arr = np.array(con.image[idx_new])
+            avg_int = np.average(int_arr)
+            avg_int_arr = []
+
+            avg_mag_arr.append(avg_mag)
+            avg_vel_arr.append(avg_vel)
+            avg_int_arr.append(avg_int)
+            dilation_count = 1
+
+            # y axis
+            current_floor = 0
+            prev_dilation = np.logical_or(idx_new, max_area_idx) 
+            while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.65):
+                if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
+                    current_floor = np.floor((0.209)* (dilation_count +3))
+                    new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
+                else:
+                    new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
+                
+                idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
+                idx_new = np.logical_and(idx_new, self.regions != 1)
+        
+                vel_arr = np.array(dop.v_corr[idx_new]) 
+                avg_vel = np.average(vel_arr)
+                avg_vel_arr.append(avg_vel)
+
+                mag_arr = np.array(mag.image[idx_new]) 
+                avg_mag = np.average(mag_arr)
+                avg_mag_arr.append(avg_mag)
+
+                int_arr = np.array(con.image[idx_new]) 
+                avg_int = np.average(int_arr)
+                avg_int_arr.append(avg_int)
+
+                dilation_count += 1 # update dilation count
+                prev_dilation = np.logical_or(idx_new, prev_dilation)
+                # moat_pixels = np.logical_and(prev_dilation, idx_new)
+
+            # get average velocity of whole moat
+            # tot_vel_arr = np.array(dop.v_corr[moat_pixels])
+            # tot_avg_vel = np.average(tot_vel_arr)
+            # moat_avg_vels.append(tot_avg_vel)
+
+            moat = np.logical_xor(prev_dilation, max_area_idx)
+
         dilated_spots.append(moat)
 
         # set-up x axis for dilations plots

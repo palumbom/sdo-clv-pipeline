@@ -104,6 +104,8 @@ lo_mus = np.unique(plage.lo_mu)
 hi_mus = np.unique(plage.hi_mu)
 mu_bin = (lo_mus + hi_mus) / 2.0
 
+print(np.unique(left_moat.lo_mu))
+
 # plot red/blue
 plot_rb = False
 
@@ -306,12 +308,12 @@ def clv_plot(fname=None):
 
     axs[0,1].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
                  capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
-    axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=lm_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
     axs[0,1].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
                  capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Right Moat}$")
-    axs[0,1].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=mt_color, alpha=0.4)
+    axs[0,1].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
 
@@ -556,6 +558,8 @@ for i in range(n_mu_samps):
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
     #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
+    axs[1,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
+    axs[1,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
 
     # label stuff
     # axs[1,i].set_xlabel(xlabel)
@@ -574,30 +578,30 @@ for i in range(n_mu_samps):
 for i in range(n_mu_samps):
     axs[1,i].set_ylim(0.0, np.max(ylims))
 
-# loop over values
-ylims = np.zeros(n_mu_samps)
-for i in range(n_mu_samps):
-    # do all regs
-    idx6 = left_moat.lo_mu == mu_samps[i]
-    idx7 = right_moat.lo_mu == mu_samps[i]
+# # loop over values
+# ylims = np.zeros(n_mu_samps)
+# for i in range(n_mu_samps):
+#     # do all regs
+#     idx6 = left_moat.lo_mu == mu_samps[i]
+#     idx7 = right_moat.lo_mu == mu_samps[i]
 
-    # plot this mu
-    axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
-    #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
+#     # plot this mu
+#     axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
+#     axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+#     #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
 
-    # label stuff
-    # axs[1,i].set_xlabel(xlabel)
-    #axs[1,i].set_xlim(-250,250)
-    axs[2,i].set_xlim(-1000,1000)
+#     # label stuff
+#     # axs[1,i].set_xlabel(xlabel)
+#     #axs[1,i].set_xlim(-250,250)
+#     axs[2,i].set_xlim(-1000,1000)
 
-    if i == n_mu_samps - 1:
-        axs[2,i].legend(fontsize=10)
+#     if i == n_mu_samps - 1:
+#         axs[2,i].legend(fontsize=10)
 
-    ylims[i] = axs[2,i].get_ylim()[1]
+#     ylims[i] = axs[2,i].get_ylim()[1]
 
-    if i > 0:
-        axs[2,i].set_yticklabels([])
+#     if i > 0:
+#         axs[2,i].set_yticklabels([])
 
 # set axes labels
 fig.supxlabel(xlabel, fontsize=16)

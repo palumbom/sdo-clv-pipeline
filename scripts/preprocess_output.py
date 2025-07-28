@@ -69,8 +69,8 @@ print(outdir)
 
 # read in and sort by mjd
 # df_all = pd.read_csv(os.path.join(datadir, "region_output.csv"))
-# df_all = pd.read_csv("C:\\Users\\srugi\\Documents\\sdo-clv-pipeline\\data\\region_output.csv")
-df_all = pd.read_csv("/Users/srugins/sdo-clv-pipeline/data/region_output.csv")
+df_all = pd.read_csv("C:\\Users\\srugi\\Documents\\sdo-clv-pipeline\\data\\region_output.csv")
+# df_all = pd.read_csv("/Users/srugins/sdo-clv-pipeline/data/region_output.csv")
 df_all.sort_values(by=["mjd", "region", "lo_mu"], inplace=True)
 df_all.drop_duplicates()
 df_all.reset_index(drop=True, inplace=True)

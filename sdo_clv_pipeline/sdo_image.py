@@ -575,6 +575,11 @@ class SunMask(object):
                 idx_new = np.logical_and(max_area_idx, self.regions != 2)
                 idx_new = np.logical_and(idx_new, self.regions != 1)
 
+                if symbol[-1] == 0:
+                    left_moat_pixels |= idx_new 
+                else:
+                    right_moat_pixels |= idx_new  
+
                 # plt.imshow(idx_new) 
                 # plt.colorbar()
                 # plt.show() # visualize that region
@@ -630,12 +635,6 @@ class SunMask(object):
         load_and_plot()
         #plot_loop()
 
-        # for i in dilated_spots:
-        #     if symbol[i] == 0:
-        #         left_moat_pixels.append(dilated_spots[i])
-        #     else:
-        #         right_moat_pixels.append(dilated_spots[i])
-
         # set moat pixels
         moat_pixels = np.any(dilated_spots, axis=0).astype(bool)
         print("len moat pixels=", len(moat_pixels))
@@ -645,8 +644,8 @@ class SunMask(object):
         # left_moat_pixels = np.any(left_moat_pixels, axis=0).astype(bool)
         # right_moat_pixels = np.any(right_moat_pixels, axis=0).astype(bool)
 
-        # self.regions[left_moat_pixels] = 8   
-        # self.regions[right_moat_pixels] = 9  
+        self.regions[left_moat_pixels] = 8   
+        self.regions[right_moat_pixels] = 9  
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0

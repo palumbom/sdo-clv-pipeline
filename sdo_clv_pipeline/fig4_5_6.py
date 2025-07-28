@@ -96,15 +96,16 @@ red_penumbrae = pd.read_csv(os.path.join(datadir, "processed", "red_penumbrae.cs
 blu_penumbrae = pd.read_csv(os.path.join(datadir, "processed", "blu_penumbrae.csv"))
 umbrae = pd.read_csv(os.path.join(datadir, "processed", "umbrae.csv"))
 moat = pd.read_csv(os.path.join(datadir, "processed", "moat.csv"))
-left_moat = pd.read_csv(os.path.join(datadir, "processed", "left_moat.csv"))
-right_moat = pd.read_csv(os.path.join(datadir, "processed", "right_moat.csv"))
+# left_moat = pd.read_csv(os.path.join(datadir, "processed", "left_moat.csv"))
+# right_moat = pd.read_csv(os.path.join(datadir, "processed", "right_moat.csv"))
 
 # get centers of mu bins
 lo_mus = np.unique(plage.lo_mu)
 hi_mus = np.unique(plage.hi_mu)
 mu_bin = (lo_mus + hi_mus) / 2.0
 
-print(np.unique(left_moat.lo_mu))
+# print(np.unique(left_moat.lo_mu))
+# print(np.unique(right_moat.lo_mu))
 
 # plot red/blue
 plot_rb = False
@@ -129,8 +130,8 @@ def clv_plot(fname=None):
     network_avg, network_std, network_err = calc_region_stats(network, colname="v_hat")
     plage_avg, plage_std, plage_err = calc_region_stats(plage, colname="v_hat")
     moat_avg, moat_std, moat_err = calc_region_stats(moat, colname="v_hat")
-    left_moat_avg, left_moat_std, left_moat_err = calc_region_stats(left_moat, colname="v_hat")
-    right_moat_avg, right_moat_std, right_moat_err = calc_region_stats(right_moat, colname="v_hat")
+    # left_moat_avg, left_moat_std, left_moat_err = calc_region_stats(left_moat, colname="v_hat")
+    # right_moat_avg, right_moat_std, right_moat_err = calc_region_stats(right_moat, colname="v_hat")
 
 
     # write out table
@@ -149,10 +150,10 @@ def clv_plot(fname=None):
     df_v_hat["v_std_pu"] = np.round(penumbrae_std, decimals=2)
     df_v_hat["v_avg_mt"] = np.round(moat_avg, decimals=2)
     df_v_hat["v_std_mt"] = np.round(moat_std, decimals=2)
-    df_v_hat["v_avg_lm"] = np.round(left_moat_avg, decimals=2)
-    df_v_hat["v_std_lm"] = np.round(left_moat_std, decimals=2)
-    df_v_hat["v_avg_rm"] = np.round(right_moat_avg, decimals=2)
-    df_v_hat["v_std_rm"] = np.round(right_moat_std, decimals=2)
+    # df_v_hat["v_avg_lm"] = np.round(left_moat_avg, decimals=2)
+    # df_v_hat["v_std_lm"] = np.round(left_moat_std, decimals=2)
+    # df_v_hat["v_avg_rm"] = np.round(right_moat_avg, decimals=2)
+    # df_v_hat["v_std_rm"] = np.round(right_moat_std, decimals=2)
     # df_v_hat.to_latex(buf=tabfile1, na_rep="-", index=False, float_format="%.2f")
 
     # polyfit each of them
@@ -176,11 +177,11 @@ def clv_plot(fname=None):
     moat_wts = 1.0 / (moat_std)
     moat_fit = np.polyfit(mu_bin, moat_avg, w=moat_wts, deg=5)
 
-    left_moat_wts = 1.0 / (left_moat_std)
-    left_moat_fit = np.polyfit(mu_bin, left_moat_avg, w=left_moat_wts, deg=5)
+    # left_moat_wts = 1.0 / (left_moat_std)
+    # left_moat_fit = np.polyfit(mu_bin, left_moat_avg, w=left_moat_wts, deg=5)
 
-    right_moat_wts = 1.0 / (right_moat_std)
-    right_moat_fit = np.polyfit(mu_bin, right_moat_avg, w=right_moat_wts, deg=5)
+    # right_moat_wts = 1.0 / (right_moat_std)
+    # right_moat_fit = np.polyfit(mu_bin, right_moat_avg, w=right_moat_wts, deg=5)
 
     # plot v_hat
     axs[0,0].errorbar(mu_bin, quiet_sun_avg, yerr=np.abs(quiet_sun_err), fmt=qs_marker, capsize=capsize,
@@ -217,22 +218,20 @@ def clv_plot(fname=None):
     axs[1,0].fill_between(mu_bin, umbrae_avg - umbrae_std, umbrae_avg + umbrae_std, color=um_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(umbrae_fit, mu_fit), color=um_color, ls="--")
 
-    # axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
-    #                   capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
-    # axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+                      capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
+
+    # axs[1,0].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
+    #                   capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
+    # axs[1,0].fill_between(mu_bin, left_moat_avg - left_moat_std, left_moat_avg + left_moat_std, color=lm_color, alpha=0.4)
     # # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
-    axs[1,0].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
-    axs[1,0].fill_between(mu_bin, left_moat_avg - left_moat_std, left_moat_avg + left_moat_std, color=lm_color, alpha=0.4)
-    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
-
-    axs[1,0].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
-    axs[1,0].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
-    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
-
-    
+    # axs[1,0].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
+    #                   capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
+    # axs[1,0].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
+    # # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
 
 
@@ -245,8 +244,8 @@ def clv_plot(fname=None):
     network_avg, network_std, network_err = calc_region_stats(network, colname="v_conv")
     plage_avg, plage_std, plage_err = calc_region_stats(plage, colname="v_conv")
     moat_avg, moat_std, moat_err = calc_region_stats(moat, colname="v_conv")
-    left_moat_avg, left_moat_std, left_moat_err = calc_region_stats(left_moat, colname="v_conv")
-    right_moat_avg, right_moat_std, right_moat_err = calc_region_stats(right_moat, colname="v_conv")
+    # left_moat_avg, left_moat_std, left_moat_err = calc_region_stats(left_moat, colname="v_conv")
+    # right_moat_avg, right_moat_std, right_moat_err = calc_region_stats(right_moat, colname="v_conv")
 
     tabfile2 = os.path.join(datadir, "v_conv_table.tex")
     df_v_conv = pd.DataFrame()
@@ -261,10 +260,10 @@ def clv_plot(fname=None):
     df_v_conv["v_std_pu"] = penumbrae_std
     df_v_conv["v_avg_mt"] = moat_avg
     df_v_conv["v_std_mt"] = moat_std
-    df_v_conv["v_avg_lm"] = left_moat_avg
-    df_v_conv["v_std_lm"] = left_moat_std
-    df_v_conv["v_avg_rm"] = left_moat_avg
-    df_v_conv["v_std_rm"] = left_moat_std
+    # df_v_conv["v_avg_lm"] = left_moat_avg
+    # df_v_conv["v_std_lm"] = left_moat_std
+    # df_v_conv["v_avg_rm"] = left_moat_avg
+    # df_v_conv["v_std_rm"] = left_moat_std
     # df_v_conv.to_latex(buf=tabfile2, na_rep="-", index=False, float_format="%.2f")
 
     # polyfit each of them
@@ -283,11 +282,11 @@ def clv_plot(fname=None):
     moat_wts = 1.0 / (moat_std)
     moat_fit = np.polyfit(mu_bin, moat_avg, w=moat_wts, deg=5)
 
-    moat_wts = 1.0 / (left_moat_std)
-    moat_fit = np.polyfit(mu_bin, left_moat_avg, w=plage_wts, deg=5)
+    # moat_wts = 1.0 / (left_moat_std)
+    # moat_fit = np.polyfit(mu_bin, left_moat_avg, w=plage_wts, deg=5)
 
-    moat_wts = 1.0 / (right_moat_std)
-    moat_fit = np.polyfit(mu_bin, right_moat_avg, w=plage_wts, deg=5)
+    # moat_wts = 1.0 / (right_moat_std)
+    # moat_fit = np.polyfit(mu_bin, right_moat_avg, w=plage_wts, deg=5)
 
     # plot v_conv
     axs[0,1].errorbar(mu_bin, plage_avg, yerr=plage_err, fmt=pl_marker, capsize=capsize,
@@ -301,20 +300,20 @@ def clv_plot(fname=None):
     axs[0,1].fill_between(mu_bin, network_avg - network_std, network_avg + network_std, color=nw_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
-    # axs[0,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
-    #              capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
-    # axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    axs[0,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+                 capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
+
+    # axs[0,1].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
+    #              capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
+    # axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=lm_color, alpha=0.4)
     # # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
-    axs[0,1].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
-    axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=lm_color, alpha=0.4)
-    # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
-
-    axs[0,1].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Right Moat}$")
-    axs[0,1].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
-    # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
+    # axs[0,1].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
+    #              capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Right Moat}$")
+    # axs[0,1].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
+    # # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
 
 
@@ -391,7 +390,7 @@ n_mu_samps = len(mu_samps)
 # create figure objects
 colname = "v_hat"
 xlabel =  r"$\hat{v}_{k, \mu}\ {\rm(m\ s}^{-1}{\rm )}$"
-fig, axs = plt.subplots(figsize=(11, 8.5), nrows=3, ncols=n_mu_samps)
+fig, axs = plt.subplots(figsize=(11, 8.5), nrows=4, ncols=n_mu_samps)
 fig.subplots_adjust(wspace=0.07, hspace=0.15)
 
 # loop over valus
@@ -402,9 +401,9 @@ for i in range(n_mu_samps):
     idx2 = red_penumbrae.lo_mu == mu_samps[i]
     idx3 = blu_penumbrae.lo_mu == mu_samps[i]
     idx4 = penumbrae.lo_mu == mu_samps[i]
-    # idx5 = moat.lo_mu == mu_samps[i]
-    idx6 = left_moat.lo_mu == mu_samps[i]
-    idx7 = right_moat.lo_mu == mu_samps[i]
+    idx5 = moat.lo_mu == mu_samps[i]
+    # idx6 = left_moat.lo_mu == mu_samps[i]
+    # idx7 = right_moat.lo_mu == mu_samps[i]
 
 
     # # get the FWHM the penumbra distribution
@@ -453,12 +452,12 @@ for i in range(n_mu_samps):
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
     #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
-    axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+    # axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
+    # axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
 
     # label stuff
-    #axs[1,i].set_xlim(-250,250)
-    axs[1,i].set_xlim(-500,500)
+    axs[1,i].set_xlim(-250,250)
+    #axs[1,i].set_xlim(-500,500)
 
     # axs[1,i].set_xlim(0,500)
 
@@ -498,6 +497,30 @@ for i in range(n_mu_samps):
 for i in range(n_mu_samps):
     axs[2,i].set_ylim(0.0, np.max(ylims))
 
+# loop over valus
+ylims = np.zeros(n_mu_samps)
+for i in range(n_mu_samps):
+    # do all regs
+    idx5 = moat.lo_mu == mu_samps[i]
+    axs[3,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
+
+    # label stuff
+    # axs[2,i].set_xlabel(xlabel)
+    axs[3,i].set_xlim(-700,700)
+    # axs[2,i].set_xlim(0,50)
+
+    ylims[i] = axs[3,i].get_ylim()[1]
+
+    if i > 0:
+        axs[3,i].set_yticklabels([])
+
+    if i == n_mu_samps - 1:
+        axs[3,i].legend(fontsize=10)
+
+# loop again to set yvals
+for i in range(n_mu_samps):
+    axs[3,i].set_ylim(0.0, np.max(ylims))
+
 
 # save the figure
 fig.supxlabel(xlabel, fontsize=16, y=0.04)
@@ -508,7 +531,7 @@ plt.clf(); plt.close()
 # create figure objects
 colname = "v_conv"
 xlabel = r"$\Delta \hat{v}_{{\rm conv},k,\mu}\ {\rm(m\ s}^{-1}{\rm )}$"
-fig, axs = plt.subplots(figsize=(11, 5.8), nrows=2, ncols=n_mu_samps)
+fig, axs = plt.subplots(figsize=(11, 5.8), nrows=3, ncols=n_mu_samps)
 fig.subplots_adjust(wspace=0.07, hspace=0.15)
 
 # loop over values
@@ -520,8 +543,8 @@ for i in range(n_mu_samps):
     idx3 = blu_penumbrae.lo_mu == mu_samps[i]
     idx4 = penumbrae.lo_mu == mu_samps[i]
     # idx5 = moat.lo_mu == mu_samps[i]
-    idx6 = left_moat.lo_mu == mu_samps[i]
-    idx7 = right_moat.lo_mu == mu_samps[i]
+    # idx6 = left_moat.lo_mu == mu_samps[i]
+    # idx7 = right_moat.lo_mu == mu_samps[i]
 
     # plot this mu
     axs[0,i].hist(umbrae[colname][idx1], bins="auto", density=True, color=um_color, histtype="step", label=r"{\rm Umbrae}")
@@ -557,14 +580,14 @@ for i in range(n_mu_samps):
     # plot this mu
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
-    #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
-    axs[1,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    axs[1,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+    # axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
+    # axs[1,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
+    # axs[1,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
 
     # label stuff
     # axs[1,i].set_xlabel(xlabel)
-    #axs[1,i].set_xlim(-250,250)
-    axs[1,i].set_xlim(-500,500)
+    axs[1,i].set_xlim(-250,250)
+    #axs[1,i].set_xlim(-500,500)
 
     if i == n_mu_samps - 1:
         axs[1,i].legend(fontsize=10)
@@ -578,30 +601,32 @@ for i in range(n_mu_samps):
 for i in range(n_mu_samps):
     axs[1,i].set_ylim(0.0, np.max(ylims))
 
-# # loop over values
-# ylims = np.zeros(n_mu_samps)
-# for i in range(n_mu_samps):
-#     # do all regs
-#     idx6 = left_moat.lo_mu == mu_samps[i]
-#     idx7 = right_moat.lo_mu == mu_samps[i]
+# loop over values
+ylims = np.zeros(n_mu_samps)
+for i in range(n_mu_samps):
+    # do all regs
+    idx5 = moat.lo_mu == mu_samps[i]
 
-#     # plot this mu
-#     axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-#     axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
-#     #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
+    # plot this mu
+    axs[2,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
 
-#     # label stuff
-#     # axs[1,i].set_xlabel(xlabel)
-#     #axs[1,i].set_xlim(-250,250)
-#     axs[2,i].set_xlim(-1000,1000)
+    # label stuff
+    # axs[1,i].set_xlabel(xlabel)
+    #axs[2,i].set_xlim(-250,250)
+    axs[2,i].set_xlim(-700,700)
 
-#     if i == n_mu_samps - 1:
-#         axs[2,i].legend(fontsize=10)
+    if i == n_mu_samps - 1:
+        axs[2,i].legend(fontsize=10)
 
-#     ylims[i] = axs[2,i].get_ylim()[1]
+    ylims[i] = axs[2,i].get_ylim()[1]
 
-#     if i > 0:
-#         axs[2,i].set_yticklabels([])
+    if i > 0:
+        axs[2,i].set_yticklabels([])
+
+# loop again to set yvals
+for i in range(n_mu_samps):
+    axs[2,i].set_ylim(0.0, np.max(ylims))
+
 
 # set axes labels
 fig.supxlabel(xlabel, fontsize=16)

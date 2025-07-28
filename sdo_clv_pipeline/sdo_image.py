@@ -530,6 +530,8 @@ class SunMask(object):
         mus =[]
         area_idx_arr = []
         dilated_spots = []
+        left_moat_pixels = []
+        right_moat_pixels = []
 
         maximum_area = np.max(areas_pix) # get the max value in the array
         # for rprop in rprops:
@@ -572,11 +574,6 @@ class SunMask(object):
                 # don't double count
                 idx_new = np.logical_and(max_area_idx, self.regions != 2)
                 idx_new = np.logical_and(idx_new, self.regions != 1)
-
-                if symbol[-1] == 0:
-                    left_moat_pixels |= idx_new   # <<< ADDED
-                else:
-                    right_moat_pixels |= idx_new  # <<< ADDED
 
                 # plt.imshow(idx_new) 
                 # plt.colorbar()
@@ -633,14 +630,23 @@ class SunMask(object):
         load_and_plot()
         #plot_loop()
 
+        # for i in dilated_spots:
+        #     if symbol[i] == 0:
+        #         left_moat_pixels.append(dilated_spots[i])
+        #     else:
+        #         right_moat_pixels.append(dilated_spots[i])
+
         # set moat pixels
         moat_pixels = np.any(dilated_spots, axis=0).astype(bool)
         print("len moat pixels=", len(moat_pixels))
         print("shape moat pixels=", np.shape(moat_pixels))
         self.regions[moat_pixels] = 7 # moat
 
-        self.regions[left_moat_pixels] = 8   # <<< ADDED: Label for left-side moats
-        self.regions[right_moat_pixels] = 9  # <<< ADDED: Label for right-side moats
+        # left_moat_pixels = np.any(left_moat_pixels, axis=0).astype(bool)
+        # right_moat_pixels = np.any(right_moat_pixels, axis=0).astype(bool)
+
+        # self.regions[left_moat_pixels] = 8   
+        # self.regions[right_moat_pixels] = 9  
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0
@@ -702,6 +708,12 @@ class SunMask(object):
     
     def is_moat_flow(self):
         return self.regions == 7
+    
+    def is_left_moat(self):
+        return self.regions == 8
+    
+    def is_right_moat(self):
+        return self.regions == 9
 
     def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, max_area, corners, no_corners, moat_avg_vels, symbol):
         

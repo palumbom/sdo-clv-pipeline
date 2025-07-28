@@ -538,6 +538,10 @@ class SunMask(object):
         a_label = [36, 17, 19, 15, 37, 49]
         b_label = [71, 86, 81, 62, 52, 36, 39, 26]
 
+        # store left/right pixels
+        left_moat_pixels = np.zeros_like(self.regions, dtype=bool)
+        right_moat_pixels = np.zeros_like(self.regions, dtype=bool)
+
         for rprop in rprops:
             # get area of that region              
             max_area = rprop.area
@@ -568,6 +572,11 @@ class SunMask(object):
                 # don't double count
                 idx_new = np.logical_and(max_area_idx, self.regions != 2)
                 idx_new = np.logical_and(idx_new, self.regions != 1)
+
+                if symbol[-1] == 0:
+                    left_moat_pixels |= idx_new   # <<< ADDED
+                else:
+                    right_moat_pixels |= idx_new  # <<< ADDED
 
                 # plt.imshow(idx_new) 
                 # plt.colorbar()
@@ -629,6 +638,9 @@ class SunMask(object):
         print("len moat pixels=", len(moat_pixels))
         print("shape moat pixels=", np.shape(moat_pixels))
         self.regions[moat_pixels] = 7 # moat
+
+        self.regions[left_moat_pixels] = 8   # <<< ADDED: Label for left-side moats
+        self.regions[right_moat_pixels] = 9  # <<< ADDED: Label for right-side moats
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0

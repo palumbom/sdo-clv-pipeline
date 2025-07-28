@@ -163,9 +163,10 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
     return None
 
 
-def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, 
-                     mu_thresh=0.1, n_rings=10, suffix=None, datadir=None):
+def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol,
+                     mu_thresh, n_rings=10, suffix=None, datadir=None):
 
+    start_time = time.perf_counter()
     #figure out data directories
     if not isdir(datadir):
         os.mkdir(datadir)
@@ -174,6 +175,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     if suffix is None:
         fname1 = os.path.join(datadir, "thresholds.csv")
         fname2 = os.path.join(datadir, "region_output.csv")
+        fname3 = os.path.join(datadir, "region_output.csv")
     else:
         # make tmp directory
         tmpdir = os.path.join(datadir,"tmp/")
@@ -289,6 +291,9 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     del region_mask
     gc.collect()
 
+    end_time = time.perf_counter()
+
     # report success and return
     print("\t >>> Epoch %s run successfully" % get_date(con_file).isoformat(), flush=True)
+    print("Elapsed time: ", end_time - start_time)
     return None

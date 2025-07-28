@@ -197,10 +197,10 @@ def clv_plot(fname=None):
     axs[1,0].fill_between(mu_bin, umbrae_avg - umbrae_std, umbrae_avg + umbrae_std, color=um_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(umbrae_fit, mu_fit), color=um_color, ls="--")
 
-    axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
-    axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
-    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
+    # axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+    #                   capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    # axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    # # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
     # get stats for v_conv
     umbrae_avg, umbrae_std, umbrae_err = calc_region_stats(umbrae, colname="v_conv")
@@ -255,6 +255,11 @@ def clv_plot(fname=None):
     axs[0,1].fill_between(mu_bin, network_avg - network_std, network_avg + network_std, color=nw_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
+    axs[0,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+                 capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    axs[0,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
+
 
     if plot_rb:
         axs[1,1].errorbar(mu_bin, red_penumbrae_avg, yerr=red_penumbrae_err, fmt=rp_marker, capsize=capsize,
@@ -276,10 +281,10 @@ def clv_plot(fname=None):
     axs[1,1].fill_between(mu_bin, umbrae_avg - umbrae_std, umbrae_avg + umbrae_std, color=um_color, alpha=0.4)
     # axs[1,1].plot(mu_fit, np.polyval(umbrae_fit, mu_fit), color=um_color, ls="--")
 
-    axs[1,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
-    axs[1,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
-    # axs[1,1].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
+    # axs[1,1].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+    #              capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    # axs[1,1].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    # # axs[1,1].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
 
     # set limits
@@ -340,6 +345,7 @@ for i in range(n_mu_samps):
     idx2 = red_penumbrae.lo_mu == mu_samps[i]
     idx3 = blu_penumbrae.lo_mu == mu_samps[i]
     idx4 = penumbrae.lo_mu == mu_samps[i]
+    idx5 = moat.lo_mu == mu_samps[i]
 
     # # get the FWHM the penumbra distribution
     # if i == 1:
@@ -358,6 +364,7 @@ for i in range(n_mu_samps):
         axs[0,i].hist(red_penumbrae[colname][idx2], bins="auto", density=True, color=rp_color, histtype="step", label=r"{\rm Red\ Penumbrae}")
         axs[0,i].hist(blu_penumbrae[colname][idx3], bins="auto", density=True, color=bp_color, histtype="step", label=r"{\rm Blue\ Penumbrae}")
     axs[0,i].hist(penumbrae[colname][idx4], bins="auto", density=True, color=pu_color, histtype="step", label=r"{\rm Penumbrae}")
+    # axs[0,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
 
     # label stuff
     axs[0,i].set_title(r"$\mu = " + str(mu_samps[i] + 0.05)[0:4]+ r"$")
@@ -385,9 +392,12 @@ for i in range(n_mu_samps):
     # pl1,ot this mu
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
+    axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
 
     # label stuff
-    axs[1,i].set_xlim(-250,250)
+    #axs[1,i].set_xlim(-250,250)
+    axs[1,i].set_xlim(-500,500)
+
     # axs[1,i].set_xlim(0,500)
 
     ylims[i] = axs[1,i].get_ylim()[1]
@@ -447,6 +457,7 @@ for i in range(n_mu_samps):
     idx2 = red_penumbrae.lo_mu == mu_samps[i]
     idx3 = blu_penumbrae.lo_mu == mu_samps[i]
     idx4 = penumbrae.lo_mu == mu_samps[i]
+    idx5 = moat.lo_mu == mu_samps[i]
 
     # plot this mu
     axs[0,i].hist(umbrae[colname][idx1], bins="auto", density=True, color=um_color, histtype="step", label=r"{\rm Umbrae}")
@@ -454,6 +465,7 @@ for i in range(n_mu_samps):
         axs[0,i].hist(red_penumbrae[colname][idx2], bins="auto", density=True, color=rp_color, histtype="step", label=r"{\rm Red\ Penumbrae}")
         axs[0,i].hist(blu_penumbrae[colname][idx3], bins="auto", density=True, color=bp_color, histtype="step", label=r"{\rm Blue\ Penumbrae}")
     axs[0,i].hist(penumbrae[colname][idx4], bins="auto", density=True, color=pu_color, histtype="step", label=r"{\rm Penumbrae}")
+    # axs[0,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
 
     # label stuff
     axs[0,i].set_title(r"$\mu = " + str(mu_samps[i] + 0.05)[0:4]+ r"$")
@@ -481,10 +493,11 @@ for i in range(n_mu_samps):
     # plot this mu
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
-
+    axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
     # label stuff
     # axs[1,i].set_xlabel(xlabel)
-    axs[1,i].set_xlim(-250,250)
+    #axs[1,i].set_xlim(-250,250)
+    axs[1,i].set_xlim(-500,500)
 
     if i == n_mu_samps - 1:
         axs[1,i].legend(fontsize=10)

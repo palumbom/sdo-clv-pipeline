@@ -21,7 +21,7 @@ def reduce_sdo_images(
     con_file, mag_file, dop_file, aia_file,
     moat_vels, moat_mags, moat_ints, moat_dilations,
     moat_thetas, moat_areas, moat_vals, counter,
-    moat_avg_vels, symbol, mu_thresh=0.1, fit_cbs=False
+    moat_avg_vels, symbol, left_moats, right_moats, mu_thresh=0.1, fit_cbs=False
 ):
     assert exists(con_file)
     assert exists(mag_file)
@@ -88,7 +88,7 @@ def reduce_sdo_images(
     # identify regions for thresholding
     try:
         print("About to construct SunMask")
-        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol)
+        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats)
         mask.mask_low_mu(mu_thresh)
     except:
         print("\t >>> Region identification failed, skipping " + iso, flush=True)
@@ -96,7 +96,7 @@ def reduce_sdo_images(
 
     return con, mag, dop, aia, mask
 
-def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, mu_thresh=0.1, fit_cbs=False):
+def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats, mu_thresh=0.1, fit_cbs=False):
     assert exists(con_file)
     assert exists(mag_file)
     assert exists(aia_file)
@@ -146,7 +146,7 @@ def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, mo
 
     # identify regions for thresholding
     try:
-        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol)
+        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats)
         mask.mask_low_mu(mu_thresh)
         counter += 1
     except:
@@ -163,7 +163,7 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
     return None
 
 
-def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol,
+def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats,
                      mu_thresh, n_rings=10, suffix=None, datadir=None):
 
     start_time = time.perf_counter()
@@ -195,7 +195,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     con_file, mag_file, dop_file, aia_file,
     moat_vels, moat_mags, moat_ints, moat_dilations,
     moat_thetas, moat_areas, moat_vals, counter,
-    moat_avg_vels, symbol)
+    moat_avg_vels, symbol, left_moats, right_moats)
     except:
         return None
 
@@ -228,7 +228,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     # loop over the mu annuli
     mu_grid = np.linspace(mu_thresh, 1.0, n_rings)
 
-    regions = [1, 2, 2.5, 3, 4, 5, 6, 7, 8, 9]
+    regions = [1, 2, 2.5, 3, 4, 5, 6, 8, 9]
     for j in range(n_rings-1):
         # mu values for annuli
         lo_mu=mu_grid[j]

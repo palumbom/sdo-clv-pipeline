@@ -369,7 +369,7 @@ def calculate_pixel_area(lat, lon):
     return pix_area
 
 class SunMask(object):
-    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol):
+    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats):
         # check argument order/names are correct
         print("Entered SunMask.__init__")
         
@@ -393,7 +393,7 @@ class SunMask(object):
         self.ff = np.nansum(self.w_active[con.mu >= con.mu_thresh]) / npix
 
         # identify regions
-        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol)
+        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats)
 
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix
@@ -416,7 +416,7 @@ class SunMask(object):
         # self.lon = np.copy(other_image.lon)
         return None
 
-    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol):
+    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats):
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
 
@@ -530,8 +530,6 @@ class SunMask(object):
         mus =[]
         area_idx_arr = []
         dilated_spots = []
-        left_moat_pixels = []
-        right_moat_pixels = []
 
         maximum_area = np.max(areas_pix) # get the max value in the array
         # for rprop in rprops:
@@ -580,7 +578,7 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
 
-                dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, max_area, corners, no_corners, moat_avg_vels, symbol)
+                dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, max_area, corners, no_corners, moat_avg_vels, symbol, left_moats, right_moats)
 
                 vels.append(avg_vel_arr)
                 moat_vels.append(avg_vel_arr)
@@ -639,13 +637,15 @@ class SunMask(object):
 
         # set moat pixels
         moat_pixels = np.any(dilated_spots, axis=0).astype(bool)
-        print("len moat pixels=", len(moat_pixels))
-        print("shape moat pixels=", np.shape(moat_pixels))
-        self.regions[moat_pixels] = 7 # moat
+        # print("len moat pixels=", len(moat_pixels))
+        # print("shape moat pixels=", np.shape(moat_pixels))
+        # self.regions[moat_pixels] = 7 # moat
 
-
-        # self.regions[left_moat_pixels] = 8   
-        # self.regions[right_moat_pixels] = 9  
+        # left and right moat pixels
+        left_moat_pixels = np.any(left_moats, axis=0).astype(bool)
+        right_moat_pixels = np.any(right_moats, axis=0).astype(bool)
+        self.regions[left_moat_pixels] = 8   
+        self.regions[right_moat_pixels] = 9  
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0
@@ -714,7 +714,7 @@ class SunMask(object):
     def is_right_moat(self):
         return self.regions == 9
 
-    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, max_area, corners, no_corners, moat_avg_vels, symbol):
+    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, max_area, corners, no_corners, moat_avg_vels, symbol, left_moats, right_moats):
         
 
         # first dilation
@@ -839,6 +839,11 @@ class SunMask(object):
             moat = np.logical_xor(prev_dilation, max_area_idx)
 
         dilated_spots.append(moat)
+        for moat in dilated_spots:
+            if symbol == 0:
+                left_moats.append(moat)
+            else: 
+                right_moats.append(moat)
 
         # set-up x axis for dilations plots
         dilation_arr = [i for i in range (1, dilation_count+1)]

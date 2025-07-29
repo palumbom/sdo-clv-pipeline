@@ -95,9 +95,9 @@ penumbrae = pd.read_csv(os.path.join(datadir, "processed", "penumbrae.csv"))
 red_penumbrae = pd.read_csv(os.path.join(datadir, "processed", "red_penumbrae.csv"))
 blu_penumbrae = pd.read_csv(os.path.join(datadir, "processed", "blu_penumbrae.csv"))
 umbrae = pd.read_csv(os.path.join(datadir, "processed", "umbrae.csv"))
-moat = pd.read_csv(os.path.join(datadir, "processed", "moat.csv"))
-# left_moat = pd.read_csv(os.path.join(datadir, "processed", "left_moat.csv"))
-# right_moat = pd.read_csv(os.path.join(datadir, "processed", "right_moat.csv"))
+# moat = pd.read_csv(os.path.join(datadir, "processed", "moat.csv"))
+left_moat = pd.read_csv(os.path.join(datadir, "processed", "left_moat.csv"))
+right_moat = pd.read_csv(os.path.join(datadir, "processed", "right_moat.csv"))
 
 # get centers of mu bins
 lo_mus = np.unique(plage.lo_mu)
@@ -129,9 +129,9 @@ def clv_plot(fname=None):
     quiet_sun_avg, quiet_sun_std, quiet_sun_err = calc_region_stats(quiet_sun, colname="v_hat")
     network_avg, network_std, network_err = calc_region_stats(network, colname="v_hat")
     plage_avg, plage_std, plage_err = calc_region_stats(plage, colname="v_hat")
-    moat_avg, moat_std, moat_err = calc_region_stats(moat, colname="v_hat")
-    # left_moat_avg, left_moat_std, left_moat_err = calc_region_stats(left_moat, colname="v_hat")
-    # right_moat_avg, right_moat_std, right_moat_err = calc_region_stats(right_moat, colname="v_hat")
+    # moat_avg, moat_std, moat_err = calc_region_stats(moat, colname="v_hat")
+    left_moat_avg, left_moat_std, left_moat_err = calc_region_stats(left_moat, colname="v_hat")
+    right_moat_avg, right_moat_std, right_moat_err = calc_region_stats(right_moat, colname="v_hat")
 
 
     # write out table
@@ -148,13 +148,13 @@ def clv_plot(fname=None):
     df_v_hat["v_std_um"] = np.round(umbrae_std, decimals=2)
     df_v_hat["v_avg_pu"] = np.round(penumbrae_avg, decimals=2)
     df_v_hat["v_std_pu"] = np.round(penumbrae_std, decimals=2)
-    df_v_hat["v_avg_mt"] = np.round(moat_avg, decimals=2)
-    df_v_hat["v_std_mt"] = np.round(moat_std, decimals=2)
-    # df_v_hat["v_avg_lm"] = np.round(left_moat_avg, decimals=2)
-    # df_v_hat["v_std_lm"] = np.round(left_moat_std, decimals=2)
-    # df_v_hat["v_avg_rm"] = np.round(right_moat_avg, decimals=2)
-    # df_v_hat["v_std_rm"] = np.round(right_moat_std, decimals=2)
-    # df_v_hat.to_latex(buf=tabfile1, na_rep="-", index=False, float_format="%.2f")
+    # df_v_hat["v_avg_mt"] = np.round(moat_avg, decimals=2)
+    # df_v_hat["v_std_mt"] = np.round(moat_std, decimals=2)
+    df_v_hat["v_avg_lm"] = np.round(left_moat_avg, decimals=2)
+    df_v_hat["v_std_lm"] = np.round(left_moat_std, decimals=2)
+    df_v_hat["v_avg_rm"] = np.round(right_moat_avg, decimals=2)
+    df_v_hat["v_std_rm"] = np.round(right_moat_std, decimals=2)
+    df_v_hat.to_latex(buf=tabfile1, na_rep="-", index=False, float_format="%.2f")
 
     # polyfit each of them
     mu_fit = np.linspace(0.15, 0.95, num=100)

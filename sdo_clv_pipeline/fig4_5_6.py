@@ -156,6 +156,8 @@ def clv_plot(fname=None):
     df_v_hat["v_std_rm"] = np.round(right_moat_std, decimals=2)
     df_v_hat.to_latex(buf=tabfile1, na_rep="-", index=False, float_format="%.2f")
 
+    print(df_v_hat["v_avg_lm"].to_numpy())
+
     # polyfit each of them
     mu_fit = np.linspace(0.15, 0.95, num=100)
 

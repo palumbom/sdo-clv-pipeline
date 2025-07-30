@@ -857,7 +857,7 @@ class SunMask(object):
                 n = -1*n
                 inv_mag_arr.append(n)
             # TODO check return values
-            return (dilation_arr, avg_vel_arr, inv_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels)
+            return (dilation_arr, avg_vel_arr, inv_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats)
         else:
-            return (dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels)
+            return (dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats)
 

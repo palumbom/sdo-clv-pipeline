@@ -626,6 +626,7 @@ class SunMask(object):
         import sdo_clv_pipeline.plot_moats_data as plot_moats_data
         from sdo_clv_pipeline.plot_moats_data import load_and_plot
         
+        print("before plotting")
         load_and_plot()
         #plot_loop()
 

@@ -41,6 +41,7 @@ def load_and_plot():
     moats.append(mus)   # 4
 
     # print(np.shape(x))
+    print("outside plot loop")
 
     for j in range (0, 3): # vel, mag, int
         print ("trying to plot...")

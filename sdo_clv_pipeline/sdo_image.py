@@ -578,6 +578,7 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
 
+                # TODO below line fails: too many values to unpack
                 dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, max_area, corners, no_corners, moat_avg_vels, symbol, left_moats, right_moats)
 
                 vels.append(avg_vel_arr)
@@ -855,6 +856,7 @@ class SunMask(object):
             for n in avg_mag_arr:
                 n = -1*n
                 inv_mag_arr.append(n)
+            # TODO check return values
             return (dilation_arr, avg_vel_arr, inv_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels)
         else:
             return (dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels)

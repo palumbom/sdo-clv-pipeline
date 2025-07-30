@@ -26,9 +26,9 @@ def read_data(file, dtype=np.float32):
 # function to glob the input data
 def find_data(indir, globexp=""):
     # find the data
-    con_files, con_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.ic_720s.{globexp}*.continuum.fits")))
-    mag_files, mag_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.m_720s.{globexp}*.magnetogram.fits")))
-    dop_files, dop_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.v_720s.{globexp}*.Dopplergram.fits")))
+    con_files, con_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.*.{globexp}*.continuum.fits")))
+    mag_files, mag_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.*.{globexp}*.magnetogram.fits")))
+    dop_files, dop_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.*.{globexp}*.Dopplergram.fits")))
     aia_files, aia_dates = sort_data(glob.glob(os.path.join(indir, f"aia_lev1_1700a_{globexp}*t*_image_lev1*")))
     # aia_files, aia_dates = sort_data(glob.glob(indir + "*aia*" + globexp + ".fits"))
 

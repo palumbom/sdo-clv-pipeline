@@ -580,6 +580,7 @@ class SunMask(object):
 
                 # TODO below line fails: too many values to unpack
                 dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, max_area, corners, no_corners, moat_avg_vels, symbol, left_moats, right_moats)
+                print("below line")
 
                 vels.append(avg_vel_arr)
                 moat_vels.append(avg_vel_arr)

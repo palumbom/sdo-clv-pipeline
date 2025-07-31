@@ -11,20 +11,21 @@ from sdo_clv_pipeline.sdo_process import *
 def main():
     # figure out data directories
     files = []
-    datadir = str(root / "data") + "/"
+    datadir = os.path.join(root, "data")
 
     # find the files to combine
     for file in os.listdir(datadir):
-        file = datadir + file
+        file = os.path.join(datadir, file)
         if not isdir(file):
             continue
         else:
-            for f in glob.glob(file + "/" + "*.csv"):
+            # for f in glob.glob(file + "/" + "*.csv"):
+            for f in glob.glob(os.path.join(file, "*.csv")):
                 files.append(f)
 
     # names for output files
-    fname1 = datadir + "thresholds.csv"
-    fname2 = datadir + "region_output.csv"
+    fname1 = os.path.join(datadir, "thresholds.csv")
+    fname2 = os.path.join(datadir, "region_output.csv")
 
     # headers for output files
     header1 = ["mjd", "aia_thresh", "a_aia", "b_aia", "c_aia",

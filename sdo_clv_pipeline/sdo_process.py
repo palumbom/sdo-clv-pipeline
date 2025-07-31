@@ -309,6 +309,5 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     end_time = time.perf_counter()
 
     # report success and return
-    print("\t >>> Run successfully", flush=True)
-    print("\t >>> Elapsed time: %s seconds" % str(end_time - start_time), flush=True)
+    print("\t >>> Run successfully in %s seconds" % str(end_time - start_time), flush=True)
     return None

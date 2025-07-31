@@ -63,10 +63,10 @@ mt_marker = "*"
 lm_marker = "<"
 rm_marker = ">"
 
-
+mu_bins = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
 def calc_region_stats(region_df, colname="v_hat"):
     # get number elements
-    lo_mus = np.unique(region_df.lo_mu[~np.isnan(region_df.lo_mu)])
+    lo_mus = mu_bins
     nn = len(lo_mus)
 
     # allocate memory
@@ -169,25 +169,25 @@ def clv_plot(fname=None):
     print(df_v_hat["v_avg_lm"].to_numpy())
 
     # polyfit each of them
-    mu_fit = np.linspace(0.15, 0.95, num=100)
+    # mu_fit = np.linspace(0.15, 0.95, num=100)
 
-    qs_wts = 1.0 / (quiet_sun_std)
-    qs_fit = np.polyfit(mu_bin, quiet_sun_avg, w=qs_wts, deg=5)
+    # qs_wts = 1.0 / (quiet_sun_std)
+    # qs_fit = np.polyfit(mu_bin, quiet_sun_avg, w=qs_wts, deg=5)
 
-    umbrae_wts = 1.0 / (umbrae_std)
-    umbrae_fit = np.polyfit(mu_bin, umbrae_avg, w=umbrae_wts, deg=5)
+    # umbrae_wts = 1.0 / (umbrae_std)
+    # umbrae_fit = np.polyfit(mu_bin, umbrae_avg, w=umbrae_wts, deg=5)
 
-    penumbrae_wts = 1.0 / (penumbrae_std)
-    penumbrae_fit = np.polyfit(mu_bin, penumbrae_avg, w=penumbrae_wts, deg=5)
+    # penumbrae_wts = 1.0 / (penumbrae_std)
+    # penumbrae_fit = np.polyfit(mu_bin, penumbrae_avg, w=penumbrae_wts, deg=5)
 
-    network_wts = 1.0 / (network_std)
-    network_fit = np.polyfit(mu_bin, network_avg, w=network_wts, deg=5)
+    # network_wts = 1.0 / (network_std)
+    # network_fit = np.polyfit(mu_bin, network_avg, w=network_wts, deg=5)
 
-    plage_wts = 1.0 / (plage_std)
-    plage_fit = np.polyfit(mu_bin, plage_avg, w=plage_wts, deg=5)
+    # plage_wts = 1.0 / (plage_std)
+    # plage_fit = np.polyfit(mu_bin, plage_avg, w=plage_wts, deg=5)
 
-    moat_wts = 1.0 / (moat_std)
-    moat_fit = np.polyfit(mu_bin, moat_avg, w=moat_wts, deg=5)
+    # moat_wts = 1.0 / (moat_std)
+    # moat_fit = np.polyfit(mu_bin, moat_avg, w=moat_wts, deg=5)
 
     # left_moat_wts = 1.0 / (left_moat_std)
     # left_moat_fit = np.polyfit(mu_bin, left_moat_avg, w=left_moat_wts, deg=5)
@@ -276,29 +276,29 @@ def clv_plot(fname=None):
     df_v_conv["v_std_lm"] = left_moat_std
     df_v_conv["v_avg_rm"] = left_moat_avg
     df_v_conv["v_std_rm"] = left_moat_std
-    df_v_conv.to_latex(buf=tabfile2, na_rep="-", index=False, float_format="%.2f")
+    # df_v_conv.to_latex(buf=tabfile2, na_rep="-", index=False, float_format="%.2f")
 
     # polyfit each of them
-    umbrae_wts = 1.0 / (umbrae_std)
-    umbrae_fit = np.polyfit(mu_bin, umbrae_avg, w=umbrae_wts, deg=5)
+    # umbrae_wts = 1.0 / (umbrae_std)
+    # umbrae_fit = np.polyfit(mu_bin, umbrae_avg, w=umbrae_wts, deg=5)
 
-    penumbrae_wts = 1.0 / (penumbrae_std)
-    penumbrae_fit = np.polyfit(mu_bin, penumbrae_avg, w=penumbrae_wts, deg=5)
+    # penumbrae_wts = 1.0 / (penumbrae_std)
+    # penumbrae_fit = np.polyfit(mu_bin, penumbrae_avg, w=penumbrae_wts, deg=5)
 
-    network_wts = 1.0 / (network_std)
-    network_fit = np.polyfit(mu_bin, network_avg, w=network_wts, deg=5)
+    # network_wts = 1.0 / (network_std)
+    # network_fit = np.polyfit(mu_bin, network_avg, w=network_wts, deg=5)
 
-    plage_wts = 1.0 / (plage_std)
-    plage_fit = np.polyfit(mu_bin, plage_avg, w=plage_wts, deg=5)
+    # plage_wts = 1.0 / (plage_std)
+    # plage_fit = np.polyfit(mu_bin, plage_avg, w=plage_wts, deg=5)
 
     # moat_wts = 1.0 / (moat_std)
     # moat_fit = np.polyfit(mu_bin, moat_avg, w=moat_wts, deg=5)
 
-    moat_wts = 1.0 / (left_moat_std)
-    moat_fit = np.polyfit(mu_bin, left_moat_avg, w=plage_wts, deg=5)
+    # moat_wts = 1.0 / (left_moat_std)
+    # moat_fit = np.polyfit(mu_bin, left_moat_avg, w=plage_wts, deg=5)
 
-    moat_wts = 1.0 / (right_moat_std)
-    moat_fit = np.polyfit(mu_bin, right_moat_avg, w=plage_wts, deg=5)
+    # moat_wts = 1.0 / (right_moat_std)
+    # moat_fit = np.polyfit(mu_bin, right_moat_avg, w=plage_wts, deg=5)
 
     # plot v_conv
     axs[0,1].errorbar(mu_bin, plage_avg, yerr=plage_err, fmt=pl_marker, capsize=capsize,

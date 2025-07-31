@@ -33,10 +33,10 @@ def find_data(indir, globexp=""):
     # aia_files, aia_dates = sort_data(glob.glob(indir + "*aia*" + globexp + ".fits"))
 
     print("File counts:")
-    print("CON:", len(con_dates))
-    print("MAG:", len(mag_dates))
-    print("DOP:", len(dop_dates))
-    print("AIA:", len(aia_dates))
+    print("\t >>> CON:", len(con_dates))
+    print("\t >>> MAG:", len(mag_dates))
+    print("\t >>> DOP:", len(dop_dates))
+    print("\t >>> AIA:", len(aia_dates))
 
     # find datetimes that are in *all* lists
     common_dates = list(set.intersection(*map(set, [con_dates, mag_dates, dop_dates, aia_dates])))

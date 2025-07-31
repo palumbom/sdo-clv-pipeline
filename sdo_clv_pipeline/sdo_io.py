@@ -40,7 +40,7 @@ def find_data(indir, globexp=""):
 
     # find datetimes that are in *all* lists
     common_dates = list(set.intersection(*map(set, [con_dates, mag_dates, dop_dates, aia_dates])))
-    print(common_dates)
+    # print(common_dates)
 
     # remove epochs that are missing in any data set from all data sets
     con_files = [con_files[idx] for idx, date in enumerate(con_dates) if date in common_dates]
@@ -93,19 +93,19 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
     assert (len(con_files) == len(mag_files) == len(dop_files) == len(aia_files))
 
     # figure out data directories
-    if datadir == None:
+    if datadir is None:
         globdir = globexp.replace("*","")
-        datadir = str(root / "data") + "/" + globdir + "/"
+        datadir = os.path.join(root, "data", globdir)
 
-    if not isdir(str(root / "data") + "/"):
-        os.mkdir(str(root / "data") + "/")
+    if not isdir(os.path.join(root, "data")):
+        os.mkdir(os.path.join(root, "data"))
 
     if not isdir(datadir):
         os.mkdir(datadir)
 
     # name output files
-    fname1 = datadir + "thresholds.csv"
-    fname2 = datadir + "region_output.csv"
+    fname1 = os.path.join(datadir, "thresholds.csv")
+    fname2 = os.path.join(datadir, "region_output.csv")
 
     # headers for output files
     header1 = ["mjd", "aia_thresh", "a_aia", "b_aia", "c_aia",
@@ -114,7 +114,9 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
                "min_vel_sat", "max_vel_sat", "avg_vel_sat",
                "min_vel_rot", "max_vel_rot", "avg_vel_rot",
                "min_vel_mer", "max_vel_mer", "avg_vel_mer"]
-    header2 = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac", "light_frac", "v_hat", "v_phot", "v_quiet", "v_conv", "mag_unsigned", "avg_int", "avg_int_flat"]
+    header2 = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac", 
+               "light_frac", "v_hat", "v_phot", "v_quiet", 
+               "v_conv", "mag_unsigned", "avg_int", "avg_int_flat"]
 
     # replace/create/modify output files
     fileset = (fname1, fname2)
@@ -150,7 +152,7 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
 def clean_output_directory(*fnames):
     for fname in fnames:
         truncate_output_file(fname)
-        fname_mp = glob.glob(split(fname)[0] + "/tmp/" + splitext(split(fname)[1])[0] + "_*")
+        fname_mp = glob.glob(os.path.join(split(fname)[0], "tmp", splitext(split(fname)[1])[0] + "_*"))
         if not not fname_mp:
             for f_mp in fname_mp:
                 os.remove(f_mp)

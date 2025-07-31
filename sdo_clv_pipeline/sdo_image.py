@@ -724,9 +724,9 @@ class SunMask(object):
     def is_right_moat(self):
         return self.regions == 9
 
-    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, max_area, corners, no_corners, moat_avg_vels, symbol, left_moats, right_moats):
-        
-
+    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, 
+                   max_area, corners, no_corners, moat_avg_vels, 
+                   symbol, left_moats, right_moats):
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)
@@ -755,9 +755,9 @@ class SunMask(object):
         while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.97):
             if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
                 current_floor = np.floor((0.209)* (dilation_count +3))
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure=corners)   # dilate no corners
             else:
-                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
+                new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure=no_corners)   # dilate with corners
             
             idx_new = np.logical_and(new_dilated_idx, self.regions != 2)
             idx_new = np.logical_and(idx_new, self.regions != 1)

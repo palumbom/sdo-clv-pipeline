@@ -163,7 +163,9 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
     return None
 
 
-def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats,
+def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, 
+                     moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, 
+                     counter, moat_avg_vels, symbol, left_moats, right_moats,
                      mu_thresh, n_rings=10, suffix=None, datadir=None):
 
     start_time = time.perf_counter()
@@ -175,7 +177,6 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     if suffix is None:
         fname1 = os.path.join(datadir, "thresholds.csv")
         fname2 = os.path.join(datadir, "region_output.csv")
-        fname3 = os.path.join(datadir, "region_output.csv")
     else:
         # make tmp directory
         tmpdir = os.path.join(datadir,"tmp/")

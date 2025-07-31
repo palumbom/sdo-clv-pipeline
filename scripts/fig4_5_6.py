@@ -5,34 +5,28 @@ import matplotlib.dates as mdates
 import matplotlib.cm as cm
 import os, sys, pdb, csv, glob
 import pandas as pd
+from sdo_clv_pipeline.paths import root
 
 # get paths
-# from showyourwork.paths import user as Paths
-paths = os.path.abspath(os.path.join(os.getcwd(), "..", "data"))
-print(paths)
-plotdir = os.path.join(paths, "figures")
+plotdir = os.path.join(root, "figures")
 os.makedirs(plotdir, exist_ok=True)
-datadir = paths
+
+datadir = os.path.join(root, "data")
 os.makedirs(datadir, exist_ok=True)
 
-datafile = 'C:\\Users\\srugi\\Documents\\sdo-clv-pipeline\\data\\region_output.csv'
+# datafile = 'C:\\Users\\srugi\\Documents\\sdo-clv-pipeline\\data\\region_output.csv'
+datafile = os.path.join(datadir, "region_output.csv")
+
 # staticdir = os.path.join(paths, "static")
 # os.makedirs(staticdir, exist_ok=True)
 
-project = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-
-src_dir = os.path.join(project, "src")
-scripts_dir = os.path.join(project, "scripts")
-
+scripts_dir = os.path.join(root, "scripts")
 
 # with open(datafile) as f:
 #     exec(f.read())
 
-# plt.style.use(os.path.join(src_dir, "my.mplstyle"))
+plt.style.use(os.path.join(root, "my.mplstyle"))
 # plt.ioff()
-
-# # use style
-# plt.style.use(str(paths.src) + "/" + "my.mplstyle"); plt.ioff()
 
 # # consolidate output
 # exec(open(str(paths.scripts) + "/" + "preprocess_output.py").read())
@@ -74,10 +68,17 @@ def calc_region_stats(region_df, colname="v_hat"):
     reg_std = np.zeros(nn)
     reg_err = np.zeros(nn)
 
+    if len(region_df[colname]) == 0:
+        reg_avg[:] = np.nan
+        reg_std[:] = np.nan
+        reg_err[:] = np.nan
+        return reg_avg, reg_std, reg_err
+
     # loop over mu rings
     for i in range(nn):
         # get idx
-        idx = region_df.lo_mu == lo_mus[i]
+        # idx = region_df.lo_mu.values == lo_mus[i]
+        idx = np.isclose(lo_mus[i], region_df.lo_mu.values, atol=1e-2)
 
         # calculate the stats
         reg_avg[i] = np.mean(region_df[colname][idx])
@@ -87,7 +88,6 @@ def calc_region_stats(region_df, colname="v_hat"):
 
 # read in by region
 df_vels_full = pd.read_csv(os.path.join(datadir, "processed", "full_disk.csv"))
-print(df_vels_full)
 plage = pd.read_csv(os.path.join(datadir, "processed", "plage.csv"))
 network = pd.read_csv(os.path.join(datadir, "processed", "network.csv"))
 quiet_sun = pd.read_csv(os.path.join(datadir, "processed", "quiet_sun.csv"))
@@ -153,7 +153,6 @@ def clv_plot(fname=None):
     df_v_hat["v_avg_lm"] = np.round(right_moat_avg, decimals=2)
     df_v_hat["v_std_rm"] = np.round(right_moat_std, decimals=2)
     
-    
     # df_v_hat["v_avg_mt"] = np.round(moat_avg, decimals=2)
     # df_v_hat["v_std_mt"] = np.round(moat_std, decimals=2)
     print("df_v_hat[v_avg_lm]: ", df_v_hat["v_std_pu"].values)
@@ -211,6 +210,21 @@ def clv_plot(fname=None):
     axs[0,0].fill_between(mu_bin, network_avg - network_std, network_avg + network_std, color=nw_color, alpha=0.4)
     # axs[0,0].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
+    # axs[0,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
+    #                   capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
+    # axs[0,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
+    # # axs[0,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
+
+    axs[0,0].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
+                      capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
+    axs[0,0].fill_between(mu_bin, left_moat_avg - left_moat_std, left_moat_avg + left_moat_std, color=lm_color, alpha=0.4)
+    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
+
+    axs[0,0].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
+                      capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
+    axs[0,0].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
+    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
+
     if plot_rb:
         axs[1,0].errorbar(mu_bin, red_penumbrae_avg, yerr=red_penumbrae_err, fmt=rp_marker, capsize=capsize,
                           capthick=capthick, elinewidth=elinewidth, color=rp_color, label=r"${\rm Red\ Penumbrae}$")
@@ -229,23 +243,6 @@ def clv_plot(fname=None):
                       capthick=capthick, elinewidth=elinewidth, color=um_color, label=r"${\rm Umbrae}$")
     axs[1,0].fill_between(mu_bin, umbrae_avg - umbrae_std, umbrae_avg + umbrae_std, color=um_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(umbrae_fit, mu_fit), color=um_color, ls="--")
-
-    # axs[1,0].errorbar(mu_bin, moat_avg, yerr=moat_err, fmt=mt_marker, capsize=capsize,
-    #                   capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Moat}$")
-    # axs[1,0].fill_between(mu_bin, moat_avg - moat_std, moat_avg + moat_std, color=mt_color, alpha=0.4)
-    # # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
-
-    axs[1,0].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
-    axs[1,0].fill_between(mu_bin, left_moat_avg - left_moat_std, left_moat_avg + left_moat_std, color=lm_color, alpha=0.4)
-    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
-
-    axs[1,0].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
-    axs[1,0].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
-    # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
-
-
 
     # get stats for v_conv
     umbrae_avg, umbrae_std, umbrae_err = calc_region_stats(umbrae, colname="v_conv")
@@ -323,7 +320,7 @@ def clv_plot(fname=None):
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
     axs[0,1].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=mt_color, label=r"${\rm Right Moat}$")
+                 capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
     axs[0,1].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 

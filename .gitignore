@@ -5,6 +5,8 @@
 *.fits
 uv.lock
 *.npz
+*.png
+*.csv
 
 # directories
 data/*

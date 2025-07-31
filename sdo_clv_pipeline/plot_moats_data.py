@@ -24,8 +24,8 @@ from .reproject import *
 
 
 def load_and_plot():
-
-    data = np.load("moats_data.npz")
+    moat_file = os.path.join(root, "data", "moats_data.npz")
+    data = np.load(moat_file)
 
     x = data['x']
     vels = data['vels']

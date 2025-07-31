@@ -427,7 +427,8 @@ class SunMask(object):
 
     def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
                          moat_dilations, moat_thetas, moat_areas, moat_vals, counter, 
-                         moat_avg_vels, symbol, left_moats, right_moats):
+                         moat_avg_vels, symbol, left_moats, right_moats,
+                         plot_moat=True):
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
 
@@ -515,9 +516,10 @@ class SunMask(object):
         no_corners = ndimage.generate_binary_structure(2,1)
         labels, nlabels = ndimage.label(binary_img, structure=corners) # label each island of umbra and penumbra
 
-        plt.imshow(labels)
-        plt.colorbar()
-        plt.show()
+        if plot_moat:
+            plt.imshow(labels)
+            plt.colorbar()
+            plt.show()
 
         # get labeled region areas and perimeters for umbra and penumbra
         # find areas (NEW WAY)
@@ -559,9 +561,11 @@ class SunMask(object):
             #print(centroid)                 
             #if rprop.label == a_label[counter]:
             #if max_area == maximum_area:
+
             if max_area > 600:
-                print(rprop.label)
-                print(max_area)
+                # print(rprop.label)
+                # print(max_area)
+
                 # get pixels in that region
                 max_area_idx = areas_pix == max_area
                 areas.append(max_area) # areas[i] = max_area
@@ -587,12 +591,11 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
 
-                # TODO below line fails: too many values to unpack
                 out = SunMask.plot_value(dilated_spots, self, dop, mag, con, idx_new, 
                                          max_area, corners, no_corners, moat_avg_vels, 
                                          symbol, left_moats, right_moats)
                 dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats = out
-                print("below line")
+                # print("below line")
 
                 vels.append(avg_vel_arr)
                 moat_vels.append(avg_vel_arr)
@@ -631,13 +634,15 @@ class SunMask(object):
         letters = [ascii_letters[i%52] for i in range(len(areas))]
         
         # moats = np.array(moats, dtype = object)
-        np.savez_compressed('moats_data.npz', x=x, vels=vels, mags=mags, ints=ints, 
+        moat_file = os.path.join(root, "data", "moats_data.npz")
+        np.savez_compressed(moat_file, x=x, vels=vels, mags=mags, ints=ints, 
                             areas=areas, mus=mus, area_idx_arr=area_idx_arr, 
                             letters=letters, dilated_spots=dilated_spots)
         
         print("before plotting")
-        load_and_plot()
-        #plot_loop()
+        if plot_moat:
+            load_and_plot()
+            # plot_loop()
 
         # for i in dilated_spots:
         #     if symbol[i] == 0:

@@ -17,12 +17,12 @@ import multiprocessing as mp
 def is_quality_data(sdo_image):
     return sdo_image.quality == 0
 
-def reduce_sdo_images(
-    con_file, mag_file, dop_file, aia_file,
-    moat_vels, moat_mags, moat_ints, moat_dilations,
-    moat_thetas, moat_areas, moat_vals, counter,
-    moat_avg_vels, symbol, left_moats, right_moats, mu_thresh=0.1, fit_cbs=False
-):
+def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels, 
+                      moat_mags, moat_ints, moat_dilations, moat_thetas, 
+                      moat_areas, moat_vals, counter,moat_avg_vels, 
+                      symbol, left_moats, right_moats, mu_thresh=0.1, 
+                      fit_cbs=False):
+    # assertions
     assert exists(con_file)
     assert exists(mag_file)
     assert exists(dop_file)
@@ -88,7 +88,9 @@ def reduce_sdo_images(
     # identify regions for thresholding
     # try:
     print("About to construct SunMask")
-    mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats)
+    mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
+                   moat_dilations, moat_thetas, moat_areas, moat_vals, 
+                   counter, moat_avg_vels, symbol, left_moats, right_moats)
     mask.mask_low_mu(mu_thresh)
     # except:
         # print("\t >>> Region identification failed, skipping " + iso, flush=True)
@@ -96,7 +98,10 @@ def reduce_sdo_images(
 
     return con, mag, dop, aia, mask
 
-def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats, mu_thresh=0.1, fit_cbs=False):
+def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, 
+                           moat_mags, moat_ints, moat_dilations, moat_thetas, 
+                           moat_areas, moat_vals, counter, moat_avg_vels, symbol, 
+                           left_moats, right_moats, mu_thresh=0.1, fit_cbs=False):
     assert exists(con_file)
     assert exists(mag_file)
     assert exists(aia_file)
@@ -146,7 +151,9 @@ def reduce_sdo_images_fast(con_file, mag_file, dop_file, aia_file, moat_vels, mo
 
     # identify regions for thresholding
     try:
-        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, counter, moat_avg_vels, symbol, left_moats, right_moats)
+        mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
+                       moat_dilations, moat_thetas, moat_areas, moat_vals, 
+                       counter, moat_avg_vels, symbol, left_moats, right_moats)
         mask.mask_low_mu(mu_thresh)
         counter += 1
     except:
@@ -179,7 +186,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
         fname2 = os.path.join(datadir, "region_output.csv")
     else:
         # make tmp directory
-        tmpdir = os.path.join(datadir,"tmp/")
+        tmpdir = os.path.join(datadir, "tmp")
 
         # filenames
         fname1 = os.path.join(tmpdir, "thresholds_", suffix, ".csv")
@@ -191,16 +198,16 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
                 create_file(file)
 
     # reduce the data set
-    # try:
-    ### TODO: below lines fails
-    con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, 
-                                                    aia_file, moat_vels, moat_mags, 
-                                                    moat_ints, moat_dilations, moat_thetas, 
-                                                    moat_areas, moat_vals, counter, 
-                                                    moat_avg_vels, symbol, left_moats, 
-                                                    right_moats)
-    # except:
-        # return None
+    try:
+        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, 
+                                                     aia_file, moat_vels, moat_mags, 
+                                                     moat_ints, moat_dilations, 
+                                                     moat_thetas, moat_areas, 
+                                                     moat_vals, counter, 
+                                                     moat_avg_vels, symbol, 
+                                                     left_moats, right_moats)
+    except:
+        return None
 
     # get the MJD of the obs
     mjd = Time(con.date_obs).mjd

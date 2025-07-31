@@ -18,7 +18,7 @@ plt.style.use(str(root) + "/" + "my.mplstyle"); plt.ioff()
 def get_parser_args():
     # initialize argparser
     parser = argparse.ArgumentParser(description="Analyze SDO data")
-    parser.add_argument("--fitsdir",type=str, default="/storage/home/mlp95/scratch/sdo_data/")
+    parser.add_argument("--fitsdir", type=str, default="/storage/home/mlp95/scratch/sdo_data/")
     parser.add_argument("--clobber", action="store_true", default=False)
     parser.add_argument("--globexp", type=str, default="")
 
@@ -31,8 +31,9 @@ def get_parser_args():
 
 def main():
     # make raw data dir if it does not exist
-    if not isdir(str(root / "data") + "/"):
-        os.mkdir(str(root / "data") + "/")
+
+    if not isdir(os.path.join(root, "data")):
+        os.mkdir(os.path.join(root, "data"))
 
     # sort out input/output data files
     fitsdir, clobber, globexp = get_parser_args()
@@ -41,7 +42,7 @@ def main():
     con_files, mag_files, dop_files, aia_files = files
 
     # get output datadir
-    datadir = str(root / "data") + "/" + globdir + "/"
+    os.path.join(root, "data", globdir)
     if not isdir(datadir):
         os.mkdir(datadir)
 
@@ -62,7 +63,7 @@ def main():
     # process the data either in parallel or serially
     if ncpus > 1:
         # make tmp directory
-        tmpdir = datadir + "tmp/"
+        tmpdir = os.path.join(datadir, "tmp")
         if not isdir(tmpdir):
             os.mkdir(tmpdir)
 
@@ -84,13 +85,13 @@ def main():
             pool.starmap(process_data_set_parallel, items, chunksize=4)
 
         # find the output data sets
-        outfiles1 = glob.glob(tmpdir + "thresholds_*")
-        outfiles2 = glob.glob(tmpdir + "region_output_*")
+        outfiles1 = glob.glob(os.path.join(tmpdir,"thresholds_*"))
+        outfiles2 = glob.glob(os.path.join(tmpdir,"region_output_*"))
 
         # stitch them together on the main process
         delete = False
-        stitch_output_files(datadir + "thresholds.csv", outfiles1, delete=delete)
-        stitch_output_files(datadir + "region_output.csv", outfiles2, delete=delete)
+        stitch_output_files(os.path.join(datadir, "thresholds.csv"), outfiles1, delete=delete)
+        stitch_output_files(os.path.join(datadir, "region_output.csv"), outfiles2, delete=delete)
 
         # print run time
         print("Parallel: --- %s seconds ---" % (time.time() - t0))

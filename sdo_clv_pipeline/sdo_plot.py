@@ -49,7 +49,7 @@ def plot_image(sdo_image, outdir=None, fname=None):
         if outdir is not None:
             if fname is None:
                 fname = "mag_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(outdir + fname, bbox_inches="tight", dpi=500)
+            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
             plt.clf(); plt.close()
 
         else:
@@ -82,7 +82,7 @@ def plot_image(sdo_image, outdir=None, fname=None):
 
             if fname is None:
                 fname = "dop_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(outdir + fname, bbox_inches="tight", dpi=500)
+            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
             plt.clf(); plt.close()
 
         else:
@@ -117,7 +117,7 @@ def plot_image(sdo_image, outdir=None, fname=None):
         if outdir is not None:
             if fname is None:
                 fname = "con_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(outdir + fname, bbox_inches="tight", dpi=500)
+            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
             plt.clf(); plt.close()
         else:
             plt.show()
@@ -146,7 +146,7 @@ def plot_image(sdo_image, outdir=None, fname=None):
         if outdir is not None:
             if fname is None:
                 fname = "aia_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(outdir + fname, bbox_inches="tight", dpi=500)
+            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
             plt.clf(); plt.close()
         else:
             plt.show()
@@ -188,7 +188,7 @@ def plot_mask(mask, outdir=None, fname=None):
     if outdir is not None:
         if fname is None:
             fname = "mask_" + mask.date_obs + ".pdf"
-        fig.savefig(outdir + fname, bbox_inches="tight", dpi=500)
+        fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
         plt.clf(); plt.close()
     else:
         plt.show()
@@ -196,7 +196,8 @@ def plot_mask(mask, outdir=None, fname=None):
 
 def label_moats_on_sun(mask, outdir=None, fname=None):
     # get spot mask and letters for labels from separate file
-    data = np.load('moats_data.npz', allow_pickle=True)  # allow_pickle for arrays of arrays
+    moat_file = os.path.join(root, "data", "moats_data.npz")
+    data = np.load(moat_file, allow_pickle=True)  # allow_pickle for arrays of arrays
     area_idx_arr = data['area_idx_arr']
     letters = data['letters']
 
@@ -272,5 +273,6 @@ def label_moats_on_sun(mask, outdir=None, fname=None):
     ax.set_ylim(0, h)
     plt.gca().invert_yaxis()
     plt.gca().invert_xaxis()
-    # os.remove('moats_data.npz')
+    # moat_file = os.path.join(root, "data", "moats_data.npz")
+    # os.remove(moat_file)
     plt.show()

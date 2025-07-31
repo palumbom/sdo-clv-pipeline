@@ -42,7 +42,7 @@ def main():
     con_files, mag_files, dop_files, aia_files = files
 
     # get output datadir
-    os.path.join(root, "data", globdir)
+    datadir = os.path.join(root, "data", globdir)
     if not isdir(datadir):
         os.mkdir(datadir)
 

@@ -26,6 +26,7 @@ dependencies = [
     "scikit-image",
     "ipykernel>=6.29.5",
     "numba>=0.61.2",
+    "tqdm>=4.67.1",
 ]
 
 [dependency-groups]

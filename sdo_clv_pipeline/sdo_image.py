@@ -376,9 +376,10 @@ def pad_max_len(data, max_length):
 class SunMask(object):
     def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
                  moat_dilations, moat_thetas, moat_areas, moat_vals, counter, 
-                 moat_avg_vels, symbol, left_moats, right_moats):
+                 moat_avg_vels, symbol, left_moats, right_moats, 
+                 plot_moat=True):
         # check argument order/names are correct
-        print("Entered SunMask.__init__")
+        # print("Entered SunMask.__init__")
         
         assert con.is_continuum()
         assert mag.is_magnetogram()
@@ -402,7 +403,8 @@ class SunMask(object):
         # identify regions
         self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
                               moat_dilations, moat_thetas, moat_areas, moat_vals, 
-                              counter, moat_avg_vels, symbol, left_moats, right_moats)
+                              counter, moat_avg_vels, symbol, left_moats, right_moats,
+                              plot_moat=plot_moat)
 
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix

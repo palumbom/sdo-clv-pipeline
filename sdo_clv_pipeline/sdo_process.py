@@ -21,7 +21,7 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels,
                       moat_mags, moat_ints, moat_dilations, moat_thetas, 
                       moat_areas, moat_vals, counter,moat_avg_vels, 
                       symbol, left_moats, right_moats, mu_thresh=0.1, 
-                      fit_cbs=False):
+                      fit_cbs=False, plot_moat=True):
     # assertions
     assert exists(con_file)
     assert exists(mag_file)
@@ -63,34 +63,35 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels,
         return None
 
     # correct magnetogram for foreshortening
-    print("correct mag")
+    # print("correct mag")
     mag.correct_magnetogram()
 
     # calculate differential rot., meridional circ., obs. vel, grav. redshift, cbs
-    print("correct dop")
+    # print("correct dop")
     dop.correct_dopplergram(fit_cbs=fit_cbs)
 
     # check that the dopplergram correction went well
-    print("checking")
+    # print("checking")
     if np.nanmax(np.abs(dop.v_rot)) < 1000.0:
         print("\t >>> Dopplergram correction failed, skipping " + iso, flush=True)
         return None
     
-    print("set to nan")
+    # print("set to nan")
     # set values to nan for mu less than mu_thresh
     con.mask_low_mu(mu_thresh)
     dop.mask_low_mu(mu_thresh)
     mag.mask_low_mu(mu_thresh)
     aia.mask_low_mu(mu_thresh)
 
-    print("mask")
+    # print("mask")
 
     # identify regions for thresholding
     # try:
-    print("About to construct SunMask")
+    # print("About to construct SunMask")
     mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
                    moat_dilations, moat_thetas, moat_areas, moat_vals, 
-                   counter, moat_avg_vels, symbol, left_moats, right_moats)
+                   counter, moat_avg_vels, symbol, left_moats, right_moats,
+                   plot_moat=plot_moat)
     mask.mask_low_mu(mu_thresh)
     # except:
         # print("\t >>> Region identification failed, skipping " + iso, flush=True)
@@ -173,7 +174,8 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
 def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, 
                      moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, 
                      counter, moat_avg_vels, symbol, left_moats, right_moats,
-                     mu_thresh, n_rings=10, suffix=None, datadir=None):
+                     mu_thresh, n_rings=10, suffix=None, datadir=None,
+                     plot_moat=True):
 
     start_time = time.perf_counter()
     #figure out data directories
@@ -205,7 +207,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
                                                     moat_thetas, moat_areas, 
                                                     moat_vals, counter, 
                                                     moat_avg_vels, symbol, 
-                                                    left_moats, right_moats)
+                                                    left_moats, right_moats,
+                                                    plot_moat=plot_moat)
     # except:
         # return None
 

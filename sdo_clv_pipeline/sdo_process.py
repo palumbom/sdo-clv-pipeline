@@ -177,6 +177,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
                      mu_thresh, n_rings=10, suffix=None, datadir=None,
                      plot_moat=True):
 
+    print(">>> Running epoch %s " % get_date(con_file).isoformat(), flush=True)
+
     start_time = time.perf_counter()
     #figure out data directories
     if not isdir(datadir):
@@ -308,5 +310,5 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
 
     # report success and return
     print("\t >>> Epoch %s run successfully" % get_date(con_file).isoformat(), flush=True)
-    print("Elapsed time: ", end_time - start_time)
+    print("\t >>> Elapsed time: ", end_time - start_time)
     return None

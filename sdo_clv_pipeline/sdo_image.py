@@ -649,7 +649,7 @@ class SunMask(object):
                             areas=areas, mus=mus, area_idx_arr=area_idx_arr, 
                             letters=letters, dilated_spots=dilated_spots)
         
-        print("before plotting")
+        # print("before plotting")
         if plot_moat:
             load_and_plot()
             # plot_loop()
@@ -696,7 +696,7 @@ class SunMask(object):
         self.moat_thetas = moat_thetas
         self.moat_areas = moat_areas
 
-        print("moat pixels")
+        # print("moat pixels")
         plt.imshow(moat_pixels)
 
         return None

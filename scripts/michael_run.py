@@ -40,7 +40,7 @@ right_moats = []
 
 # loop over data
 print()
-for i in trange(len(con_files)):
+for i in range(len(con_files)):
     # define the paths where files live
     con_file = con_files[i]
     mag_file = mag_files[i]

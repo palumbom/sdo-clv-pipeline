@@ -381,7 +381,7 @@ def calculate_pixel_area(lat, lon):
     return pix_area
 
 def pad_max_len(data, max_length):
-    return np.array(data + [np.nan] * (max_length - len(data)), dtype=float)
+    return np.hstack([data, np.repeat(np.nan, max_length - len(data))]).astype(float)
 
 def get_areas(labels, intensity_image):
     properties = ("label","area","mean_intensity")
@@ -541,16 +541,6 @@ class SunMask(object):
         # save original array first
         # save_arr = areas_pix.copy()
 
-        # set up list of lists for layered plot
-        x = []
-        mus = []
-        vels = []
-        mags = []
-        ints = []
-        areas = []
-        area_idx_arr = []
-        dilated_spots = []
-
         a_label = [36, 17, 19, 15, 37, 49]
         b_label = [71, 86, 81, 62, 52, 36, 39, 26]
 
@@ -561,21 +551,33 @@ class SunMask(object):
         # collect areas and centroids
         area_thresh = 600
         rprops_tab = regionprops_table(labels, properties=("label","area","centroid"))  
-        areas = rprops_tab["area"]
-        x_centroids = rprops_tab["centroid-1"][areas > area_thresh]
-        y_centroids = rprops_tab["centroid-0"][areas > area_thresh]
-        labels = rprops_tab["label"][areas > area_thresh]
+        areas = np.array(rprops_tab["area"])
+        x_centroids = np.array((rprops_tab["centroid-1"][areas > area_thresh])).astype(int)
+        y_centroids = np.array((rprops_tab["centroid-0"][areas > area_thresh])).astype(int)
+        labels = np.array(rprops_tab["label"][areas > area_thresh]).astype(int)
         areas = areas[areas > area_thresh]
 
         # allocate for moats
         moat_idx = np.zeros_like(con.image).astype(bool)
         moats = np.zeros((len(areas), *np.shape(con.image))).astype(bool)
 
+        # allocate for hemisphere indicator 
+        left_hemisphere = np.zeros(len(areas)).astype(bool)
+        lon = dop.lon.value
+
+        # allocate for average quantities
+        avg_mu = np.zeros(len(areas))
+        max_dilations = np.zeros(len(areas))
+        avg_vels = []
+        avg_mags = []
+        avg_ints = []
+
         # define function to dilate moats
-        def dilate_moat(idx, pre_factor):
+        def dilate_moat(idx, pre_factor, compute_avgs=True):
             # get area of that region              
             max_area = areas[idx]
-            centroid = x_centroids[idx]
+            x_centroid = x_centroids[idx]
+            y_centroid = y_centroids[idx]
 
             # get pixels in that region
             max_area_idx = areas_pix == max_area
@@ -599,24 +601,35 @@ class SunMask(object):
                 return cumsum_sums[1:] / cumsum_counts[1:]
 
             # select and ravel averaging quantities
-            flat_vel = dop.v_corr[valid_mask].ravel()
-            flat_mag = mag.image[valid_mask].ravel()
-            flat_int = con.image[valid_mask].ravel()
-            
-            # compute averages
-            avg_vels = cum_avg_val(flat_vel)
-            avg_mags = cum_avg_val(flat_mag)
-            avg_ints = cum_avg_val(flat_int)
+            if compute_avgs:
+                flat_vel = dop.v_corr[valid_mask].ravel()
+                flat_mag = mag.image[valid_mask].ravel()
+                flat_int = con.image[valid_mask].ravel()
+                
+                # compute averages and append
+                avg_vels.append(cum_avg_val(flat_vel))
+                avg_mags.append(cum_avg_val(flat_mag))
+                avg_ints.append(cum_avg_val(flat_int))
 
             # select initially on the larger moat radius
-            cond = [rings < pre_factor * (1.2 * np.sqrt(max_area / pi)), valid_mask] 
+            rings_cond = rings < pre_factor * (1.2 * np.sqrt(max_area / pi))
+            cond = [rings_cond, valid_mask] 
             np.logical_and.reduce(cond, out=moat_idx)
             moats[idx, :, :] = moat_idx
+
+            # get average mu
+            avg_mu[idx] = np.average(con.mu[moat_idx])
+
+            # get max number of dilations
+            max_dilations[idx] = np.nanmax(rings[rings_cond])
+
+            # make hemisphere indicator
+            left_hemisphere[idx] = lon[y_centroid, x_centroid] >= 0.0
             return None
 
         # iterate over regions
         for idx in range(len(areas)):
-            dilate_moat(idx, 0.97)
+            dilate_moat(idx, 0.97, compute_avgs=True)
 
         # now re-do overlapping moats
         collision_map = np.count_nonzero(moats, axis=0) > 1
@@ -625,65 +638,24 @@ class SunMask(object):
 
         # iterate again over regions which overlap
         for idx in redo_idxs:
-            dilate_moat(idx, 0.65)
+            dilate_moat(idx, 0.65, compute_avgs=False)
+
+        # get average theta
+        avg_theta = np.arccos(avg_mu)
 
         # discriminate based on hemisphere
+        ind8 = moats[left_hemisphere, :, :].any(axis=0)
+        ind9 = moats[~left_hemisphere, :, :].any(axis=0)
 
-        ind = np.any(dilated_spots, axis=0).astype(bool)
+        # set values 
+        self.regions[ind8] = 8 # left moats
+        self.regions[ind9] = 9 # right moats
 
-        plt.imshow(np.sum(moats.astype(int), axis=0))
-        plt.show()
-        pdb.set_trace()
-            
-
-            # areas.append(max_area) # areas[i] = max_area
-            # moat_areas.append(max_area)
-            # area_idx_arr.append(max_area_idx) # area_idx_arr[i] = max_area_idx
-            # # get average mu of the region
-            # mu_arr = np.array(con.mu[max_area_idx])
-            # avg_mu = np.average(mu_arr)
-            # mus.append(avg_mu) # mus[i] = avg_mu
-            # avg_theta = np.arccos(avg_mu)
-            # moat_thetas.append(avg_theta)
-            # if centroid > 2030:
-            #     symbol.append(1)
-            # else: 
-            #     symbol.append(0)
-            # # print(avg_mu)
-
-            # mv = self.dilate_moat(dilated_spots, dop, mag, con, 
-            #                     max_area_idx, max_area, corners, 
-            #                     no_corners, moat_avg_vels, symbol, 
-            #                     left_moats, right_moats)
-            # dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats = mv
-            # # print("below line")
-
-            # pdb.set_trace()
-
-            # vels.append(avg_vel_arr)
-            # moat_vels.append(avg_vel_arr)
-            # mags.append(avg_mag_arr)
-            # moat_mags.append(avg_mag_arr)
-            # ints.append(avg_int_arr)
-            # moat_ints.append(avg_int_arr)
-            # x.append(dilation_arr)
-            # moat_dilations.append(dilation_arr)
-        
-            # moat_vals.append(moat_vels)  # 0 
-            # moat_vals.append(moat_mags)  # 1
-            # moat_vals.append(moat_ints)  # 2 
-            # moat_vals.append(moat_areas) # 3
-            # moat_vals.append(moat_thetas)   # 4
-            # moat_vals.append(symbol) # 5
-
-        # padding lists
-        max_length_y = max(len(arr) for arr in vels)
-        max_length_x = max(len(arr) for arr in x)
-        
-        vels = np.vstack([pad_max_len(arr, max_length_y) for arr in vels])
-        mags = np.vstack([pad_max_len(arr, max_length_y) for arr in mags])
-        ints = np.vstack([pad_max_len(arr, max_length_y) for arr in ints])
-        x = np.vstack([pad_max_len(arr, max_length_x) for arr in x])
+        # pad data for write out
+        max_length = np.max([len(arr) for arr in avg_vels])
+        vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
+        mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
+        ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
 
         # print("padded")
         # for i, arr in enumerate(vels):

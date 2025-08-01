@@ -43,10 +43,10 @@ def find_data(indir, globexp=""):
     aia_files = [aia_files[idx] for idx, date in enumerate(aia_dates) if date in common_dates]
 
     print("File counts:")
-    print("\t >>> CON:", len(con_dates))
-    print("\t >>> MAG:", len(mag_dates))
-    print("\t >>> DOP:", len(dop_dates))
-    print("\t >>> AIA:", len(aia_dates))
+    print("\t >>> CON:", len(con_files))
+    print("\t >>> MAG:", len(mag_files))
+    print("\t >>> DOP:", len(dop_files))
+    print("\t >>> AIA:", len(aia_files))
 
     return con_files, mag_files, dop_files, aia_files
 

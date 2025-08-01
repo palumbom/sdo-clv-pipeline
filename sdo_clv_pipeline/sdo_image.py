@@ -513,6 +513,10 @@ class SunMask(object):
         ind6 = areas_mic >= area_thresh  # areas_mic
         self.regions[ind6] = 6 # plage
 
+        # set isolated bright pixels to quiet sun
+        ind_iso = areas_pix == 1.0
+        self.regions[ind_iso] = 4 # quiet sun
+
         # label each penumbra island and include umbra so we only expand outwards
         binary_img = np.logical_or.reduce([self.regions == 1, self.regions == 2, self.regions == 3])
         labels, nlabels = ndimage.label(binary_img, structure=corners) # label each island of umbra and penumbra
@@ -528,12 +532,12 @@ class SunMask(object):
         save_arr = areas_pix.copy()
 
         # set up list of lists for layered plot
+        x = []
+        mus = []
         vels = []
         mags = []
         ints = []
-        x = []
         areas = []
-        mus =[]
         area_idx_arr = []
         dilated_spots = []
 
@@ -664,10 +668,6 @@ class SunMask(object):
         right_moat_pixels = np.any(right_moats, axis=0).astype(bool)
         self.regions[left_moat_pixels] = 8   
         self.regions[right_moat_pixels] = 9  
-
-        # set isolated bright pixels to quiet sun
-        ind_iso = areas_pix == 1.0
-        self.regions[ind_iso] = 4 # quiet sun
 
         # make any remaining unclassified pixels quiet sun
         ind_rem = ((con.mu >= con.mu_thresh) & (self.regions == 0))

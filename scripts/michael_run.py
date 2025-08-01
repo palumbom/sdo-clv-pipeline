@@ -14,7 +14,8 @@ from sdo_clv_pipeline.sdo_plot import *
 import sdo_clv_pipeline
 
 # returns four sorted lists with the path to each of the file types
-fits_dir = os.path.abspath("/mnt/ceph/users/mpalumbo/sdo_data")
+# fits_dir = os.path.abspath("/mnt/ceph/users/mpalumbo/sdo_data")
+fits_dir = os.path.join(root, "data")
 
 globexp ="2014*0*"
 files = organize_IO(fits_dir, clobber=True, globexp=globexp)

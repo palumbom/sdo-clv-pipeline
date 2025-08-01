@@ -1,5 +1,5 @@
 import numpy as np
-import pdb, warnings
+import pdb, time, warnings
 import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -10,7 +10,7 @@ from sunpy.coordinates import frames
 from scipy import ndimage
 from astropy.wcs import WCS
 from scipy.optimize import curve_fit
-from skimage.measure import regionprops
+from skimage.measure import regionprops, regionprops_table
 from astropy.wcs import FITSFixedWarning
 from astropy.io.fits.verify import VerifyWarning
 from astropy.wcs.utils import proj_plane_pixel_scales
@@ -373,6 +373,15 @@ def calculate_pixel_area(lat, lon):
 def pad_max_len(data, max_length):
     return np.array(data + [np.nan] * (max_length - len(data)), dtype=float)
 
+def get_areas(labels, intensity_image):
+    properties = ("label","area","mean_intensity")
+    rprops_tab = regionprops_table(labels, intensity_image=intensity_image, properties=properties)    
+    area = np.r_[0, rprops_tab['area']]
+    mean = np.r_[0, rprops_tab['mean_intensity']]
+    areas_pix = area[labels]
+    areas_mic = (area * mean)[labels]
+    return areas_pix, areas_mic
+
 class SunMask(object):
     def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
                  moat_dilations, moat_thetas, moat_areas, moat_vals, counter, 
@@ -435,8 +444,8 @@ class SunMask(object):
         self.regions = np.zeros_like(con.image)
 
         # calculate intensity thresholds for HMI
-        self.con_thresh1 = 0.89 * np.nansum(con.iflat * self.w_quiet)/np.nansum(self.w_quiet)
-        self.con_thresh2 = 0.45 * np.nansum(con.iflat * self.w_quiet)/np.nansum(self.w_quiet)
+        self.con_thresh1 = 0.89 * np.nansum(con.iflat * self.w_quiet) / np.nansum(self.w_quiet)
+        self.con_thresh2 = 0.45 * np.nansum(con.iflat * self.w_quiet) / np.nansum(self.w_quiet)
 
         # get indices for umbrae
         ind1 = con.iflat <= self.con_thresh2      # if intensity less than thresh2, umbra (ind1)
@@ -473,13 +482,13 @@ class SunMask(object):
         ind4 = np.logical_and(con.iflat > self.con_thresh1, self.w_quiet)
         
         # calculate intensity thresholds for AIA
-        weights = self.w_active * (~ind1) * (~ind2) * (~ind3)
+        weights = np.logical_and.reduce([self.w_active, ~ind1, ~ind2, ~ind3])
         self.aia_thresh = np.nansum(aia.iflat * weights) / np.nansum(weights)
 
         # get indices for bright regions (plage/faculae + network)
         ind5a = np.logical_and(con.iflat > self.con_thresh1, self.w_active)  # intensity greater than thresh 1 and strong B field
-        ind5b = (aia.iflat > self.aia_thresh) & (~ind1) & (~ind2) & (~ind3)  # > aia thresh and not umbra or penumbra
-        ind5 = ind5a | ind5b # if ind5a or ind5b, bright
+        ind5b = np.logical_and.reduce([aia.iflat > self.aia_thresh, ~ind1, ~ind2, ~ind3]) # > aia thresh and not umbra or penumbra
+        ind5 = np.logical_or(ind5a, ind5b) # if ind5a or ind5b, bright
 
         # set mask indices
         self.regions[ind1] = 1 # umbrae
@@ -488,19 +497,14 @@ class SunMask(object):
         self.regions[ind4] = 4 # quiet sun
         self.regions[ind5] = 5 # bright areas (will separate into plage + network)
 
+        # create structures for dilations
+        corners = ndimage.generate_binary_structure(2,2) # array of bools, defines feature connections
+        no_corners = ndimage.generate_binary_structure(2,1)
+
         # label unique contiguous bright regions (label islands of bright stuff)
         binary_img = self.regions == 5  # get bright areas 
-        structure = ndimage.generate_binary_structure(2,2) # array of bools, defines feature connections
-        labels, nlabels = ndimage.label(binary_img, structure=structure) 
-            # takes bright areas and feature connections, gives each island a label
-
-        # find areas (NEW WAY)
-        rprops = regionprops(labels, dop.pix_area)
-        areas_mic = np.zeros_like(con.image)             # areas_mic
-        areas_pix = np.zeros_like(con.image)            # areas_pix 
-        for k in range(1, len(rprops)):
-            areas_mic[rprops[k].coords[:, 0], rprops[k].coords[:, 1]] = rprops[k].area * rprops[k].mean_intensity
-            areas_pix[rprops[k].coords[:, 0], rprops[k].coords[:, 1]] = rprops[k].area
+        labels, nlabels = ndimage.label(binary_img, structure=corners) # takes bright areas and feature connections, gives each island a label
+        areas_pix, areas_mic = get_areas(labels, dop.pix_area) # get areas
 
         # area thresh is 20 microhemispheres
         area_thresh = 20.0
@@ -509,27 +513,16 @@ class SunMask(object):
         ind6 = areas_mic >= area_thresh  # areas_mic
         self.regions[ind6] = 6 # plage
 
-        ### plotting ####
-
         # label each penumbra island and include umbra so we only expand outwards
-        binary_img = (self.regions == 2) | (self.regions == 3) | (self.regions == 1) # get penumbra and umbra 
-        corners = ndimage.generate_binary_structure(2,2) # binary structure (rank, connectivity)
-        no_corners = ndimage.generate_binary_structure(2,1)
+        binary_img = np.logical_or.reduce([self.regions == 1, self.regions == 2, self.regions == 3])
         labels, nlabels = ndimage.label(binary_img, structure=corners) # label each island of umbra and penumbra
+        rprops = regionprops(labels, dop.pix_area)
+        areas_pix, areas_mic = get_areas(labels, dop.pix_area) # get areas
 
         if plot_moat:
             plt.imshow(labels)
             plt.colorbar()
             plt.show()
-
-        # get labeled region areas and perimeters for umbra and penumbra
-        # find areas (NEW WAY)
-        rprops = regionprops(labels, dop.pix_area)
-        areas_mic = np.zeros_like(con.image)             # areas_mic
-        areas_pix = np.zeros_like(con.image)            # areas_pix 
-        for k in range(1, len(rprops)):
-            areas_mic[rprops[k].coords[:, 0], rprops[k].coords[:, 1]] = rprops[k].area * rprops[k].mean_intensity
-            areas_pix[rprops[k].coords[:, 0], rprops[k].coords[:, 1]] = rprops[k].area
 
         # save original array first
         save_arr = areas_pix.copy()
@@ -600,10 +593,10 @@ class SunMask(object):
                 # plt.colorbar()
                 # plt.show() # visualize that region
 
-                mv = SunMask.plot_value(dilated_spots, self, dop, mag, con, 
-                                        bit_array_out2, max_area, corners, 
-                                        no_corners, moat_avg_vels, symbol, 
-                                        left_moats, right_moats)
+                mv = SunMask.dilate_moat(dilated_spots, self, dop, mag, con, 
+                                         bit_array_out2, max_area, corners, 
+                                         no_corners, moat_avg_vels, symbol, 
+                                         left_moats, right_moats)
                 dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats = mv
                 # print("below line")
 
@@ -697,7 +690,9 @@ class SunMask(object):
         self.moat_areas = moat_areas
 
         # print("moat pixels")
-        plt.imshow(moat_pixels)
+        if plot_moat:
+            plt.imshow(moat_pixels)
+            plt.show()
 
         return None
 
@@ -739,9 +734,9 @@ class SunMask(object):
     def is_right_moat(self):
         return self.regions == 9
 
-    def plot_value(dilated_spots, self, dop, mag, con, max_area_idx, 
-                   max_area, corners, no_corners, moat_avg_vels, 
-                   symbol, left_moats, right_moats):
+    def dilate_moat(dilated_spots, self, dop, mag, con, max_area_idx, 
+                    max_area, corners, no_corners, moat_avg_vels, 
+                    symbol, left_moats, right_moats):
         # first dilation
         dilated_idx = ndimage.binary_dilation(max_area_idx, structure=no_corners)
         idx_new = np.logical_and(dilated_idx, self.regions != 2)

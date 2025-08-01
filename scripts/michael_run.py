@@ -16,7 +16,7 @@ import sdo_clv_pipeline
 # returns four sorted lists with the path to each of the file types
 fits_dir = os.path.abspath("/mnt/ceph/users/mpalumbo/sdo_data")
 
-globexp ="2014*01*07"
+globexp ="2014*0*"
 files = organize_IO(fits_dir, clobber=True, globexp=globexp)
 con_files, mag_files, dop_files, aia_files = files
 

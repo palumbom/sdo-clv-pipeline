@@ -202,17 +202,17 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
                 create_file(file)
 
     # reduce the data set
-    # try:
-    con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, 
-                                                    aia_file, moat_vels, moat_mags, 
-                                                    moat_ints, moat_dilations, 
-                                                    moat_thetas, moat_areas, 
-                                                    moat_vals, counter, 
-                                                    moat_avg_vels, symbol, 
-                                                    left_moats, right_moats,
-                                                    plot_moat=plot_moat)
-    # except:
-        # return None
+    try:
+        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, 
+                                                     aia_file, moat_vels, moat_mags, 
+                                                     moat_ints, moat_dilations, 
+                                                     moat_thetas, moat_areas, 
+                                                     moat_vals, counter, 
+                                                     moat_avg_vels, symbol, 
+                                                     left_moats, right_moats,
+                                                     plot_moat=plot_moat)
+    except:
+        return None
 
     # get the MJD of the obs
     mjd = Time(con.date_obs).mjd

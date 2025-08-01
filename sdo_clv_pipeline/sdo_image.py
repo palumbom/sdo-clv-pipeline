@@ -1,5 +1,5 @@
 import numpy as np
-import pdb, time, warnings
+import pdb, ipdb, time, warnings
 import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -7,6 +7,7 @@ import matplotlib.colors as colors
 from sunpy.map import Map as sun_map
 from sunpy.coordinates import frames
 
+from numba import njit
 from scipy import ndimage
 from astropy.wcs import WCS
 from scipy.optimize import curve_fit
@@ -92,7 +93,7 @@ class SDOImage(object):
         paxis2 = np.arange(self.naxis2)
         xx, yy = np.meshgrid(paxis1, paxis2)
         hpc = smap.pixel_to_world(xx * u.pix, yy * u.pix)   # helioprojective cartesian
-        self.rsun_solrad = self.dsun_obs/self.rsun_ref
+        self.rsun_solrad = self.dsun_obs / self.rsun_ref
 
         # transform to other coordinate systems
         hgs = hpc.transform_to(frames.HeliographicStonyhurst)
@@ -111,10 +112,13 @@ class SDOImage(object):
         self.pix_area = calculate_pixel_area(self.lat, self.lon)
 
         # get mu
-        mask = self.rr <= 1.0
-        self.mu = np.zeros_like(self.image)
-        self.mu[mask] = np.sqrt(1.0 - self.rr.value[mask]**2.0)
-        self.mu[~mask] = np.nan
+        rr2 = self.rr.value**2.0
+        diff = 1.0 - rr2
+        np.clip(diff, 0.0, None, out=diff)
+        with np.errstate(invalid='ignore'):
+            np.sqrt(diff, out=diff)
+        self.mu = diff.astype(self.image.dtype)
+        self.mu[rr2 >= 1.0] = np.nan
         return None
 
     def inherit_geometry(self, other_image):
@@ -172,7 +176,7 @@ class SDOImage(object):
         self.mask_nan = (self.mu >= 0.1)
 
         # velocity components
-        self.v_grav = 633 # m/s, constant
+        self.v_grav = 633 # m/s, constant 
         self.calc_spacecraft_vel() # spacecraft velocity
         self.calc_bulk_vel(fit_cbs=fit_cbs) # differential rotation + meridional flows + cbs
         return None
@@ -183,7 +187,7 @@ class SDOImage(object):
         assert self.is_dopplergram()
 
         # pre-compute trigonometric quantities
-        sig = np.arctan(self.rr/self.rsun_solrad)
+        sig = np.arctan(self.rr / self.rsun_solrad)
         chi = np.arctan2(self.xx, self.yy)
         sin_sig = np.sin(sig)
         cos_sig = np.cos(sig)
@@ -294,13 +298,18 @@ class SDOImage(object):
         # get average intensity in evenly spaced rings
         mu_edge = np.linspace(1.0, mu_lim, num=num_mu)
         avg_int = np.zeros(len(mu_edge)-1)
+
+        # loop over bins 
+        inds = np.zeros_like(self.image).astype(bool)
         for i in range(len(avg_int)):
             # find indices in ring that aren't nan
-            inds = (self.mu > mu_edge[i+1]) & (self.mu <= mu_edge[i]) & (~np.isnan(self.image))
+            conds = [self.mu > mu_edge[i+1], self.mu <= mu_edge[i], ~np.isnan(self.image)]
+            np.logical_and.reduce(conds, out=inds)
 
             # mask section that are big outliers
             ints = self.image[inds]
-            ints[np.abs(ints - np.mean(ints)) >= (n_sigma * np.std(ints))] = np.nan
+            sc = np.abs(ints - np.mean(ints)) >= (n_sigma * np.std(ints))
+            ints[sc] = np.nan
             avg_int[i] = np.nanmean(ints)
 
         # take averages in mu annuli to fit to
@@ -318,7 +327,7 @@ class SDOImage(object):
         popt, pcov = curve_fit(quad_darkening, mu_avgs, avg_int, p0=p0)
         self.ld_coeffs = popt
         self.ldark = quad_darkening_two(self.mu, *popt[1:])
-        self.iflat = self.image/self.ldark
+        self.iflat = self.image / self.ldark
         return None
 
     def rescale_to_hmi(self, hmi_image):
@@ -340,7 +349,7 @@ class SDOImage(object):
 # for creating pixel mask with thresholded regions
 def calculate_weights(mag):
     # set magnetic threshold
-    mag_thresh = 24.0/mag.mu
+    mag_thresh = 24.0 / mag.mu
 
     # make flag array for magnetically active areas
     w_active = (np.abs(mag.image) > mag_thresh).astype(float)

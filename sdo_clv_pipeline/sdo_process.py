@@ -82,7 +82,6 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels,
     dop.mask_low_mu(mu_thresh)
     mag.mask_low_mu(mu_thresh)
     aia.mask_low_mu(mu_thresh)
-    print("derp")
 
     # print("mask")
 

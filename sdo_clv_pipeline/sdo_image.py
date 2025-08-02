@@ -393,10 +393,7 @@ def get_areas(labels, intensity_image):
     return areas_pix, areas_mic
 
 class SunMask(object):
-    def __init__(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
-                 moat_dilations, moat_thetas, moat_areas, moat_vals, counter, 
-                 moat_avg_vels, symbol, left_moats, right_moats, 
-                 plot_moat=True):
+    def __init__(self, con, mag, dop, aia, plot_moat=True):
         # check argument order/names are correct
         # print("Entered SunMask.__init__")
         
@@ -420,10 +417,7 @@ class SunMask(object):
         self.ff = np.nansum(self.w_active[con.mu >= con.mu_thresh]) / npix
 
         # identify regions
-        self.identify_regions(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
-                              moat_dilations, moat_thetas, moat_areas, moat_vals, 
-                              counter, moat_avg_vels, symbol, left_moats, right_moats,
-                              plot_moat=plot_moat)
+        self.identify_regions(con, mag, dop, aia, plot_moat=plot_moat)
 
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix
@@ -446,10 +440,7 @@ class SunMask(object):
         # self.lon = np.copy(other_image.lon)
         return None
 
-    def identify_regions(self, con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
-                         moat_dilations, moat_thetas, moat_areas, moat_vals, counter, 
-                         moat_avg_vels, symbol, left_moats, right_moats,
-                         plot_moat=True):    
+    def identify_regions(self, con, mag, dop, aia, plot_moat=True):    
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
 
@@ -736,7 +727,7 @@ class SunMask(object):
     
     def is_moat_flow(self):
         # return self.regions == 7
-        return np.logical_or(self.regions == 8, self.region == 9)
+        return np.logical_or(self.regions == 8, self.regions == 9)
     
     def is_left_moat(self):
         return self.regions == 8

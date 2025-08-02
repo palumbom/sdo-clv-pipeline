@@ -15,7 +15,7 @@ import sdo_clv_pipeline
 
 # returns four sorted lists with the path to each of the file types
 # fits_dir = os.path.abspath("/mnt/ceph/users/mpalumbo/sdo_data")
-fits_dir = os.path.join(root, "data")
+fits_dir = os.path.join(root, "data", "fits")
 
 globexp ="2014*0*"
 files = organize_IO(fits_dir, clobber=True, globexp=globexp)
@@ -25,19 +25,6 @@ globdir = globexp.replace("*","")
 datadir = os.path.join(root, "data", globdir)
 if not isdir(datadir):
     os.mkdir(datadir)
-
-moat_vels = []
-moat_mags = []
-moat_ints = []
-moat_dilations = []
-moat_areas = []
-moat_thetas = []
-moat_vals = []
-counter = -1
-moat_avg_vels = []
-symbol = []
-left_moats = []
-right_moats = []
 
 # loop over data
 print()
@@ -49,8 +36,5 @@ for i in range(len(con_files)):
     aia_file = aia_files[i]
 
     process_data_set(con_file, mag_file, dop_file, aia_file,
-                     moat_vels, moat_mags, moat_ints, moat_dilations,
-                     moat_thetas, moat_areas, moat_vals, counter,
-                     moat_avg_vels, symbol, left_moats, right_moats,
                      mu_thresh=0.1, n_rings=10, suffix=None, 
                      datadir=datadir, plot_moat=False)

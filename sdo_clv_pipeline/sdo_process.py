@@ -17,11 +17,7 @@ import multiprocessing as mp
 def is_quality_data(sdo_image):
     return sdo_image.quality == 0
 
-def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels, 
-                      moat_mags, moat_ints, moat_dilations, moat_thetas, 
-                      moat_areas, moat_vals, counter,moat_avg_vels, 
-                      symbol, left_moats, right_moats, mu_thresh=0.1, 
-                      fit_cbs=False, plot_moat=True):
+def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False, plot_moat=True):
     # assertions
     assert exists(con_file)
     assert exists(mag_file)
@@ -88,10 +84,7 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels,
     # identify regions for thresholding
     # try:
     # print("About to construct SunMask")
-    mask = SunMask(con, mag, dop, aia, moat_vels, moat_mags, moat_ints, 
-                   moat_dilations, moat_thetas, moat_areas, moat_vals, 
-                   counter, moat_avg_vels, symbol, left_moats, right_moats,
-                   plot_moat=plot_moat)
+    mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
     mask.mask_low_mu(mu_thresh)
     # except:
         # print("\t >>> Region identification failed, skipping " + iso, flush=True)
@@ -103,15 +96,14 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, moat_vels,
 def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh, n_rings, datadir):
     process_data_set(con_file, mag_file, dop_file, aia_file,
                      mu_thresh=mu_thresh, n_rings=n_rings,
-                     suffix=str(mp.current_process().pid), datadir=datadir)
+                     suffix=str(mp.current_process().pid), datadir=datadir,
+                     plot_moat=False)
     return None
 
 
-def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags, 
-                     moat_ints, moat_dilations, moat_thetas, moat_areas, moat_vals, 
-                     counter, moat_avg_vels, symbol, left_moats, right_moats,
-                     mu_thresh, n_rings=10, suffix=None, datadir=None,
-                     plot_moat=True):
+def process_data_set(con_file, mag_file, dop_file, aia_file, 
+                     mu_thresh, n_rings=10, suffix=None, 
+                     datadir=None, plot_moat=True):
 
     print(">>> Running Epoch %s " % get_date(con_file).isoformat(), flush=True)
 
@@ -140,13 +132,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,moat_vels, moat_mags
     # reduce the data set
     # try:
     con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, 
-                                                    aia_file, moat_vels, moat_mags, 
-                                                    moat_ints, moat_dilations, 
-                                                    moat_thetas, moat_areas, 
-                                                    moat_vals, counter, 
-                                                    moat_avg_vels, symbol, 
-                                                    left_moats, right_moats,
-                                                    plot_moat=plot_moat)
+                                                    aia_file, plot_moat=plot_moat)
     # except:
     #     return None
 

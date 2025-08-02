@@ -84,13 +84,13 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
     # print("mask")
 
     # identify regions for thresholding
-    # try:
+    try:
     # print("About to construct SunMask")
-    mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
-    mask.mask_low_mu(mu_thresh)
-    # except:
-        # print("\t >>> Region identification failed, skipping " + iso, flush=True)
-        # return None
+        mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
+        mask.mask_low_mu(mu_thresh)
+    except:
+        print("\t >>> Region identification failed, skipping " + iso, flush=True)
+        return None
 
     return con, mag, dop, aia, mask
 
@@ -123,8 +123,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         tmpdir = os.path.join(datadir, "tmp")
 
         # filenames
-        fname1 = os.path.join(tmpdir, "thresholds_", suffix, ".csv")
-        fname2 = os.apth.join(tmpdir, "region_output_", suffix, ".csv")
+        fname1 = os.path.join(tmpdir, "thresholds_" + suffix + ".csv")
+        fname2 = os.path.join(tmpdir, "region_output_" + suffix + ".csv")
 
     # check if the files exist, create otherwise
     for file in (fname1, fname2):
@@ -132,11 +132,11 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                 create_file(file)
 
     # reduce the data set
-    # try:
-    con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, 
-                                                    aia_file, plot_moat=plot_moat)
-    # except:
-    #     return None
+    try:
+        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, aia_file, plot_moat=plot_moat)
+    except:
+        print("\t >>> Epoch %s reduction failed for unknown reasons :(" % iso, flush=True)
+        return None
 
     # get the MJD of the obs
     mjd = Time(con.date_obs).mjd

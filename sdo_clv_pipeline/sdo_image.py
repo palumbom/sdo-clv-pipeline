@@ -642,14 +642,14 @@ class SunMask(object):
         self.regions[ind8] = 8 # left moats
         self.regions[ind9] = 9 # right moats
 
-        # pad data for write out
-        max_length = np.max([len(arr) for arr in avg_vels])
-        vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
-        mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
-        ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
+        # # pad data for write out
+        # max_length = np.max([len(arr) for arr in avg_vels])
+        # vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
+        # mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
+        # ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
 
-        # letters for labeling
-        letters = [ascii_letters[i%52] for i in range(len(areas))]
+        # # letters for labeling
+        # letters = [ascii_letters[i%52] for i in range(len(areas))]
         
         # write out the moat data
         # iso = get_date(con.filename).isoformat()

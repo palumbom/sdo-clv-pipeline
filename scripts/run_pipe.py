@@ -54,11 +54,15 @@ def main():
     # get number of cpus
     try:
         from os import sched_getaffinity
+        print()
         print(">>> OS claims %s CPUs are available..." % len(sched_getaffinity(0)))
-        ncpus = len(sched_getaffinity(0)) - 1
+        # ncpus = len(sched_getaffinity(0)) - 1
+        ncpus = 16 - 1
     except:
         # ncpus = np.min([len(con_files), mp.cpu_count()])
         ncpus = 1
+
+    # ncpus = 1
 
     # process the data either in parallel or serially
     if ncpus > 1:
@@ -74,6 +78,7 @@ def main():
 
         # run in parellel
         print(">>> Processing %s epochs with %s processes..." % (len(con_files), ncpus))
+        print()
         t0 = time.time()
         pids = []
         with get_context("spawn").Pool(ncpus, maxtasksperchild=4) as pool:
@@ -98,10 +103,12 @@ def main():
     else:
         # run serially
         print(">>> Processing %s epochs on a single process" % len(con_files))
+        print()
         t0 = time.time()
         for i in range(len(con_files)):
             process_data_set(con_files[i], mag_files[i], dop_files[i], aia_files[i],
-                             mu_thresh=mu_thresh, n_rings=n_rings, datadir=datadir)
+                             mu_thresh=mu_thresh, n_rings=n_rings, datadir=datadir,
+                             plot_moat=False)
 
         # print run time
         print("Serial: --- %s seconds ---" % (time.time() - t0))

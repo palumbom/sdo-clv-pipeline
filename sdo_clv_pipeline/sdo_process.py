@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import gc, os, re, pdb, csv, glob, time, argparse
 from astropy.time import Time
 from os.path import exists, split, isdir, getsize
+from multiprocessing import get_context
+import multiprocessing as mp
 
 # bring functions into scope
 from .paths import root
@@ -105,7 +107,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                      mu_thresh, n_rings=10, suffix=None, 
                      datadir=None, plot_moat=True):
 
-    print(">>> Running Epoch %s " % get_date(con_file).isoformat(), flush=True)
+    print(">>> Running epoch %s " % get_date(con_file).isoformat(), flush=True)
 
     start_time = time.perf_counter()
     #figure out data directories

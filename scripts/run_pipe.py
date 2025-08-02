@@ -18,7 +18,7 @@ plt.style.use(str(root) + "/" + "my.mplstyle"); plt.ioff()
 def get_parser_args():
     # initialize argparser
     parser = argparse.ArgumentParser(description="Analyze SDO data")
-    parser.add_argument("--fitsdir", type=str, default="/storage/home/mlp95/scratch/sdo_data/")
+    parser.add_argument("--fitsdir", type=str, default="/mnt/ceph/users/mpalumbo/sdo_data/")
     parser.add_argument("--clobber", action="store_true", default=False)
     parser.add_argument("--globexp", type=str, default="")
 

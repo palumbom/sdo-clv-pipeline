@@ -27,6 +27,7 @@ dependencies = [
     "ipykernel>=6.29.5",
     "numba>=0.61.2",
     "tqdm>=4.67.1",
+    "ipdb>=0.13.13",
 ]
 
 [dependency-groups]

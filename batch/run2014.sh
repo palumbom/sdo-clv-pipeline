@@ -23,5 +23,6 @@ echo "Environment activated"
 
 echo "About to start Python"
 python /storage/home/mlp95/work/sdo-clv-pipeline/scripts/run_pipe.py --globexp "*2014*"
+# uv run scripts/run_pipe.py --globexp "*2014*"
 echo "Python exited"
 date

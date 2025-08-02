@@ -56,8 +56,8 @@ def main():
         from os import sched_getaffinity
         print()
         print(">>> OS claims %s CPUs are available..." % len(sched_getaffinity(0)))
-        # ncpus = len(sched_getaffinity(0)) - 1
-        ncpus = 16 - 1
+        ncpus = len(sched_getaffinity(0)) - 1
+        # ncpus = 33 - 1
     except:
         # ncpus = np.min([len(con_files), mp.cpu_count()])
         ncpus = 1

@@ -657,45 +657,25 @@ class SunMask(object):
         mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
         ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
 
-        # print("padded")
-        # for i, arr in enumerate(vels):
-        #     print(type(arr), np.shape(arr))
-        
-        # print("len(dilated_spots)=", len(dilated_spots))
-        # print("shape(dilated_spots=", np.shape(dilated_spots))
-        # print(np.shape(vels))
-        # print(np.shape(x))
-
+        # letters for labeling
         letters = [ascii_letters[i%52] for i in range(len(areas))]
         
-        # moats = np.array(moats, dtype = object)
-        moat_file = os.path.join(root, "data", "moats_data.npz")
-        np.savez_compressed(moat_file, x=x, vels=vels, mags=mags, ints=ints, 
-                            areas=areas, mus=mus, area_idx_arr=area_idx_arr, 
-                            letters=letters, dilated_spots=dilated_spots)
+        # write out the moat data
+        # iso = get_date(con.filename).isoformat()
+        # fname = f"moats_data_{iso}"
+        # moat_path = os.path.join(root, "data", "moat_data")
+        # if !os.path.exists(moat_path):
+        #     os.mkdir(moat_path)
+        # np.savez_compressed(os.path.join(moat_path, fname), 
+        #                     x=x, vels=vels, mags=mags, ints=ints, 
+        #                     areas=areas, mus=mus, area_idx_arr=area_idx_arr, 
+        #                     letters=letters, dilated_spots=dilated_spots)
         
         # print("before plotting")
-        if plot_moat:
-            load_and_plot()
+        # TODO this is broken 
+        # if plot_moat:
+        #     load_and_plot()
             # plot_loop()
-
-        # for i in dilated_spots:
-        #     if symbol[i] == 0:
-        #         left_moat_pixels.append(dilated_spots[i])
-        #     else:
-        #         right_moat_pixels.append(dilated_spots[i])
-
-        # set moat pixels
-        moat_pixels = np.any(dilated_spots, axis=0).astype(bool)
-        # print("len moat pixels=", len(moat_pixels))
-        # print("shape moat pixels=", np.shape(moat_pixels))
-        # self.regions[moat_pixels] = 7 # moat
-
-        # left and right moat pixels
-        left_moat_pixels = np.any(left_moats, axis=0).astype(bool)
-        right_moat_pixels = np.any(right_moats, axis=0).astype(bool)
-        self.regions[left_moat_pixels] = 8   
-        self.regions[right_moat_pixels] = 9  
 
         # make any remaining unclassified pixels quiet sun
         ind_rem = ((con.mu >= con.mu_thresh) & (self.regions == 0))
@@ -712,14 +692,15 @@ class SunMask(object):
         # ax.set_title("Regions and overlaps")
         # plt.show()
 
-        self.moat_vals = moat_vals
-        self.moat_dilations = moat_dilations
-        self.moat_thetas = moat_thetas
-        self.moat_areas = moat_areas
+        # TODO not sure what this does
+        # self.moat_vals = moat_vals
+        # self.moat_dilations = moat_dilations
+        # self.moat_thetas = moat_thetas
+        # self.moat_areas = moat_areas
 
         # print("moat pixels")
         if plot_moat:
-            plt.imshow(moat_pixels)
+            plt.imshow(self.is_moat_flow())
             plt.show()
 
         return None
@@ -754,7 +735,8 @@ class SunMask(object):
         return self.regions == 6
     
     def is_moat_flow(self):
-        return self.regions == 7
+        # return self.regions == 7
+        return np.logical_or(self.regions == 8, self.region == 9)
     
     def is_left_moat(self):
         return self.regions == 8

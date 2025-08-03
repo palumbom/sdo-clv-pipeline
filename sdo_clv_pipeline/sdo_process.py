@@ -106,8 +106,8 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
 def process_data_set(con_file, mag_file, dop_file, aia_file, 
                      mu_thresh, n_rings=10, suffix=None, 
                      datadir=None, plot_moat=True):
-
-    print(">>> Running epoch %s " % get_date(con_file).isoformat(), flush=True)
+    iso = get_date(con_file).isoformat()
+    print(">>> Running epoch %s " % iso, flush=True)
 
     start_time = time.perf_counter()
     #figure out data directories

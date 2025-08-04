@@ -109,7 +109,9 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     iso = get_date(con_file).isoformat()
     print(">>> Running epoch %s " % iso, flush=True)
 
+    # start the timer
     start_time = time.perf_counter()
+
     #figure out data directories
     if not isdir(datadir):
         os.mkdir(datadir)
@@ -164,7 +166,6 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     # append full-disk results
     results.append([mjd, np.nan, np.nan, np.nan, all_pixels, all_light, *vels, mags, *ints])
 
-    """
     # loop over the mu annuli
     mu_grid = np.linspace(mu_thresh, 1.0, n_rings)
 
@@ -212,27 +213,26 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
             # append the velocity results
             results.append([mjd, k, lo_mu, hi_mu, pixels, light, *vels, mags, *ints])
 
-    """
     # write to disk
     write_results_to_file(fname2, results)    
 
     # do some memory cleanup
-    # del con
-    # del mag
-    # del dop
-    # del aia
-    # del mask
-    # del vels
-    # del mags
-    # del ints
-    # del results
-    # del regions
-    # del mu_grid
-    # del v_quiet
-    # del region_mask
-    # gc.collect() 
+    del con
+    del mag
+    del dop
+    del aia
+    del mask
+    del vels
+    del mags
+    del ints
+    del results
+    del regions
+    del mu_grid
+    del v_quiet
+    del region_mask
+    gc.collect() 
     
-
+    # end the timer
     end_time = time.perf_counter()
 
     # report success and return
@@ -316,7 +316,7 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     v_hat_di /= denom
 
     v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid]) 
-    v_phot_di /= np.nansum(flat_int[valid])
+    v_phot_di /= denom
 
     v_quiet_di = np.nansum(flat_v_corr[valid] * flat_int[valid] * flat_w_quiet[valid])
     v_quiet_di /= np.nansum(flat_int[valid] * flat_w_quiet[valid])
@@ -341,7 +341,6 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
                     all_light, v_hat_di, v_phot_di, v_quiet_di, 
                     v_cbs_di, mag_unsigned, avg_int, avg_int_flat])
 
-    """
     # bins & region mapping
     bins = np.linspace(mu_thresh, 1.0, n_rings)
     bin_idx = np.digitize(flat_mu, bins) - 1
@@ -356,16 +355,16 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
 
     # compute sums
     sum_vhat = np.bincount(grp, weights=flat_int[valid] * flat_v_corr[valid], minlength=M)
-    sum_vphot = np.bincount(grp, weights=(flat_int - k_hat_con*flat_ld)[valid] * flat_v_rot[valid], minlength=M)
+    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid], minlength=M)
     sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
     sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
-    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid], minlength=M)
+    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid] * flat_int[valid], minlength=M)
 
     # quiet-sun sums
     qidx = valid & flat_w_quiet
     grp_q = bin_idx[qidx] * len(regions) + reg_idx[qidx]
-    sum_vquiet = np.bincount(grp_q, weights=flat_int[qidx] * flat_v_corr[qidx], minlength=M)
-    sum_int_q = np.bincount(grp_q, weights=flat_int[qidx],                    minlength=M)
+    sum_vquiet = np.bincount(grp_q, weights=flat_v_corr[qidx] * flat_int[qidx], minlength=M)
+    sum_int_q = np.bincount(grp_q, weights=flat_int[qidx], minlength=M)
 
     # reshape
     sum_vhat = sum_vhat.reshape(n_bins, len(regions))
@@ -377,35 +376,50 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     sum_int_q = sum_int_q.reshape(n_bins, len(regions))
 
     # build results
-    
+    # loop over mu bins
     for j in range(n_bins):
-        lo_mu, hi_mu = bins[j], bins[j+1]
+        lo_mu = bins[j]
+        hi_mu = bins[j+1]
+
+        # loop over regions
         for ir, r in enumerate(regions):
-            denom   = sum_int[j, ir]
+            denom = sum_int[j, ir]
             if denom == 0:
                 results.append([mjd, r, lo_mu, hi_mu, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                 continue
-            pix_frac  = denom / all_pixels
-            light_frac= denom / all_light
-            v_hat     = sum_vhat[j, ir] / denom
-            v_phot    = sum_vphot[j, ir] / denom
-            dq        = sum_int_q[j, ir]
-            v_q       = (sum_vquiet[j, ir] / dq) if dq>0 else 0.0
-            v_conv    = v_hat - v_q
-            mag_u     = sum_mag[j, ir] / denom
-            avg_i     = sum_int[j, ir] / denom
-            avg_if    = sum_iflat[j, ir] / denom
+
+            pix_frac = denom / all_pixels
+            light_frac = denom / all_light
+            v_hat = sum_vhat[j, ir] / denom
+            v_phot = sum_vphot[j, ir] / denom
+            dq = sum_int_q[j, ir]
+            v_q = (sum_vquiet[j, ir] / dq) if dq>0 else 0.0
+            v_conv = v_hat - v_q
+            mag_u = sum_mag[j, ir] / denom
+            avg_i = sum_int[j, ir] / denom
+            avg_if = sum_iflat[j, ir] / denom
 
             # append the velocity results
             results.append([mjd, r, lo_mu, hi_mu, pix_frac, 
                             light_frac, v_hat, v_phot, v_q, 
                             v_conv, mag_u, avg_i, avg_if])
-    """
 
     # write to disk
     write_results_to_file(fname2, results)
 
-    gc.collect()
+    # do some memory cleanup
+    del con
+    del mag
+    del dop
+    del aia
+    del results
+    del regions
+    del mu_grid
+    gc.collect() 
+    
+    # end the timer
     end_time = time.perf_counter()
-    print("\t >>> Run successfully in %s seconds" % (end_time - start_time), flush=True)
+
+    # report success and return
+    print("\t >>> Run successfully in %s seconds" % str(end_time - start_time), flush=True)
     return None

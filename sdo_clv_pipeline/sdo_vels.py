@@ -87,7 +87,11 @@ def calc_int_stats(con, region_mask=True):
     avg_int_flat = np.nansum(con.iflat * region_mask)
 
     # divide by the denominator
-    denom = np.nansum(region_mask)
+    if (type(region_mask) is not np.ndarray):
+        denom = np.nansum(con.mu > con.mu_thresh)
+    else:
+        denom = np.nansum(region_mask)
+
     avg_int /= denom
     avg_int_flat /= denom
 

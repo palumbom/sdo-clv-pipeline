@@ -93,7 +93,7 @@ idx = dist[dist > 2.0 * v_conv_rolling_std].index
 # make dfs by mu
 right_moat = df_all[df_all.region == 9.0]
 left_moat = df_all[df_all.region == 8.0]
-# moat = df_all[df_all.region == 7.0]
+moat = df_all[df_all.region == 8.5]
 plage = df_all[df_all.region == 6.0]
 network = df_all[df_all.region == 5.0]
 quiet_sun = df_all[df_all.region == 4.0]
@@ -116,9 +116,9 @@ left_moat.to_csv(os.path.join(outdir, "left_moat.csv"), index=False)
 # moat_daily = daily_bin(moat)
 # moat_daily.to_csv(outdir + "moat_daily.csv", index=False)
 
-# moat = mask_all_zero_rows(moat)
-# moat.reset_index(drop=True, inplace=True)
-# moat.to_csv(os.path.join(outdir, "moat.csv"), index=False)
+moat = mask_all_zero_rows(moat)
+moat.reset_index(drop=True, inplace=True)
+moat.to_csv(os.path.join(outdir, "moat.csv"), index=False)
 # moat_daily = daily_bin(moat)
 # moat_daily.to_csv(outdir + "moat_daily.csv", index=False)
 

@@ -165,19 +165,20 @@ class SDOImage(object):
 
     def mask_low_mu(self, mu_thresh):
         self.mu_thresh = mu_thresh
-        self.image[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
+        mask_idx = np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))
+        self.image[mask_idx] = np.nan
 
         if self.is_continuum() | self.is_filtergram():
-            self.ldark[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
-            self.iflat[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
+            self.ldark[mask_idx] = np.nan
+            self.iflat[mask_idx] = np.nan
         elif self.is_magnetogram():
-            self.B_obs[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
+            self.B_obs[mask_idx] = np.nan
         elif self.is_dopplergram():
-            self.v_corr[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
-            self.v_obs[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
-            self.v_rot[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
-            self.v_mer[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
-            self.v_cbs[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
+            self.v_corr[mask_idx] = np.nan
+            self.v_obs[mask_idx] = np.nan
+            self.v_rot[mask_idx] = np.nan
+            self.v_mer[mask_idx] = np.nan
+            self.v_cbs[mask_idx] = np.nan
 
         return None
 
@@ -315,38 +316,47 @@ class SDOImage(object):
     def calc_limb_darkening(self, mu_lim=0.1, num_mu=25, n_sigma=2.0):
         assert (self.is_continuum() | self.is_filtergram())
 
-        # get average intensity in evenly spaced rings
-        mu_edge = np.linspace(1.0, mu_lim, num=num_mu)
-        avg_int = np.zeros(len(mu_edge)-1)
+        # flatten & mask
+        mu_flat = self.mu.ravel()
+        I_flat = self.image.ravel()
+        valid = (~np.isnan(I_flat)) & (mu_flat >= mu_lim)
+        mu_valid = mu_flat[valid]
+        I_valid = I_flat[valid]
 
-        # loop over bins 
-        inds = np.zeros_like(self.image).astype(bool)
-        for i in range(len(avg_int)):
-            # find indices in ring that aren't nan
-            conds = [self.mu > mu_edge[i+1], self.mu <= mu_edge[i], ~np.isnan(self.image)]
-            np.logical_and.reduce(conds, out=inds)
+        # build bin edges
+        mu_edges = np.linspace(mu_lim, 1.0, num=num_mu+1)
+        bin_idx = np.digitize(mu_valid, mu_edges) - 1
+        bin_idx = np.clip(bin_idx, 0, num_mu-1)
+        nbins = num_mu
 
-            # mask section that are big outliers
-            ints = self.image[inds]
-            sc = np.abs(ints - np.mean(ints)) >= (n_sigma * np.std(ints))
-            ints[sc] = np.nan
-            avg_int[i] = np.nanmean(ints)
+        # first pass: sums, counts, sum of squares
+        sums = np.bincount(bin_idx, weights=I_valid, minlength=nbins)
+        counts = np.bincount(bin_idx, minlength=nbins)
+        sum2 = np.bincount(bin_idx, weights=I_valid**2, minlength=nbins)
+        
+        # compute mean & std per bin
+        means = sums / counts
+        stds = np.sqrt(np.clip(sum2/counts - means**2.0, 0, None))
+        
+        # sigma-clip outliers
+        mask_out = np.abs(I_valid - means[bin_idx]) > (n_sigma * stds[bin_idx])
+        if np.any(mask_out):
+            sums = np.bincount(bin_idx[~mask_out], weights=I_valid[~mask_out], minlength=nbins)
+            counts = np.bincount(bin_idx[~mask_out], minlength=nbins)
+        avg_int = sums / counts
 
-        # take averages in mu annuli to fit to
-        mu_avgs = (mu_edge[1:] + mu_edge[0:-1]) / 2.0
+        # bin-center mu values
+        mu_avgs = 0.5 * (mu_edges[:-1] + mu_edges[1:])
 
-        # set the initial guess parameters for optimization
-        if self.is_continuum():
-            p0 = [59000.0, 0.38, 0.23]
-        elif self.is_filtergram():
-            p0 = [1000, 0.9, -0.25]
-        else:
-            return None
+        # fit and fix the coeffs for LD law
+        p = np.polyfit(1.0 - mu_avgs, avg_int, 2)
+        a = p[2]
+        b = -p[1] / p[2]
+        c = -p[0] / p[2]
 
-        # do the fit and divide out the LD profile
-        popt, pcov = curve_fit(quad_darkening, mu_avgs, avg_int, p0=p0)
-        self.ld_coeffs = popt
-        self.ldark = quad_darkening_two(self.mu, *popt[1:])
+        # flatten
+        self.ld_coeffs = np.array([a, b, c]) 
+        self.ldark = quad_darkening_two(self.mu, b, c)
         self.iflat = self.image / self.ldark
         return None
 

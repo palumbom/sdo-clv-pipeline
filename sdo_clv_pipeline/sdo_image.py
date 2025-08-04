@@ -691,7 +691,7 @@ class SunMask(object):
         
         # print("before plotting")
         # TODO this needs to be checked
-        # if plot_moat:
+        if plot_moat:
             load_and_plot(fname)
             # plot_loop()
 

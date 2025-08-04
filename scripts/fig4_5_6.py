@@ -400,7 +400,7 @@ n_mu_samps = len(mu_samps)
 colname = "v_hat"
 xlabel =  r"$\hat{v}_{k, \mu}\ {\rm(m\ s}^{-1}{\rm )}$"
 fig, axs = plt.subplots(figsize=(11, 8.5), nrows=4, ncols=n_mu_samps)
-fig.subplots_adjust(wspace=0.07, hspace=0.15)
+# fig.subplots_adjust(wspace=0.07, hspace=0.15)
 
 # loop over valus
 ylims = np.zeros(n_mu_samps)
@@ -546,7 +546,7 @@ plt.clf(); plt.close()
 colname = "v_conv"
 xlabel = r"$\Delta \hat{v}_{{\rm conv},k,\mu}\ {\rm(m\ s}^{-1}{\rm )}$"
 fig, axs = plt.subplots(figsize=(11, 5.8), nrows=3, ncols=n_mu_samps)
-fig.subplots_adjust(wspace=0.07, hspace=0.15)
+# fig.subplots_adjust(wspace=0.07, hspace=0.15)
 
 # loop over values
 ylims = np.zeros(n_mu_samps)

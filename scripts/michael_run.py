@@ -39,3 +39,7 @@ for i in range(len(con_files)):
     process_data_set(con_file, mag_file, dop_file, aia_file,
                      mu_thresh=0.1, n_rings=10, suffix=None, 
                      datadir=datadir, plot_moat=False)
+    
+    process_data_set_new(con_file, mag_file, dop_file, aia_file,
+                     mu_thresh=0.1, n_rings=10, suffix=None, 
+                     datadir=datadir, plot_moat=False)

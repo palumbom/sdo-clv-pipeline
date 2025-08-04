@@ -29,6 +29,25 @@ from sdo_clv_pipeline.plot_moats_data import load_and_plot
 warnings.simplefilter("ignore", category=VerifyWarning)
 warnings.simplefilter("ignore", category=FITSFixedWarning)
 
+# set globals for region IDS
+umbrae_code = 1 # umbrae
+blue_pen_code = 2 # blueshifted penumbrae
+red_pen_code = 3 # redshifted penumbrae
+quiet_sun_code = 4 # quiet sun
+network_code = 5 # bright areas (will separate into plage + network)
+plage_code = 6 # plage
+left_moat_code = 8 # left moats
+right_moat_code = 9 # right moats
+
+region_codes = [umbrae_code, 
+                blue_pen_code,
+                red_pen_code,
+                quiet_sun_code,
+                network_code,
+                plage_code,
+                left_moat_code,
+                right_moat_code]
+
 class SDOImage(object):
     def __init__(self, file, dtype=np.float32):
         # set the filename
@@ -440,7 +459,9 @@ class SunMask(object):
         # self.lon = np.copy(other_image.lon)
         return None
 
-    def identify_regions(self, con, mag, dop, aia, plot_moat=True):    
+    def identify_regions(self, con, mag, dop, aia, plot_moat=True):
+        invalid_mask = np.logical_or(con.mu <= con.mu_thresh, np.isnan(con.mu))
+
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
 
@@ -492,11 +513,11 @@ class SunMask(object):
         ind5 = np.logical_or(ind5a, ind5b) # if ind5a or ind5b, bright
 
         # set mask indices
-        self.regions[ind1] = 1 # umbrae
-        self.regions[ind2] = 2 # blueshifted penumbrae
-        self.regions[ind3] = 3 # redshifted penumbrae
-        self.regions[ind4] = 4 # quiet sun
-        self.regions[ind5] = 5 # bright areas (will separate into plage + network)
+        self.regions[ind1] = umbrae_code # umbrae
+        self.regions[ind2] = blue_pen_code # blueshifted penumbrae
+        self.regions[ind3] = red_pen_code # redshifted penumbrae
+        self.regions[ind4] = quiet_sun_code # quiet sun
+        self.regions[ind5] = network_code # bright areas (will separate into plage + network)
 
         # create structures for dilations
         corners = ndimage.generate_binary_structure(2,2) # array of bools, defines feature connections
@@ -512,11 +533,11 @@ class SunMask(object):
 
         # assign region type to plage for ratios less than ratio thresh
         ind6 = areas_mic >= area_thresh  # areas_mic
-        self.regions[ind6] = 6 # plage
+        self.regions[ind6] = plage_code # plage
 
         # set isolated bright pixels to quiet sun
         ind_iso = areas_pix == 1.0
-        self.regions[ind_iso] = 4 # quiet sun
+        self.regions[ind_iso] = quiet_sun_code # quiet sun
 
         # label each penumbra island and include umbra so we only expand outwards
         binary_img = np.logical_or.reduce([self.is_umbra(), self.is_penumbra()])
@@ -551,6 +572,7 @@ class SunMask(object):
         # allocate for moats
         moat_idx = np.zeros_like(con.image).astype(bool)
         moats = np.zeros((len(areas), *np.shape(con.image))).astype(bool)
+        area_idx_arr = np.zeros((len(areas), *np.shape(con.image))).astype(bool)
 
         # allocate for hemisphere indicator 
         left_hemisphere = np.zeros(len(areas)).astype(bool)
@@ -559,9 +581,13 @@ class SunMask(object):
         # allocate for average quantities
         avg_mu = np.zeros(len(areas))
         max_dilations = np.zeros(len(areas))
+        max_rings = np.zeros(len(areas))
         avg_vels = []
         avg_mags = []
         avg_ints = []
+
+        # allocate for mask
+        valid_mask = np.zeros_like(invalid_mask)
 
         # define function to dilate moats
         def dilate_moat(idx, pre_factor, compute_avgs=True):
@@ -572,10 +598,9 @@ class SunMask(object):
 
             # get pixels in that region
             max_area_idx = areas_pix == max_area
-            valid_mask = [~max_area_idx, ~np.isnan(con.mu),
-                          ~self.is_umbra(), ~self.is_penumbra(), 
-                          con.mu >= con.mu_thresh]
-            valid_mask = np.logical_and.reduce(valid_mask)
+            area_idx_arr[idx, :, :] = max_area_idx
+            valid_list = [~max_area_idx, ~invalid_mask, ~self.is_umbra(), ~self.is_penumbra()]
+            np.logical_and.reduce(valid_list, out=valid_mask)
 
             # get the distance transform
             dist = distance_transform_edt(~max_area_idx)
@@ -594,7 +619,7 @@ class SunMask(object):
             # select and ravel averaging quantities
             if compute_avgs:
                 flat_vel = dop.v_corr[valid_mask].ravel()
-                flat_mag = mag.image[valid_mask].ravel()
+                flat_mag = np.abs(mag.image[valid_mask].ravel())
                 flat_int = con.image[valid_mask].ravel()
                 
                 # compute averages and append
@@ -613,6 +638,7 @@ class SunMask(object):
 
             # get max number of dilations
             max_dilations[idx] = np.nanmax(rings[rings_cond])
+            max_rings[idx] = max_ring
 
             # make hemisphere indicator
             left_hemisphere[idx] = lon[y_centroid, x_centroid] >= 0.0
@@ -639,41 +665,42 @@ class SunMask(object):
         ind9 = moats[~left_hemisphere, :, :].any(axis=0)
 
         # set values 
-        self.regions[ind8] = 8 # left moats
-        self.regions[ind9] = 9 # right moats
+        self.regions[ind8] = left_moat_code # left moats
+        self.regions[ind9] = right_moat_code # right moats
 
-        # # pad data for write out
-        # max_length = np.max([len(arr) for arr in avg_vels])
-        # vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
-        # mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
-        # ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
+        # pad data for write out
+        max_length = np.max([(len(arr) + 1) for arr in avg_vels])
+        vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
+        mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
+        ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
 
-        # # letters for labeling
-        # letters = [ascii_letters[i%52] for i in range(len(areas))]
+        # letters for labeling
+        letters = [ascii_letters[i%52] for i in range(len(areas))]
         
-        # write out the moat data
-        # iso = get_date(con.filename).isoformat()
-        # fname = f"moats_data_{iso}"
-        # moat_path = os.path.join(root, "data", "moat_data")
-        # if !os.path.exists(moat_path):
-        #     os.mkdir(moat_path)
-        # np.savez_compressed(os.path.join(moat_path, fname), 
-        #                     x=x, vels=vels, mags=mags, ints=ints, 
-        #                     areas=areas, mus=mus, area_idx_arr=area_idx_arr, 
-        #                     letters=letters, dilated_spots=dilated_spots)
+        # directory to write out moat data to
+        moat_path = os.path.join(root, "data", "moat_data")
+        if not os.path.exists(moat_path):
+            os.mkdir(moat_path)
+
+        # write it out
+        iso = get_date(con.filename).isoformat()
+        fname = os.path.join(moat_path, f"moats_data_{iso}.npz")
+        np.savez_compressed(fname, x=max_rings, vels=vels, mags=mags, ints=ints, 
+                            areas=areas, mus=avg_mu, area_idx_arr=area_idx_arr, 
+                            letters=letters, dilated_spots=moats)
         
         # print("before plotting")
-        # TODO this is broken 
+        # TODO this needs to be checked
         # if plot_moat:
-        #     load_and_plot()
+            load_and_plot(fname)
             # plot_loop()
 
         # make any remaining unclassified pixels quiet sun
-        ind_rem = ((con.mu >= con.mu_thresh) & (self.regions == 0))
-        self.regions[ind_rem] = 4 # quiet sun
+        ind_rem = np.logical_and(~invalid_mask, self.is_unclassified())
+        self.regions[ind_rem] = quiet_sun_code
 
-        # set values beyond mu_thresh to nan
-        self.regions[np.logical_or(con.mu <= con.mu_thresh, np.isnan(con.mu))] = np.nan
+        # set values beyond mu_thresh to nan (if they weren't already)
+        self.regions[invalid_mask] = np.nan
 
         # fig, ax = plt.subplots()
         # colors = ['r', 'g', 'b']
@@ -703,6 +730,9 @@ class SunMask(object):
         self.mu_thresh = mu_thresh
         self.regions[np.logical_or(self.mu < mu_thresh, np.isnan(self.mu))] = np.nan
         return None
+    
+    def is_unclassified(self):
+        return np.logical_or(np.isnan(self.regions), ~np.isin(self.regions, region_codes))
 
     def is_umbra(self):
         return self.regions == 1

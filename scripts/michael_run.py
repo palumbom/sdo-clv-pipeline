@@ -17,7 +17,8 @@ import sdo_clv_pipeline
 # fits_dir = os.path.abspath("/mnt/ceph/users/mpalumbo/sdo_data")
 fits_dir = os.path.join(root, "data", "fits")
 
-globexp ="2014*0*"
+# globexp ="2014*0*"
+globexp =""
 files = organize_IO(fits_dir, clobber=True, globexp=globexp)
 con_files, mag_files, dop_files, aia_files = files
 

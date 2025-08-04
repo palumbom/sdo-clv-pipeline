@@ -7,15 +7,18 @@ def calc_region_mask(mask, region=None, hi_mu=None, lo_mu=None):
         region_mask = True
     elif region == 2.5:
         region_mask = mask.is_penumbra()
+    elif region == 8.5:
+        region_mask = mask.is_moat_flow()
     else:
-        region_mask = ((region == mask.regions) & (mask.mu >= mask.mu_thresh))
+        region_mask = np.logical_and((region == mask.regions), (mask.mu >= mask.mu_thresh))
 
     # get masks for mu annuli
     if ((hi_mu is None) | (lo_mu is None)):
         region_mask *= True
     else:
         assert lo_mu < hi_mu
-        region_mask *= ((mask.mu > lo_mu) & (mask.mu <= hi_mu)  & (mask.mu >= mask.mu_thresh))
+        cond = [(mask.mu > lo_mu), (mask.mu <= hi_mu) , (mask.mu >= mask.mu_thresh)]
+        region_mask *= np.logical_and.reduce(cond)
 
     return region_mask
 

@@ -388,16 +388,19 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
                 results.append([mjd, r, lo_mu, hi_mu, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                 continue
 
-            pix_frac = denom / all_pixels
+            pix_frac = denom / all_pixels # TODO WRONG
             light_frac = denom / all_light
+
             v_hat = sum_vhat[j, ir] / denom
             v_phot = sum_vphot[j, ir] / denom
+
             dq = sum_int_q[j, ir]
             v_q = (sum_vquiet[j, ir] / dq) if dq>0 else 0.0
             v_conv = v_hat - v_q
+
             mag_u = sum_mag[j, ir] / denom
-            avg_i = sum_int[j, ir] / denom
-            avg_if = sum_iflat[j, ir] / denom
+            avg_i = sum_int[j, ir] / denom # TODO WRONG
+            avg_if = sum_iflat[j, ir] / denom # TODO WRONG
 
             # append the velocity results
             results.append([mjd, r, lo_mu, hi_mu, pix_frac, 
@@ -412,9 +415,20 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     del mag
     del dop
     del aia
+    del bins
+    del valid
+    del denom
     del results
     del regions
-    del mu_grid
+    del flat_mu
+    del flat_reg
+    del flat_int
+    del flat_v_corr
+    del flat_v_rot
+    del flat_abs_mag
+    del flat_iflat
+    del flat_ld
+    del flat_w_quiet
     gc.collect() 
     
     # end the timer

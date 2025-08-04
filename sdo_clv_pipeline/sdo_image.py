@@ -669,25 +669,26 @@ class SunMask(object):
         self.regions[ind9] = right_moat_code # right moats
 
         # pad data for write out
-        max_length = np.max([(len(arr) + 1) for arr in avg_vels])
-        vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
-        mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
-        ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
+        if plot_moat:
+            max_length = np.max([(len(arr) + 1) for arr in avg_vels])
+            vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
+            mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
+            ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
 
-        # letters for labeling
-        letters = [ascii_letters[i%52] for i in range(len(areas))]
-        
-        # directory to write out moat data to
-        moat_path = os.path.join(root, "data", "moat_data")
-        if not os.path.exists(moat_path):
-            os.mkdir(moat_path)
+            # letters for labeling
+            letters = [ascii_letters[i%52] for i in range(len(areas))]
+            
+            # directory to write out moat data to
+            moat_path = os.path.join(root, "data", "moat_data")
+            if not os.path.exists(moat_path):
+                os.mkdir(moat_path)
 
-        # write it out
-        iso = get_date(con.filename).isoformat()
-        fname = os.path.join(moat_path, f"moats_data_{iso}.npz")
-        np.savez_compressed(fname, x=max_rings, vels=vels, mags=mags, ints=ints, 
-                            areas=areas, mus=avg_mu, area_idx_arr=area_idx_arr, 
-                            letters=letters, dilated_spots=moats)
+            # write it out
+            iso = get_date(con.filename).isoformat()
+            fname = os.path.join(moat_path, f"moats_data_{iso}.npz")
+            np.savez_compressed(fname, x=max_rings, vels=vels, mags=mags, ints=ints, 
+                                areas=areas, mus=avg_mu, area_idx_arr=area_idx_arr, 
+                                letters=letters, dilated_spots=moats)
         
         # print("before plotting")
         # TODO this needs to be checked
@@ -764,148 +765,3 @@ class SunMask(object):
     
     def is_right_moat(self):
         return self.regions == 9
-
-    # def dilate_moat(self, dilated_spots, dop, mag, con, max_area_idx, 
-    #                 max_area, corners, no_corners, moat_avg_vels, 
-    #                 symbol, left_moats, right_moats):
-    #     # first dilation
-    #     dilated_idx = ndimage.binary_dilation(max_area_idx, structure=no_corners)
-    #     cond = [dilated_idx, ~self.is_umbra(), ~self.is_penumbra()]
-    #     idx_new = np.logical_and.reduce(cond)
-        
-    #     vel_arr = np.array(dop.v_corr[idx_new])
-    #     avg_vel = np.average(vel_arr)
-    #     avg_vel_arr = []
-
-    #     mag_arr = np.array(mag.image[idx_new])
-    #     avg_mag = np.average(mag_arr)
-    #     avg_mag_arr = []
-
-    #     int_arr = np.array(con.image[idx_new])
-    #     avg_int = np.average(int_arr)
-    #     avg_int_arr = []
-
-    #     avg_mag_arr.append(avg_mag)
-    #     avg_vel_arr.append(avg_vel)
-    #     avg_int_arr.append(avg_int)
-    #     dilation_count = 1
-
-    #     # y axis
-    #     current_floor = 0
-    #     prev_dilation = np.logical_or(idx_new, max_area_idx) 
-    #     while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.97):
-    #         if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
-    #             current_floor = np.floor((0.209)* (dilation_count +3))
-    #             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure=corners)   # dilate no corners
-    #         else:
-    #             new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure=no_corners)   # dilate with corners
-
-    #         cond = [new_dilated_idx, ~self.is_umbra(), ~self.is_penumbra()]
-    #         idx_new = np.logical_and.reduce(cond)
-
-    #         vel_arr = np.array(dop.v_corr[idx_new]) 
-    #         avg_vel = np.average(vel_arr)
-    #         avg_vel_arr.append(avg_vel)
-
-    #         mag_arr = np.array(mag.image[idx_new]) 
-    #         avg_mag = np.average(mag_arr)
-    #         avg_mag_arr.append(avg_mag)
-
-    #         int_arr = np.array(con.image[idx_new]) 
-    #         avg_int = np.average(int_arr)
-    #         avg_int_arr.append(avg_int)
-
-    #         dilation_count += 1 # update dilation count
-    #         prev_dilation = np.logical_or(idx_new, prev_dilation)
-    #         # moat_pixels = np.logical_and(prev_dilation, idx_new)
-
-    #     # get average velocity of whole moat
-    #     # tot_vel_arr = np.array(dop.v_corr[moat_pixels])
-    #     # tot_avg_vel = np.average(tot_vel_arr)
-    #     # moat_avg_vels.append(tot_avg_vel)
-
-    #     moat = np.logical_xor(prev_dilation, max_area_idx)
-
-    #     # tot_vel_arr = np.array(dop.v_corr[moat])
-    #     # tot_avg_vel = np.average(tot_vel_arr)
-    #     # moat_avg_vels.append(tot_avg_vel)
-
-    #     # redo dilation if overlapping moat
-    #     if np.any(np.logical_and(moat, np.any(dilated_spots, axis=0))):
-    #         # first dilation
-    #         dilated_idx = ndimage.binary_dilation(max_area_idx, structure = no_corners)
-    #         cond = [dilated_idx, ~self.is_umbra(), ~self.is_penumbra()]
-    #         idx_new = np.logical_and.reduce(cond)
-
-    #         vel_arr = np.array(dop.v_corr[idx_new])
-    #         avg_vel = np.average(vel_arr)
-    #         avg_vel_arr = []
-
-    #         mag_arr = np.array(mag.image[idx_new])
-    #         avg_mag = np.average(mag_arr)
-    #         avg_mag_arr = []
-
-    #         int_arr = np.array(con.image[idx_new])
-    #         avg_int = np.average(int_arr)
-    #         avg_int_arr = []
-
-    #         avg_mag_arr.append(avg_mag)
-    #         avg_vel_arr.append(avg_vel)
-    #         avg_int_arr.append(avg_int)
-    #         dilation_count = 1
-
-    #         # y axis
-    #         current_floor = 0
-    #         prev_dilation = np.logical_or(idx_new, max_area_idx) 
-    #         while (dilation_count < float(1.2*np.sqrt(max_area/pi))*0.65):
-    #             if np.floor((0.209)* (dilation_count +3)) == current_floor+1 :
-    #                 current_floor = np.floor((0.209)* (dilation_count +3))
-    #                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = corners)   # dilate no corners
-    #             else:
-    #                 new_dilated_idx = ndimage.binary_dilation(prev_dilation, structure = no_corners)   # dilate with corners
-                
-    #             cond = [new_dilated_idx, ~self.is_umbra(), ~self.is_penumbra()]
-    #             idx_new = np.logical_and.reduce(cond)
-        
-    #             vel_arr = np.array(dop.v_corr[idx_new]) 
-    #             avg_vel = np.average(vel_arr)
-    #             avg_vel_arr.append(avg_vel)
-
-    #             mag_arr = np.array(mag.image[idx_new]) 
-    #             avg_mag = np.average(mag_arr)
-    #             avg_mag_arr.append(avg_mag)
-
-    #             int_arr = np.array(con.image[idx_new]) 
-    #             avg_int = np.average(int_arr)
-    #             avg_int_arr.append(avg_int)
-
-    #             dilation_count += 1 # update dilation count
-    #             prev_dilation = np.logical_or(idx_new, prev_dilation)
-    #             # moat_pixels = np.logical_and(prev_dilation, idx_new)
-
-    #         # get average velocity of whole moat
-    #         # tot_vel_arr = np.array(dop.v_corr[moat_pixels])
-    #         # tot_avg_vel = np.average(tot_vel_arr)
-    #         # moat_avg_vels.append(tot_avg_vel)
-
-    #         moat = np.logical_xor(prev_dilation, max_area_idx)
-
-    #     dilated_spots.append(moat)
-    #     for moat in dilated_spots:
-    #         if symbol == 0:
-    #             left_moats.append(moat)
-    #         else: 
-    #             right_moats.append(moat)
-
-    #     # set-up x axis for dilations plots
-    #     dilation_arr = [i for i in range (1, dilation_count+1)]
-
-    #     # reverse sign for negative magnetic field
-    #     inv_mag_arr = []
-    #     if (avg_mag_arr[5] < 0):
-    #         for n in avg_mag_arr:
-    #             n = -1*n
-    #             inv_mag_arr.append(n)
-    #         return (dilation_arr, avg_vel_arr, inv_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats)
-    #     else:
-    #         return (dilation_arr, avg_vel_arr, avg_mag_arr, avg_int_arr, dilated_spots, moat_avg_vels, left_moats, right_moats)

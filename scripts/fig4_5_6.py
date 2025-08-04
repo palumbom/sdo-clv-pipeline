@@ -216,12 +216,12 @@ def clv_plot(fname=None):
     # # axs[0,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
     axs[0,0].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
+                      capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left\ Moat}$")
     axs[0,0].fill_between(mu_bin, left_moat_avg - left_moat_std, left_moat_avg + left_moat_std, color=lm_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
     axs[0,0].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
-                      capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
+                      capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right\ Moat}$")
     axs[0,0].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
     # axs[1,0].plot(mu_fit, np.polyval(moat_fit, mu_fit), color=um_color, ls="--")
 
@@ -315,12 +315,12 @@ def clv_plot(fname=None):
     # # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
     axs[0,1].errorbar(mu_bin, left_moat_avg, yerr=left_moat_err, fmt=lm_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left Moat}$")
+                 capthick=capthick, elinewidth=elinewidth, color=lm_color, label=r"${\rm Left\ Moat}$")
     axs[0,1].fill_between(mu_bin, left_moat_avg - left_moat_std, left_moat_avg + left_moat_std, color=lm_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
     axs[0,1].errorbar(mu_bin, right_moat_avg, yerr=right_moat_err, fmt=rm_marker, capsize=capsize,
-                 capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right Moat}$")
+                 capthick=capthick, elinewidth=elinewidth, color=rm_color, label=r"${\rm Right\ Moat}$")
     axs[0,1].fill_between(mu_bin, right_moat_avg - right_moat_std, right_moat_avg + right_moat_std, color=rm_color, alpha=0.4)
     # axs[0,1].plot(mu_fit, np.polyval(network_fit, mu_fit), color=nw_color, ls="--")
 
@@ -461,8 +461,8 @@ for i in range(n_mu_samps):
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
     #axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
-    # axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    # axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+    # axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left\ Moat}")
+    # axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right\ Moat}")
 
     # label stuff
     axs[1,i].set_xlim(-250,250)
@@ -515,8 +515,8 @@ for i in range(n_mu_samps):
     idx7 = right_moat.lo_mu == mu_samps[i]
 
     # axs[3,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
-    axs[3,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    axs[3,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+    axs[3,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left\ Moat}")
+    axs[3,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right\ Moat}")
 
     # label stuff
     # axs[2,i].set_xlabel(xlabel)
@@ -595,8 +595,8 @@ for i in range(n_mu_samps):
     axs[1,i].hist(plage[colname][idx1], bins="auto", density=True, color=pl_color, histtype="step", label=r"{\rm Plage}")
     axs[1,i].hist(network[colname][idx2], bins="auto", density=True, color=nw_color, histtype="step", label=r"{\rm Network}")
     # axs[1,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
-    # axs[1,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    # axs[1,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+    # axs[1,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left\ Moat}")
+    # axs[1,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right\ Moat}")
 
     # label stuff
     # axs[1,i].set_xlabel(xlabel)
@@ -624,8 +624,8 @@ for i in range(n_mu_samps):
     
 
     # plot this mu
-    axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left Moat}")
-    axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right Moat}")
+    axs[2,i].hist(left_moat[colname][idx6], bins="auto", density=True, color=lm_color, histtype="step", label=r"{\rm Left\ Moat}")
+    axs[2,i].hist(right_moat[colname][idx7], bins="auto", density=True, color=rm_color, histtype="step", label=r"{\rm Right\ Moat}")
     # axs[2,i].hist(moat[colname][idx5], bins="auto", density=True, color=mt_color, histtype="step", label=r"{\rm Moat}")
 
     # label stuff

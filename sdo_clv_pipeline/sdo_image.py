@@ -30,23 +30,15 @@ warnings.simplefilter("ignore", category=VerifyWarning)
 warnings.simplefilter("ignore", category=FITSFixedWarning)
 
 # set globals for region IDS
-umbrae_code = 1 # umbrae
-blue_pen_code = 2 # blueshifted penumbrae
-red_pen_code = 3 # redshifted penumbrae
-quiet_sun_code = 4 # quiet sun
-network_code = 5 # bright areas (will separate into plage + network)
-plage_code = 6 # plage
-left_moat_code = 8 # left moats
-right_moat_code = 9 # right moats
+umbrae_code = 1 
+penumbrae_code = 2
+quiet_sun_code = 3 
+network_code = 4 
+plage_code = 5 
+moat_code = 6 
 
-region_codes = [umbrae_code, 
-                blue_pen_code,
-                red_pen_code,
-                quiet_sun_code,
-                network_code,
-                plage_code,
-                left_moat_code,
-                right_moat_code]
+# set all region codes
+region_codes = [umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code, moat_code]
 
 class SDOImage(object):
     def __init__(self, file, dtype=np.float32):
@@ -451,8 +443,8 @@ class SunMask(object):
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix
         self.pen_frac = np.nansum(self.is_penumbra()) / npix
-        self.blu_pen_frac = np.nansum(self.is_blue_penumbra()) / npix
-        self.red_pen_frac = np.nansum(self.is_red_penumbra()) / npix
+        # self.blu_pen_frac = np.nansum(self.is_blue_penumbra()) / npix
+        # self.red_pen_frac = np.nansum(self.is_red_penumbra()) / npix
         self.quiet_frac = np.nansum(self.is_quiet_sun()) / npix
         self.network_frac = np.nansum(self.is_network()) / npix
         self.plage_frac = np.nansum(self.is_plage()) / npix
@@ -524,8 +516,8 @@ class SunMask(object):
 
         # set mask indices
         self.regions[ind1] = umbrae_code # umbrae
-        self.regions[ind2] = blue_pen_code # blueshifted penumbrae
-        self.regions[ind3] = red_pen_code # redshifted penumbrae
+        self.regions[ind2] = penumbrae_code # blue_pen_code # blueshifted penumbrae
+        self.regions[ind3] = penumbrae_code # red_pen_code # redshifted penumbrae
         self.regions[ind4] = quiet_sun_code # quiet sun
         self.regions[ind5] = network_code # bright areas (will separate into plage + network)
 
@@ -534,7 +526,7 @@ class SunMask(object):
         no_corners = ndimage.generate_binary_structure(2,1)
 
         # label unique contiguous bright regions (label islands of bright stuff)
-        binary_img = self.regions == 5  # get bright areas 
+        binary_img = self.regions == network_code  # get bright areas 
         labels, nlabels = ndimage.label(binary_img, structure=corners) # takes bright areas and feature connections, gives each island a label
         areas_pix, areas_mic = get_areas(labels, dop.pix_area) # get areas
 
@@ -675,8 +667,8 @@ class SunMask(object):
         ind9 = moats[~left_hemisphere, :, :].any(axis=0)
 
         # set values 
-        self.regions[ind8] = left_moat_code # left moats
-        self.regions[ind9] = right_moat_code # right moats
+        self.regions[ind8] = moat_code # left_moat_code # left moats
+        self.regions[ind9] = moat_code # right_moat_code # right moats
 
         # pad data for write out
         if plot_moat:
@@ -746,32 +738,33 @@ class SunMask(object):
         return np.logical_or(np.isnan(self.regions), ~np.isin(self.regions, region_codes))
 
     def is_umbra(self):
-        return self.regions == 1
+        return self.regions == umbrae_code
 
     def is_penumbra(self):
-        return np.logical_or(self.regions == 2, self.regions == 3)
+        # return np.logical_or(self.regions == 2, self.regions == 3)
+        return self.regions == penumbrae_code
 
-    def is_blue_penumbra(self):
-        return self.regions == 2
+    # def is_blue_penumbra(self):
+    #     return self.regions == 2
 
-    def is_red_penumbra(self):
-        return self.regions == 3
+    # def is_red_penumbra(self):
+    #     return self.regions == 3
 
     def is_quiet_sun(self):
-        return self.regions == 4
+        return self.regions == quiet_sun_code
 
     def is_network(self):
-        return self.regions == 5
+        return self.regions == network_code
 
     def is_plage(self):
-        return self.regions == 6
+        return self.regions == plage_code
     
     def is_moat_flow(self):
-        # return self.regions == 7
-        return np.logical_or(self.regions == 8, self.regions == 9)
+        return self.regions == moat_code
+        # return np.logical_or(self.regions == 8, self.regions == 9)
     
-    def is_left_moat(self):
-        return self.regions == 8
+    # def is_left_moat(self):
+    #     return self.regions == 8
     
-    def is_right_moat(self):
-        return self.regions == 9
+    # def is_right_moat(self):
+    #     return self.regions == 9

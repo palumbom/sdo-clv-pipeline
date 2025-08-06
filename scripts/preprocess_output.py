@@ -7,6 +7,7 @@ import os, sys, pdb, csv, glob
 import pandas as pd
 
 from sdo_clv_pipeline.paths import root
+from sdo_clv_pipeline.sdo_image import region_codes
 
 
 def mask_all_zero_rows(df, return_idx=False):

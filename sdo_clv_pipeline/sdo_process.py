@@ -84,13 +84,13 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
     # print("mask")
 
     # identify regions for thresholding
-    try:
+    # try:
     # print("About to construct SunMask")
-        mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
-        mask.mask_low_mu(mu_thresh)
-    except:
-        print("\t >>> Region identification failed, skipping " + iso, flush=True)
-        return None
+    mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
+    mask.mask_low_mu(mu_thresh)
+    # except:
+    #     print("\t >>> Region identification failed, skipping " + iso, flush=True)
+    #     return None
 
     return con, mag, dop, aia, mask
 
@@ -134,11 +134,11 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                 create_file(file)
 
     # reduce the data set
-    try:
-        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, aia_file, plot_moat=plot_moat)
-    except:
-        print("\t >>> Epoch %s reduction failed for unknown reasons :(" % iso, flush=True)
-        return None
+    # try:
+    con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, aia_file, plot_moat=plot_moat)
+    # except:
+    #     print("\t >>> Epoch %s reduction failed for unknown reasons :(" % iso, flush=True)
+    #     return None
 
     # get the MJD of the obs
     mjd = Time(con.date_obs).mjd
@@ -168,12 +168,12 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
 
     # loop over the mu annuli
     mu_grid = np.linspace(mu_thresh, 1.0, n_rings)
-
-    regions = [1, 2, 2.5, 3, 4, 5, 6, 8, 8.5, 9]
+    regions = region_codes
+    quiet_idx = np.argmax(np.array(regions) == quiet_sun_code)
     for j in range(n_rings-1):
         # mu values for annuli
-        lo_mu=mu_grid[j]
-        hi_mu=mu_grid[j+1]
+        lo_mu = mu_grid[j]
+        hi_mu = mu_grid[j+1]
 
         # compute the region mask
         region_mask = calc_region_mask(mask, region=None, hi_mu=hi_mu, lo_mu=lo_mu)
@@ -199,7 +199,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                 continue
 
             # compute velocity components in each mu annulus by region
-            if k != 4:
+            if k != quiet_sun_code:
                 # case where region is quiet sun, return zero for v_quiet
                 vels = calc_velocities(con, mag, dop, aia, mask, region_mask=region_mask, v_quiet=v_quiet)
             else:
@@ -344,7 +344,7 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     # bins & region mapping
     bins = np.linspace(mu_thresh, 1.0, n_rings)
     bin_idx = np.digitize(flat_mu, bins) - 1
-    regions = [1, 2, 2.5, 3, 4, 5, 6, 8, 8.5, 9]
+    regions = region_codes
     region_map = {r:i for i,r in enumerate(regions)}
     reg_idx = np.array([region_map.get(r, -1) for r in flat_reg])
 
@@ -378,7 +378,7 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     sum_pix = sum_pix.reshape(n_bins, len(regions))
 
     # get quiet index
-    quiet_idx = np.argmax(np.array(regions) == 4)
+    quiet_idx = np.argmax(np.array(regions) == quiet_sun_code)
 
     # build results
     # loop over mu bins

@@ -5,10 +5,6 @@ def calc_region_mask(mask, region=None, hi_mu=None, lo_mu=None):
     # get mask for region type specified
     if region is None:
         region_mask = True
-    elif region == 2.5:
-        region_mask = mask.is_penumbra()
-    elif region == 8.5:
-        region_mask = mask.is_moat_flow()
     else:
         region_mask = np.logical_and((region == mask.regions), (mask.mu >= mask.mu_thresh))
 

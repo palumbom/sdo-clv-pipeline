@@ -443,12 +443,14 @@ class SunMask(object):
         # get region fracs
         self.umb_frac = np.nansum(self.is_umbra()) / npix
         self.pen_frac = np.nansum(self.is_penumbra()) / npix
-        # self.blu_pen_frac = np.nansum(self.is_blue_penumbra()) / npix
-        # self.red_pen_frac = np.nansum(self.is_red_penumbra()) / npix
+        self.blu_pen_frac = np.nansum(self.is_blue_penumbra()) / npix
+        self.red_pen_frac = np.nansum(self.is_red_penumbra()) / npix
         self.quiet_frac = np.nansum(self.is_quiet_sun()) / npix
         self.network_frac = np.nansum(self.is_network()) / npix
         self.plage_frac = np.nansum(self.is_plage()) / npix
         self.moat_frac = np.nansum(self.is_moat_flow()) / npix
+        self.left_moat_frac = np.nansum(self.is_left_moat()) / npix
+        self.right_moat_frac = np.nansum(self.is_right_moat()) / npix
 
         return None
 
@@ -515,11 +517,17 @@ class SunMask(object):
         ind5 = np.logical_or(ind5a, ind5b) # if ind5a or ind5b, bright
 
         # set mask indices
-        self.regions[ind1] = umbrae_code # umbrae
-        self.regions[ind2] = penumbrae_code # blue_pen_code # blueshifted penumbrae
-        self.regions[ind3] = penumbrae_code # red_pen_code # redshifted penumbrae
-        self.regions[ind4] = quiet_sun_code # quiet sun
+        self.regions[ind1] = umbrae_code 
+        self.regions[ind2] = penumbrae_code # blue_pen_code 
+        self.regions[ind3] = penumbrae_code # red_pen_code 
+        self.regions[ind4] = quiet_sun_code 
         self.regions[ind5] = network_code # bright areas (will separate into plage + network)
+
+        # set blue and red penumbrae
+        self.blue_penumbrae = np.zeros_like(con.image).astype(bool)
+        self.blue_penumbrae[ind2] = True
+        self.red_penumbrae = np.zeros_like(con.image).astype(bool)
+        self.red_penumbrae[ind3] = True
 
         # create structures for dilations
         corners = ndimage.generate_binary_structure(2,2) # array of bools, defines feature connections
@@ -554,9 +562,8 @@ class SunMask(object):
 
         # save original array first
         # save_arr = areas_pix.copy()
-
-        a_label = [36, 17, 19, 15, 37, 49]
-        b_label = [71, 86, 81, 62, 52, 36, 39, 26]
+        # a_label = [36, 17, 19, 15, 37, 49]
+        # b_label = [71, 86, 81, 62, 52, 36, 39, 26]
 
         # store left/right pixels
         left_moat_pixels = np.zeros_like(self.regions, dtype=bool)
@@ -667,8 +674,14 @@ class SunMask(object):
         ind9 = moats[~left_hemisphere, :, :].any(axis=0)
 
         # set values 
-        self.regions[ind8] = moat_code # left_moat_code # left moats
-        self.regions[ind9] = moat_code # right_moat_code # right moats
+        self.regions[ind8] = moat_code
+        self.regions[ind9] = moat_code
+
+        # set left and right moat
+        self.left_moat = np.zeros_like(self.regions).astype(bool)
+        self.left_moat[ind8] = True
+        self.right_moat = np.zeros_like(self.regions).astype(bool)
+        self.right_moat[ind9] = True
 
         # pad data for write out
         if plot_moat:
@@ -744,11 +757,11 @@ class SunMask(object):
         # return np.logical_or(self.regions == 2, self.regions == 3)
         return self.regions == penumbrae_code
 
-    # def is_blue_penumbra(self):
-    #     return self.regions == 2
+    def is_blue_penumbra(self):
+        return self.blue_penumbrae
 
-    # def is_red_penumbra(self):
-    #     return self.regions == 3
+    def is_red_penumbra(self):
+        return self.red_penumbrae
 
     def is_quiet_sun(self):
         return self.regions == quiet_sun_code
@@ -761,10 +774,9 @@ class SunMask(object):
     
     def is_moat_flow(self):
         return self.regions == moat_code
-        # return np.logical_or(self.regions == 8, self.regions == 9)
     
-    # def is_left_moat(self):
-    #     return self.regions == 8
+    def is_left_moat(self):
+        return self.left_moat
     
-    # def is_right_moat(self):
-    #     return self.regions == 9
+    def is_right_moat(self):
+        return self.right_moat

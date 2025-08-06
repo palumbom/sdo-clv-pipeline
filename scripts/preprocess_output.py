@@ -8,6 +8,7 @@ import pandas as pd
 
 from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_image import region_codes
+from sdo_clv_pipeline.sdo_image import umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code, moat_code
 
 
 def mask_all_zero_rows(df, return_idx=False):
@@ -94,14 +95,14 @@ idx = dist[dist > 2.0 * v_conv_rolling_std].index
 # make dfs by mu
 right_moat = df_all[df_all.region == 9.0]
 left_moat = df_all[df_all.region == 8.0]
-moat = df_all[df_all.region == 8.5]
-plage = df_all[df_all.region == 6.0]
-network = df_all[df_all.region == 5.0]
-quiet_sun = df_all[df_all.region == 4.0]
+moat = df_all[df_all.region == moat_code]
+plage = df_all[df_all.region == plage_code]
+network = df_all[df_all.region == network_code]
+quiet_sun = df_all[df_all.region == quiet_sun_code]
 red_penumbrae = df_all[df_all.region == 3.0]
-all_penumbrae = df_all[df_all.region == 2.5]
+all_penumbrae = df_all[df_all.region == penumbrae_code]
 blu_penumbrae = df_all[df_all.region == 2.0]
-umbrae = df_all[df_all.region == 1.0]
+umbrae = df_all[df_all.region == umbrae_code]
 
 # mask rows where all vels are 0.0 (i.e., region isn't present in that annulus)
 

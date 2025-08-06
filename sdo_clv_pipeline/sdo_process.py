@@ -115,8 +115,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
 
     # name output files
     if suffix is None:
-        fname1 = os.path.join(datadir, "thresholds2.csv")
-        fname2 = os.path.join(datadir, "region_output2.csv")
+        fname1 = os.path.join(datadir, "thresholds.csv")
+        fname2 = os.path.join(datadir, "region_output.csv")
     else:
         # make tmp directory
         tmpdir = os.path.join(datadir, "tmp")

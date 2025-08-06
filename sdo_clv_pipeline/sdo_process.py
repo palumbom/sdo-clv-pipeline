@@ -61,36 +61,30 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
         return None
 
     # correct magnetogram for foreshortening
-    # print("correct mag")
     mag.correct_magnetogram()
 
     # calculate differential rot., meridional circ., obs. vel, grav. redshift, cbs
-    # print("correct dop")
     dop.correct_dopplergram(fit_cbs=fit_cbs)
 
     # check that the dopplergram correction went well
-    # print("checking")
     if np.nanmax(np.abs(dop.v_rot)) < 1000.0:
         print("\t >>> Dopplergram correction failed, skipping " + iso, flush=True)
         return None
     
-    # print("set to nan")
     # set values to nan for mu less than mu_thresh
     con.mask_low_mu(mu_thresh)
     dop.mask_low_mu(mu_thresh)
     mag.mask_low_mu(mu_thresh)
     aia.mask_low_mu(mu_thresh)
 
-    # print("mask")
-
     # identify regions for thresholding
-    # try:
-    # print("About to construct SunMask")
-    mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
-    mask.mask_low_mu(mu_thresh)
-    # except:
-    #     print("\t >>> Region identification failed, skipping " + iso, flush=True)
-    #     return None
+    try:
+        # print("About to construct SunMask")
+        mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
+        mask.mask_low_mu(mu_thresh)
+    except:
+        print("\t >>> Region identification failed, skipping " + iso, flush=True)
+        return None
 
     return con, mag, dop, aia, mask
 
@@ -148,8 +142,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                           np.nanmin(dop.v_rot), np.nanmax(dop.v_rot), np.nanmean(dop.v_rot),
                           np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer))
 
-
-    # create arrays to hold velocity magnetic fiel, and pixel fraction results
+    # create arrays to hold velocity, magnetic field, and pixel fraction results
     results = []
 
     # calculate number of pixels and total light
@@ -190,13 +183,10 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     mag_unsigned = np.nansum(flat_abs_mag[valid] * flat_int[valid]) / denom
 
     # do avg intensities
-    # get numerator
-    avg_int = np.nansum(flat_int[valid])
-    avg_int_flat = np.nansum(flat_iflat[valid])
-
-    # divide by the denominator
     denom = np.nansum(valid)
+    avg_int = np.nansum(flat_int[valid])
     avg_int /= denom
+    avg_int_flat = np.nansum(flat_iflat[valid])
     avg_int_flat /= denom
 
     # append full-disk results
@@ -243,7 +233,6 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     # get quiet index
     quiet_idx = np.argmax(np.array(regions) == quiet_sun_code)
 
-    # build results
     # loop over mu bins
     for j in range(n_bins):
         lo_mu = bins[j]

@@ -140,10 +140,10 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
         common_dates = list(set.intersection(*map(set, [get_dates(con_files), mjd_list])))
 
         # remove epochs that are missing in any data set from all data sets
-        con_files = [con_files[idx] for idx, date in enumerate(get_dates(con_files)) if date in common_dates]
-        mag_files = [mag_files[idx] for idx, date in enumerate(get_dates(mag_files)) if date in common_dates]
-        dop_files = [dop_files[idx] for idx, date in enumerate(get_dates(dop_files)) if date in common_dates]
-        aia_files = [aia_files[idx] for idx, date in enumerate(get_dates(aia_files)) if date in common_dates]
+        con_files = [con_files[idx] for idx, date in enumerate(get_dates(con_files)) if date not in common_dates]
+        mag_files = [mag_files[idx] for idx, date in enumerate(get_dates(mag_files)) if date not in common_dates]
+        dop_files = [dop_files[idx] for idx, date in enumerate(get_dates(dop_files)) if date not in common_dates]
+        aia_files = [aia_files[idx] for idx, date in enumerate(get_dates(aia_files)) if date not in common_dates]
     else:
         create_file(fname1, header1)
         create_file(fname2, header2)

@@ -7,6 +7,7 @@ from os.path import exists, split, isdir, getsize
 from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_io import *
 from sdo_clv_pipeline.sdo_process import *
+from sdo_clv_pipeline.reproject import *
 
 # multiprocessing imports
 from multiprocessing import get_context
@@ -31,13 +32,13 @@ def get_parser_args():
 
 def main():
     # make raw data dir if it does not exist
-
     if not isdir(os.path.join(root, "data")):
         os.mkdir(os.path.join(root, "data"))
 
     # sort out input/output data files
     fitsdir, clobber, globexp = get_parser_args()
     globdir = globexp.replace("*","")
+    # fitsdir = os.path.join(root, "data", "fits")
     files = organize_IO(fitsdir, clobber=clobber, globexp=globexp)
     con_files, mag_files, dop_files, aia_files = files
 
@@ -85,6 +86,13 @@ def main():
             # get PIDs of workers
             for child in mp.active_children():
                 pids.append(child.pid)
+        
+            # warm up jit
+            dummy_dst = np.empty((1,1), dtype=np.float32)
+            bilinear_reproject(np.zeros((1,1),np.float32),
+                               np.zeros((1,1),np.float32),
+                               np.zeros((1,1),np.float32),
+                               dummy_dst)
 
             # run the analysis
             pool.starmap(process_data_set_parallel, items, chunksize=4)

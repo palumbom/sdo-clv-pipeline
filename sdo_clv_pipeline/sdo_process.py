@@ -163,6 +163,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     flat_iflat = con.iflat.ravel()
     flat_ld = con.ldark.ravel()
     flat_w_quiet = w_quiet.ravel()
+    flat_w_active = ~flat_w_quiet
 
     # get disk-integrated quantitites
     valid = flat_mu >= mu_thresh
@@ -171,7 +172,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     v_hat_di = np.nansum(flat_int[valid] * flat_v_corr[valid]) 
     v_hat_di /= denom
 
-    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid]) 
+    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * flat_w_active[valid]) 
     v_phot_di /= denom
 
     v_quiet_di = np.nansum(flat_v_corr[valid] * flat_int[valid] * flat_w_quiet[valid])
@@ -292,6 +293,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     del flat_iflat
     del flat_ld
     del flat_w_quiet
+    del flat_w_active
     gc.collect() 
     
     # end the timer

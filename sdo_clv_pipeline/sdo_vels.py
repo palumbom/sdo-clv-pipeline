@@ -5,17 +5,16 @@ def calc_region_mask(mask, region=None, hi_mu=None, lo_mu=None):
     # get mask for region type specified
     if region is None:
         region_mask = True
-    elif region == 2.5:
-        region_mask = mask.is_penumbra()
     else:
-        region_mask = ((region == mask.regions) & (mask.mu >= mask.mu_thresh))
+        region_mask = np.logical_and((region == mask.regions), (mask.mu >= mask.mu_thresh))
 
     # get masks for mu annuli
     if ((hi_mu is None) | (lo_mu is None)):
         region_mask *= True
     else:
         assert lo_mu < hi_mu
-        region_mask *= ((mask.mu > lo_mu) & (mask.mu <= hi_mu)  & (mask.mu >= mask.mu_thresh))
+        cond = [(mask.mu > lo_mu), (mask.mu <= hi_mu) , (mask.mu >= mask.mu_thresh)]
+        region_mask *= np.logical_and.reduce(cond)
 
     return region_mask
 
@@ -84,7 +83,11 @@ def calc_int_stats(con, region_mask=True):
     avg_int_flat = np.nansum(con.iflat * region_mask)
 
     # divide by the denominator
-    denom = np.nansum(region_mask)
+    if (type(region_mask) is not np.ndarray):
+        denom = np.nansum(con.mu > con.mu_thresh)
+    else:
+        denom = np.nansum(region_mask)
+
     avg_int /= denom
     avg_int_flat /= denom
 

@@ -19,7 +19,7 @@ import multiprocessing as mp
 def is_quality_data(sdo_image):
     return sdo_image.quality == 0
 
-def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False, plot_moat=True):
+def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False, **kwargs):
     # assertions
     assert exists(con_file)
     assert exists(mag_file)
@@ -80,7 +80,7 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
     # identify regions for thresholding
     try:
         # print("About to construct SunMask")
-        mask = SunMask(con, mag, dop, aia, plot_moat=plot_moat)
+        mask = SunMask(con, mag, dop, aia, **kwargs)
         mask.mask_low_mu(mu_thresh)
     except:
         print("\t >>> Region identification failed, skipping " + iso, flush=True)
@@ -98,7 +98,7 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
 
 def process_data_set(con_file, mag_file, dop_file, aia_file, 
                      mu_thresh, n_rings=10, suffix=None, 
-                     datadir=None, plot_moat=True):
+                     datadir=None, **kwargs):
     iso = get_date(con_file).isoformat()
     print(">>> Running epoch %s " % iso, flush=True)
 
@@ -126,7 +126,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
 
     # reduce the data set
     try:
-        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, aia_file, plot_moat=plot_moat)
+        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, aia_file, **kwargs)
     except:
         print("\t >>> Epoch %s reduction failed for unknown reasons :(" % iso, flush=True)
         return None

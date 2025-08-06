@@ -188,8 +188,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
             region_mask = calc_region_mask(mask, region=k, hi_mu=hi_mu, lo_mu=lo_mu)
 
             # get total pix and light
-            pixels = np.nansum(region_mask)/all_pixels
-            light = np.nansum(region_mask * con.image)/all_light
+            pixels = np.nansum(region_mask) / all_pixels
+            light = np.nansum(region_mask * con.image) / all_light
 
             if ((pixels == 0.0) | (light == 0.0)):
                 vels = [0.0, 0.0, 0.0, 0.0]
@@ -359,6 +359,7 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
     sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
     sum_mag = np.bincount(grp, weights=flat_abs_mag[valid] * flat_int[valid], minlength=M)
+    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
 
     # quiet-sun sums
     qidx = valid & flat_w_quiet
@@ -374,6 +375,10 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
     sum_mag = sum_mag.reshape(n_bins, len(regions))
     sum_vquiet = sum_vquiet.reshape(n_bins, len(regions))
     sum_int_q = sum_int_q.reshape(n_bins, len(regions))
+    sum_pix = sum_pix.reshape(n_bins, len(regions))
+
+    # get quiet index
+    quiet_idx = np.argmax(np.array(regions) == 4)
 
     # build results
     # loop over mu bins
@@ -381,26 +386,32 @@ def process_data_set_new(con_file, mag_file, dop_file, aia_file,
         lo_mu = bins[j]
         hi_mu = bins[j+1]
 
+        # get v_quiet for the mu bin for vconv
+        dq_mu_bin = sum_int_q[j, quiet_idx]
+        v_q_mu_bin = (sum_vquiet[j, quiet_idx] / dq_mu_bin) if dq_mu_bin > 0 else 0.0
+
         # loop over regions
         for ir, r in enumerate(regions):
-            denom = sum_int[j, ir]
-            if denom == 0:
+            denom_int = sum_int[j, ir]
+            denom_pix = sum_pix[j, ir]
+            if denom_int == 0:
                 results.append([mjd, r, lo_mu, hi_mu, 0, 0, 0, 0, 0, 0, 0, 0, 0])
                 continue
 
-            pix_frac = denom / all_pixels # TODO WRONG
-            light_frac = denom / all_light
+            # calculate values
+            pix_frac = denom_pix / all_pixels
+            light_frac = denom_int / all_light
 
-            v_hat = sum_vhat[j, ir] / denom
-            v_phot = sum_vphot[j, ir] / denom
+            v_hat = sum_vhat[j, ir] / denom_int
+            v_phot = sum_vphot[j, ir] / denom_int
 
             dq = sum_int_q[j, ir]
-            v_q = (sum_vquiet[j, ir] / dq) if dq>0 else 0.0
-            v_conv = v_hat - v_q
+            v_q = (sum_vquiet[j, ir] / dq) if dq > 0 else 0.0
+            v_conv = v_hat - v_q_mu_bin
 
-            mag_u = sum_mag[j, ir] / denom
-            avg_i = sum_int[j, ir] / denom # TODO WRONG
-            avg_if = sum_iflat[j, ir] / denom # TODO WRONG
+            mag_u = sum_mag[j, ir] / denom_int
+            avg_i = sum_int[j, ir] / denom_pix 
+            avg_if = sum_iflat[j, ir] / denom_pix 
 
             # append the velocity results
             results.append([mjd, r, lo_mu, hi_mu, pix_frac, 

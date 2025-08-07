@@ -123,73 +123,61 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                            flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet,
                            flat_reg, region_codes, quiet_sun_code,
                            mu_thresh, n_rings, k_hat_con):
-    rows = []
     bins = np.linspace(mu_thresh, 1.0, n_rings)
-    bin_idx = np.digitize(flat_mu, bins) - 1
+    bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings-2)
+    valid_mask = (flat_mu >= mu_thresh)
 
-    region_map = {r: i for i, r in enumerate(region_codes)}
-    reg_idx = np.array([region_map.get(r, -1) for r in flat_reg])
+    # aggregate sums by (bin, region)
+    regions = np.array(region_codes)
+    reg_map = {r:i for i,r in enumerate(region_codes)}
+    reg_idx = np.array([reg_map.get(r,-1) for r in flat_reg])
+    valid = valid_mask & (reg_idx>=0)
+    grp = bin_idx[valid] * len(regions) + reg_idx[valid]
+    M = (n_rings-1)*len(regions)
 
-    n_bins = n_rings - 1
-    valid = (flat_mu >= mu_thresh) & (bin_idx >= 0) & (bin_idx < n_bins) & (reg_idx >= 0)
-    grp = bin_idx[valid] * len(region_codes) + reg_idx[valid]
-    M = n_bins * len(region_codes)
-
-    sum_vhat = np.bincount(grp, weights=flat_int[valid] * flat_v_corr[valid], minlength=M)
-    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid], minlength=M)
-    sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
-    sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
-    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid] * flat_int[valid], minlength=M)
-    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
+    sum_vhat = np.bincount(grp, weights=flat_int[valid]*flat_v_corr[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid]*(flat_int-k_hat_con*flat_ld)[valid]*~flat_w_quiet[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid]*flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M).reshape(n_rings-1,len(regions))
 
     # quiet-sun sums
-    qidx = np.logical_and(valid, flat_w_quiet)
-    grp_q = bin_idx[qidx] * len(region_codes) + reg_idx[qidx]
-    sum_vquiet = np.bincount(grp_q, weights=flat_v_corr[qidx] * flat_int[qidx], minlength=M)
-    sum_int_q = np.bincount(grp_q, weights=flat_int[qidx], minlength=M)
+    quiet_idx = np.where(regions==quiet_sun_code)[0][0]
+    q_valid = valid & flat_w_quiet
+    grp_q = bin_idx[q_valid]*len(regions)+reg_idx[q_valid]
+    sum_vquiet_flat = np.bincount(grp_q, weights=flat_v_corr[q_valid]*flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_int_q_flat = np.bincount(grp_q, weights=flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
 
-    # reshape
-    sum_vhat = sum_vhat.reshape(n_bins, len(region_codes))
-    sum_vphot = sum_vphot.reshape(n_bins, len(region_codes))
-    sum_int = sum_int.reshape(n_bins, len(region_codes))
-    sum_iflat = sum_iflat.reshape(n_bins, len(region_codes))
-    sum_mag = sum_mag.reshape(n_bins, len(region_codes))
-    sum_vquiet = sum_vquiet.reshape(n_bins, len(region_codes))
-    sum_int_q = sum_int_q.reshape(n_bins, len(region_codes))
-    sum_pix = sum_pix.reshape(n_bins, len(region_codes))
+    # compute metrics
+    total_pixels = np.nansum(valid_mask)
+    total_light = np.nansum(flat_int[valid_mask])
+    pix_frac = sum_pix/total_pixels
+    light_frac = sum_int/total_light
 
-    quiet_idx = np.argmax(np.array(region_codes) == quiet_sun_code)
+    # avoid division by zero
+    sum_int_safe = np.where(sum_int>0,sum_int,1)
+    sum_int_q_safe = np.where(sum_int_q_flat>0,sum_int_q_flat,1)
+    sum_pix_safe = np.where(sum_pix>0,sum_pix,1)
 
-    for j in range(n_bins):
-        lo_mu = bins[j]
-        hi_mu = bins[j+1]
+    v_hat = sum_vhat/sum_int_safe
+    v_phot = sum_vphot/sum_int_safe
+    v_q = sum_vquiet_flat/sum_int_q_safe
+    v_q_mu = v_q[:,quiet_idx][:,None]
+    v_conv = v_hat - v_q_mu
 
-        dq_mu = sum_int_q[j, quiet_idx]
-        v_q_mu = sum_vquiet[j, quiet_idx] / dq_mu if dq_mu > 0 else 0.0
+    mag_u = sum_mag/sum_int_safe
+    avg_i = sum_int/sum_pix_safe
+    avg_if = sum_iflat/sum_pix_safe
 
-        for ir, r in enumerate(region_codes):
-            denom_int = sum_int[j, ir]
-            denom_pix = sum_pix[j, ir]
-            if denom_int == 0:
-                rows.append([mjd, r, lo_mu, hi_mu, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-                continue
+    # build rows
+    lo_mu = bins[:-1]
+    hi_mu = bins[1:]
+    bin_idxs = np.repeat(lo_mu, len(regions)), np.repeat(hi_mu, len(regions))
+    region_list = np.tile(regions, len(lo_mu))
 
-            pix_frac = denom_pix / np.nansum(flat_mu >= mu_thresh)
-            light_frac = denom_int / np.nansum(flat_int[flat_mu >= mu_thresh])
-
-            v_hat = sum_vhat[j, ir] / denom_int
-            v_phot = sum_vphot[j, ir] / denom_int
-
-            dq = sum_int_q[j, ir]
-            v_q = sum_vquiet[j, ir] / dq if dq > 0 else 0.0
-            v_conv = v_hat - v_q_mu
-
-            mag_u = sum_mag[j, ir] / denom_int
-            avg_i = sum_int[j, ir] / denom_pix
-            avg_if = sum_iflat[j, ir] / denom_pix
-
-            rows.append([mjd, r, lo_mu, hi_mu,
-                         pix_frac, light_frac,
-                         v_hat, v_phot, v_q, v_conv,
-                         mag_u, avg_i, avg_if])
-    return rows
+    data = np.vstack([np.full_like(region_list, mjd), region_list, bin_idxs[0], 
+                      bin_idxs[1], pix_frac.ravel(), light_frac.ravel(), 
+                      v_hat.ravel(), v_phot.ravel(), v_q.ravel(), v_conv.ravel(), 
+                      mag_u.ravel(), avg_i.ravel(), avg_if.ravel()]).T.tolist()
+    return data

@@ -126,6 +126,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     bins = np.linspace(mu_thresh, 1.0, n_rings)
     bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings-2)
     valid_mask = (flat_mu >= mu_thresh)
+    flat_w_active = np.logical_not(flat_w_quiet)
 
     # aggregate sums by (bin, region)
     regions = np.array(region_codes)
@@ -136,7 +137,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     M = (n_rings-1)*len(regions)
 
     sum_vhat = np.bincount(grp, weights=flat_int[valid]*flat_v_corr[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid]*(flat_int-k_hat_con*flat_ld)[valid]*~flat_w_quiet[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int-k_hat_con*flat_ld)[valid] * flat_w_active[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_mag = np.bincount(grp, weights=flat_abs_mag[valid]*flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
@@ -156,15 +157,16 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     light_frac = sum_int/total_light
 
     # avoid division by zero
-    sum_int_safe = np.where(sum_int>0,sum_int,1)
-    sum_int_q_safe = np.where(sum_int_q_flat>0,sum_int_q_flat,1)
-    sum_pix_safe = np.where(sum_pix>0,sum_pix,1)
+    sum_int_safe = np.where(sum_int > 0, sum_int, 1)
+    sum_int_q_safe = np.where(sum_int_q_flat > 0, sum_int_q_flat, 1)
+    sum_pix_safe = np.where(sum_pix > 0, sum_pix, 1)
 
+    # get velocities
     v_hat = sum_vhat/sum_int_safe
     v_phot = sum_vphot/sum_int_safe
     v_q = sum_vquiet_flat/sum_int_q_safe
     v_q_mu = v_q[:,quiet_idx][:,None]
-    v_conv = v_hat - v_q_mu
+    v_conv = np.where(v_hat != 0, v_hat - v_q_mu, 0)
 
     mag_u = sum_mag/sum_int_safe
     avg_i = sum_int/sum_pix_safe
@@ -176,7 +178,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     bin_idxs = np.repeat(lo_mu, len(regions)), np.repeat(hi_mu, len(regions))
     region_list = np.tile(regions, len(lo_mu))
 
-    data = np.vstack([np.full_like(region_list, mjd), region_list, bin_idxs[0], 
+    data = np.vstack([np.full_like(v_phot.ravel(), mjd), region_list, bin_idxs[0], 
                       bin_idxs[1], pix_frac.ravel(), light_frac.ravel(), 
                       v_hat.ravel(), v_phot.ravel(), v_q.ravel(), v_conv.ravel(), 
                       mag_u.ravel(), avg_i.ravel(), avg_if.ravel()]).T.tolist()

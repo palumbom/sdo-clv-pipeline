@@ -93,17 +93,17 @@ idx = dist[dist > 2.0 * v_conv_rolling_std].index
 """
 
 # make dfs by mu
-not_nan_reg = np.logical_not(np.isnan(df_all.lo_mu))
-right_moat = df_all[np.logical_and(df_all.region == 9.0, not_nan_reg)]
-left_moat = df_all[np.logical_and(df_all.region == 8.0, not_nan_reg)]
-moat = df_all[np.logical_and(df_all.region == moat_code, not_nan_reg)]
-plage = df_all[np.logical_and(df_all.region == plage_code, not_nan_reg)]
-network = df_all[np.logical_and(df_all.region == network_code, not_nan_reg)]
-quiet_sun = df_all[np.logical_and(df_all.region == quiet_sun_code, not_nan_reg)]
-red_penumbrae = df_all[np.logical_and(df_all.region == 3.0, not_nan_reg)]
-all_penumbrae = df_all[np.logical_and(df_all.region == penumbrae_code, not_nan_reg)]
-blu_penumbrae = df_all[np.logical_and(df_all.region == 2.0, not_nan_reg)]
-umbrae = df_all[np.logical_and(df_all.region == umbrae_code, not_nan_reg)]
+not_nan_mu_bin = np.logical_not(np.isnan(df_all.lo_mu))
+right_moat = df_all[np.logical_and(df_all.region == 9.0, not_nan_mu_bin)]
+left_moat = df_all[np.logical_and(df_all.region == 8.0, not_nan_mu_bin)]
+moat = df_all[np.logical_and(df_all.region == moat_code, not_nan_mu_bin)]
+plage = df_all[np.logical_and(df_all.region == plage_code, not_nan_mu_bin)]
+network = df_all[np.logical_and(df_all.region == network_code, not_nan_mu_bin)]
+quiet_sun = df_all[np.logical_and(df_all.region == quiet_sun_code, not_nan_mu_bin)]
+red_penumbrae = df_all[np.logical_and(df_all.region == 3.0, not_nan_mu_bin)]
+all_penumbrae = df_all[np.logical_and(df_all.region == penumbrae_code, not_nan_mu_bin)]
+blu_penumbrae = df_all[np.logical_and(df_all.region == 2.0, not_nan_mu_bin)]
+umbrae = df_all[np.logical_and(df_all.region == umbrae_code, not_nan_mu_bin)]
 
 # mask rows where all vels are 0.0 (i.e., region isn't present in that annulus)
 right_moat = mask_all_zero_rows(right_moat)

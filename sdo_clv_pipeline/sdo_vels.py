@@ -100,9 +100,11 @@ def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     all_pixels = np.nansum(valid)
     all_light = np.nansum(flat_int[valid])
 
+    flat_w_active = np.logical_not(flat_w_quiet)
+
     denom = np.nansum(flat_int[valid])
     v_hat_di = np.nansum(flat_int[valid] * flat_v_corr[valid]) / denom
-    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid]) / denom
+    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * flat_w_active[valid]) / denom
     v_quiet_di = np.nansum(flat_v_corr[valid] * flat_int[valid] * flat_w_quiet[valid]) / np.nansum(flat_int[valid] * flat_w_quiet[valid])
     v_cbs_di = v_hat_di - v_quiet_di
 
@@ -141,7 +143,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
 
     # quiet-sun sums
-    qidx = valid & flat_w_quiet
+    qidx = np.logical_and(valid, flat_w_quiet)
     grp_q = bin_idx[qidx] * len(region_codes) + reg_idx[qidx]
     sum_vquiet = np.bincount(grp_q, weights=flat_v_corr[qidx] * flat_int[qidx], minlength=M)
     sum_int_q = np.bincount(grp_q, weights=flat_int[qidx], minlength=M)

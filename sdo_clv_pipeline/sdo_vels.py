@@ -70,12 +70,13 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     avg_i = sum_int / sum_pix_safe
     avg_if = sum_iflat / sum_pix_safe
 
-    data = []
-    for i, r in enumerate(regions):
-        data.append([mjd, r, np.nan, np.nan,
-                     pix_frac[i], light_frac[i],
-                     v_hat[i], v_phot[i], v_q[i], v_conv[i],
-                     mag_u[i], avg_i[i], avg_if[i]])
+    regs = np.array(regions)
+    mjd_arr = np.full_like(regs, mjd, dtype=float)
+    nan_arr = np.full_like(regs, np.nan, dtype=float)
+    data = np.vstack([mjd_arr, regs, nan_arr, nan_arr,
+                      pix_frac, light_frac, v_hat, 
+                      v_phot, v_q, v_conv, mag_u, 
+                      avg_i, avg_if]).T.tolist()
     return data
 
 def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,

@@ -32,9 +32,10 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                                 mu_thresh, k_hat_con):
     valid_mask = flat_mu >= mu_thresh
 
+    # aggregate sums by region
     regions = np.array(region_codes)
-    reg_map = {r: i for i, r in enumerate(regions)}
-    reg_idx = np.array([reg_map.get(r, -1) for r in flat_reg])
+    reg_map = {r:i for i,r in enumerate(region_codes)}
+    reg_idx = np.array([reg_map.get(r,-1) for r in flat_reg])
     valid = np.logical_and(valid_mask, reg_idx >= 0)
     grp = reg_idx[valid]
     M = len(regions)
@@ -92,7 +93,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     reg_idx = np.array([reg_map.get(r,-1) for r in flat_reg])
     valid = valid_mask & (reg_idx>=0)
     grp = bin_idx[valid] * len(regions) + reg_idx[valid]
-    M = (n_rings-1)*len(regions)
+    M = (n_rings-1) * len(regions)
 
     sum_vhat = np.bincount(grp, weights=flat_int[valid]*flat_v_corr[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int-k_hat_con*flat_ld)[valid] * flat_w_active[valid], minlength=M).reshape(n_rings-1,len(regions))
@@ -102,9 +103,9 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M).reshape(n_rings-1,len(regions))
 
     # quiet-sun sums
-    quiet_idx = np.where(regions==quiet_sun_code)[0][0]
+    quiet_idx = np.where(regions == quiet_sun_code)[0][0]
     q_valid = valid & flat_w_quiet
-    grp_q = bin_idx[q_valid]*len(regions)+reg_idx[q_valid]
+    grp_q = bin_idx[q_valid] * len(regions) + reg_idx[q_valid]
     sum_vquiet_flat = np.bincount(grp_q, weights=flat_v_corr[q_valid]*flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_int_q_flat = np.bincount(grp_q, weights=flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
 

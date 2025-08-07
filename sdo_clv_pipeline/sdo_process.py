@@ -102,7 +102,9 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     iso = get_date(con_file).isoformat()
     print(">>> Running epoch %s " % iso, flush=True)
 
+    # start the timer
     start_time = time.perf_counter()
+
     #figure out data directories
     if not isdir(datadir): os.mkdir(datadir)
 

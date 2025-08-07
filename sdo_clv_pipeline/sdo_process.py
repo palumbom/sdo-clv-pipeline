@@ -141,10 +141,6 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                           np.nanmin(dop.v_rot), np.nanmax(dop.v_rot), np.nanmean(dop.v_rot),
                           np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer))
 
-    # # calculate number of pixels and total light
-    # all_pixels = np.nansum(con.mu >= mu_thresh)
-    # all_light = np.nansum(con.image * (con.mu >= mu_thresh))
-
     # flatten per-pixel arrays
     flat_mu = mask.mu.ravel()
     flat_reg = mask.regions.ravel()
@@ -155,6 +151,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     flat_iflat = con.iflat.ravel()
     flat_ld = con.ldark.ravel()
     flat_w_quiet = mask.is_quiet_sun().ravel()
+    flat_w_active = np.logical_not(flat_w_quiet)
 
     # calculate k_hat
     w_quiet = mask.is_quiet_sun()
@@ -166,41 +163,44 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     # calculate disk-integrataed quantities
     results.append(compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
                                         flat_v_rot, flat_ld, flat_iflat,
-                                        flat_w_quiet, flat_abs_mag,
+                                        flat_w_quiet, flat_w_active, flat_abs_mag,
                                         mu_thresh, k_hat_con))
+    
+    # calculate velocities for regions, not binning by mu
+    results.extend(compute_region_only_results(mjd, flat_mu, flat_int,
+                                               flat_v_corr, flat_v_rot,
+                                               flat_ld, flat_iflat,
+                                               flat_abs_mag, flat_w_quiet, 
+                                               flat_w_active, 
+                                               flat_reg, region_codes,
+                                               mu_thresh, k_hat_con))
 
     # calculate disk-resovled quantities
     results.extend(compute_region_results(mjd, flat_mu, flat_int, flat_v_corr,
                                           flat_v_rot, flat_ld, flat_iflat,
-                                          flat_abs_mag, flat_w_quiet,
-                                          flat_reg, region_codes,
-                                          quiet_sun_code,
-                                          mu_thresh, n_rings, k_hat_con))
+                                          flat_abs_mag, flat_w_quiet, 
+                                          flat_w_active, flat_reg, 
+                                          region_codes, mu_thresh, 
+                                          n_rings, k_hat_con))
 
     # write to disk
     write_results_to_file(fname2, results)
 
     # do some memory cleanup
-    # del con
-    # del mag
-    # del dop
-    # del aia
-    # del bins
-    # del valid
-    # del denom
-    # del results
-    # del regions
-    # del flat_mu
-    # del flat_reg
-    # del flat_int
-    # del flat_v_corr
-    # del flat_v_rot
-    # del flat_abs_mag
-    # del flat_iflat
-    # del flat_ld
-    # del flat_w_quiet
-    # del flat_w_active
-    # gc.collect() 
+    del con
+    del mag
+    del dop
+    del aia
+    del flat_mu
+    del flat_ld
+    del flat_reg
+    del flat_int
+    del flat_v_rot
+    del flat_iflat
+    del flat_v_corr
+    del flat_abs_mag 
+    del flat_w_quiet
+    gc.collect() 
     
     # end the timer
     end_time = time.perf_counter()

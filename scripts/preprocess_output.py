@@ -76,7 +76,7 @@ df_all.drop_duplicates()
 df_all.reset_index(drop=True, inplace=True)
 
 # get full disk only
-df_full_disk = df_all[(np.isnan(df_all.lo_mu)) & np.isnan(df_all.region)]
+df_full_disk = df_all[(np.isnan(df_all.lo_mu))]
 df_full_disk.reset_index(drop=True, inplace=True)
 df_full_disk.to_csv(os.path.join(outdir, "full_disk.csv"), index=False)
 # full_disk_daily = daily_bin(df_full_disk)
@@ -93,19 +93,19 @@ idx = dist[dist > 2.0 * v_conv_rolling_std].index
 """
 
 # make dfs by mu
-right_moat = df_all[df_all.region == 9.0]
-left_moat = df_all[df_all.region == 8.0]
-moat = df_all[df_all.region == moat_code]
-plage = df_all[df_all.region == plage_code]
-network = df_all[df_all.region == network_code]
-quiet_sun = df_all[df_all.region == quiet_sun_code]
-red_penumbrae = df_all[df_all.region == 3.0]
-all_penumbrae = df_all[df_all.region == penumbrae_code]
-blu_penumbrae = df_all[df_all.region == 2.0]
-umbrae = df_all[df_all.region == umbrae_code]
+not_nan_reg = np.logical_not(np.isnan(df_all.lo_mu))
+right_moat = df_all[np.logical_and(df_all.region == 9.0, not_nan_reg)]
+left_moat = df_all[np.logical_and(df_all.region == 8.0, not_nan_reg)]
+moat = df_all[np.logical_and(df_all.region == moat_code, not_nan_reg)]
+plage = df_all[np.logical_and(df_all.region == plage_code, not_nan_reg)]
+network = df_all[np.logical_and(df_all.region == network_code, not_nan_reg)]
+quiet_sun = df_all[np.logical_and(df_all.region == quiet_sun_code, not_nan_reg)]
+red_penumbrae = df_all[np.logical_and(df_all.region == 3.0, not_nan_reg)]
+all_penumbrae = df_all[np.logical_and(df_all.region == penumbrae_code, not_nan_reg)]
+blu_penumbrae = df_all[np.logical_and(df_all.region == 2.0, not_nan_reg)]
+umbrae = df_all[np.logical_and(df_all.region == umbrae_code, not_nan_reg)]
 
 # mask rows where all vels are 0.0 (i.e., region isn't present in that annulus)
-
 right_moat = mask_all_zero_rows(right_moat)
 right_moat.reset_index(drop=True, inplace=True)
 right_moat.to_csv(os.path.join(outdir, "right_moat.csv"), index=False)

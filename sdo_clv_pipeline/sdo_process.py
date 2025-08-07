@@ -104,8 +104,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
 
     start_time = time.perf_counter()
     #figure out data directories
-    if not isdir(datadir):
-        os.mkdir(datadir)
+    if not isdir(datadir): os.mkdir(datadir)
 
     # name output files
     if suffix is None:
@@ -142,16 +141,9 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                           np.nanmin(dop.v_rot), np.nanmax(dop.v_rot), np.nanmean(dop.v_rot),
                           np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer))
 
-    # create arrays to hold velocity, magnetic field, and pixel fraction results
-    results = []
-
-    # calculate number of pixels and total light
-    all_pixels = np.nansum(con.mu >= mu_thresh)
-    all_light = np.nansum(con.image * (con.mu >= mu_thresh))
-
-    # quiet‐sun mask & continuum scaling
-    w_quiet = mask.is_quiet_sun()
-    k_hat_con = np.nansum(con.image * con.ldark * w_quiet) / np.nansum(con.ldark**2 * w_quiet)
+    # # calculate number of pixels and total light
+    # all_pixels = np.nansum(con.mu >= mu_thresh)
+    # all_light = np.nansum(con.image * (con.mu >= mu_thresh))
 
     # flatten per-pixel arrays
     flat_mu = mask.mu.ravel()
@@ -162,139 +154,53 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     flat_abs_mag = np.abs(mag.B_obs).ravel()
     flat_iflat = con.iflat.ravel()
     flat_ld = con.ldark.ravel()
-    flat_w_quiet = w_quiet.ravel()
-    flat_w_active = ~flat_w_quiet
+    flat_w_quiet = mask.is_quiet_sun().ravel()
 
-    # get disk-integrated quantitites
-    valid = flat_mu >= mu_thresh
-    denom = np.nansum(flat_int[valid])
+    # calculate k_hat
+    w_quiet = mask.is_quiet_sun()
+    k_hat_con = np.nansum(con.image * con.ldark * w_quiet) / np.nansum(con.ldark**2 * w_quiet)
 
-    v_hat_di = np.nansum(flat_int[valid] * flat_v_corr[valid]) 
-    v_hat_di /= denom
+    # create arrays to hold velocity, magnetic field, and pixel fraction results
+    results = []
 
-    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * flat_w_active[valid]) 
-    v_phot_di /= denom
+    # calculate disk-integrataed quantities
+    results.append(compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
+                                        flat_v_rot, flat_ld, flat_iflat,
+                                        flat_w_quiet, flat_abs_mag,
+                                        mu_thresh, k_hat_con))
 
-    v_quiet_di = np.nansum(flat_v_corr[valid] * flat_int[valid] * flat_w_quiet[valid])
-    v_quiet_di /= np.nansum(flat_int[valid] * flat_w_quiet[valid])
-
-    v_cbs_di = v_hat_di - v_quiet_di
-
-    # do unsigned mag flux 
-    mag_unsigned = np.nansum(flat_abs_mag[valid] * flat_int[valid]) / denom
-
-    # do avg intensities
-    denom = np.nansum(valid)
-    avg_int = np.nansum(flat_int[valid])
-    avg_int /= denom
-    avg_int_flat = np.nansum(flat_iflat[valid])
-    avg_int_flat /= denom
-
-    # append full-disk results
-    results.append([mjd, np.nan, np.nan, np.nan, all_pixels, 
-                    all_light, v_hat_di, v_phot_di, v_quiet_di, 
-                    v_cbs_di, mag_unsigned, avg_int, avg_int_flat])
-
-    # bins & region mapping
-    bins = np.linspace(mu_thresh, 1.0, n_rings)
-    bin_idx = np.digitize(flat_mu, bins) - 1
-    regions = region_codes
-    region_map = {r:i for i,r in enumerate(regions)}
-    reg_idx = np.array([region_map.get(r, -1) for r in flat_reg])
-
-    n_bins = n_rings - 1
-    valid = (flat_mu >= mu_thresh) & (bin_idx >= 0) & (bin_idx < n_bins) & (reg_idx >= 0)
-    grp = bin_idx[valid] * len(regions) + reg_idx[valid]
-    M = n_bins * len(regions)
-
-    # compute sums
-    sum_vhat = np.bincount(grp, weights=flat_int[valid] * flat_v_corr[valid], minlength=M)
-    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid], minlength=M)
-    sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
-    sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
-    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid] * flat_int[valid], minlength=M)
-    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
-
-    # quiet-sun sums
-    qidx = valid & flat_w_quiet
-    grp_q = bin_idx[qidx] * len(regions) + reg_idx[qidx]
-    sum_vquiet = np.bincount(grp_q, weights=flat_v_corr[qidx] * flat_int[qidx], minlength=M)
-    sum_int_q = np.bincount(grp_q, weights=flat_int[qidx], minlength=M)
-
-    # reshape
-    sum_vhat = sum_vhat.reshape(n_bins, len(regions))
-    sum_vphot = sum_vphot.reshape(n_bins, len(regions))
-    sum_int = sum_int.reshape(n_bins, len(regions))
-    sum_iflat = sum_iflat.reshape(n_bins, len(regions))
-    sum_mag = sum_mag.reshape(n_bins, len(regions))
-    sum_vquiet = sum_vquiet.reshape(n_bins, len(regions))
-    sum_int_q = sum_int_q.reshape(n_bins, len(regions))
-    sum_pix = sum_pix.reshape(n_bins, len(regions))
-
-    # get quiet index
-    quiet_idx = np.argmax(np.array(regions) == quiet_sun_code)
-
-    # loop over mu bins
-    for j in range(n_bins):
-        lo_mu = bins[j]
-        hi_mu = bins[j+1]
-
-        # get v_quiet for the mu bin for vconv
-        dq_mu_bin = sum_int_q[j, quiet_idx]
-        v_q_mu_bin = (sum_vquiet[j, quiet_idx] / dq_mu_bin) if dq_mu_bin > 0 else 0.0
-
-        # loop over regions
-        for ir, r in enumerate(regions):
-            denom_int = sum_int[j, ir]
-            denom_pix = sum_pix[j, ir]
-            if denom_int == 0:
-                results.append([mjd, r, lo_mu, hi_mu, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-                continue
-
-            # calculate values
-            pix_frac = denom_pix / all_pixels
-            light_frac = denom_int / all_light
-
-            v_hat = sum_vhat[j, ir] / denom_int
-            v_phot = sum_vphot[j, ir] / denom_int
-
-            dq = sum_int_q[j, ir]
-            v_q = (sum_vquiet[j, ir] / dq) if dq > 0 else 0.0
-            v_conv = v_hat - v_q_mu_bin
-
-            mag_u = sum_mag[j, ir] / denom_int
-            avg_i = sum_int[j, ir] / denom_pix 
-            avg_if = sum_iflat[j, ir] / denom_pix 
-
-            # append the velocity results
-            results.append([mjd, r, lo_mu, hi_mu, pix_frac, 
-                            light_frac, v_hat, v_phot, v_q, 
-                            v_conv, mag_u, avg_i, avg_if])
+    # calculate disk-resovled quantities
+    results.extend(compute_region_results(mjd, flat_mu, flat_int, flat_v_corr,
+                                          flat_v_rot, flat_ld, flat_iflat,
+                                          flat_abs_mag, flat_w_quiet,
+                                          flat_reg, region_codes,
+                                          quiet_sun_code,
+                                          mu_thresh, n_rings, k_hat_con))
 
     # write to disk
     write_results_to_file(fname2, results)
 
     # do some memory cleanup
-    del con
-    del mag
-    del dop
-    del aia
-    del bins
-    del valid
-    del denom
-    del results
-    del regions
-    del flat_mu
-    del flat_reg
-    del flat_int
-    del flat_v_corr
-    del flat_v_rot
-    del flat_abs_mag
-    del flat_iflat
-    del flat_ld
-    del flat_w_quiet
-    del flat_w_active
-    gc.collect() 
+    # del con
+    # del mag
+    # del dop
+    # del aia
+    # del bins
+    # del valid
+    # del denom
+    # del results
+    # del regions
+    # del flat_mu
+    # del flat_reg
+    # del flat_int
+    # del flat_v_corr
+    # del flat_v_rot
+    # del flat_abs_mag
+    # del flat_iflat
+    # del flat_ld
+    # del flat_w_quiet
+    # del flat_w_active
+    # gc.collect() 
     
     # end the timer
     end_time = time.perf_counter()

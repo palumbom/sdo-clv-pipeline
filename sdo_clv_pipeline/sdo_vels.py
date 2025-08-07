@@ -92,3 +92,102 @@ def calc_int_stats(con, region_mask=True):
     avg_int_flat /= denom
 
     return avg_int, avg_int_flat
+
+def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
+                         flat_ld, flat_iflat, flat_w_quiet, flat_abs_mag,
+                         mu_thresh, k_hat_con):
+    valid = flat_mu >= mu_thresh
+    all_pixels = np.nansum(valid)
+    all_light = np.nansum(flat_int[valid])
+
+    denom = np.nansum(flat_int[valid])
+    v_hat_di = np.nansum(flat_int[valid] * flat_v_corr[valid]) / denom
+    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid]) / denom
+    v_quiet_di = np.nansum(flat_v_corr[valid] * flat_int[valid] * flat_w_quiet[valid]) / np.nansum(flat_int[valid] * flat_w_quiet[valid])
+    v_cbs_di = v_hat_di - v_quiet_di
+
+    mag_unsigned = np.nansum(flat_abs_mag[valid] * flat_int[valid]) / denom
+
+    count = np.nansum(valid)
+    avg_int = np.nansum(flat_int[valid]) / count
+    avg_int_flat = np.nansum(flat_iflat[valid]) / count
+
+    return [mjd, np.nan, np.nan, np.nan,
+            all_pixels, all_light,
+            v_hat_di, v_phot_di, v_quiet_di, v_cbs_di,
+            mag_unsigned, avg_int, avg_int_flat]
+
+def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
+                           flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet,
+                           flat_reg, region_codes, quiet_sun_code,
+                           mu_thresh, n_rings, k_hat_con):
+    rows = []
+    bins = np.linspace(mu_thresh, 1.0, n_rings)
+    bin_idx = np.digitize(flat_mu, bins) - 1
+
+    region_map = {r: i for i, r in enumerate(region_codes)}
+    reg_idx = np.array([region_map.get(r, -1) for r in flat_reg])
+
+    n_bins = n_rings - 1
+    valid = (flat_mu >= mu_thresh) & (bin_idx >= 0) & (bin_idx < n_bins) & (reg_idx >= 0)
+    grp = bin_idx[valid] * len(region_codes) + reg_idx[valid]
+    M = n_bins * len(region_codes)
+
+    sum_vhat = np.bincount(grp, weights=flat_int[valid] * flat_v_corr[valid], minlength=M)
+    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * ~flat_w_quiet[valid], minlength=M)
+    sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
+    sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
+    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid] * flat_int[valid], minlength=M)
+    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
+
+    # quiet-sun sums
+    qidx = valid & flat_w_quiet
+    grp_q = bin_idx[qidx] * len(region_codes) + reg_idx[qidx]
+    sum_vquiet = np.bincount(grp_q, weights=flat_v_corr[qidx] * flat_int[qidx], minlength=M)
+    sum_int_q = np.bincount(grp_q, weights=flat_int[qidx], minlength=M)
+
+    # reshape
+    sum_vhat = sum_vhat.reshape(n_bins, len(region_codes))
+    sum_vphot = sum_vphot.reshape(n_bins, len(region_codes))
+    sum_int = sum_int.reshape(n_bins, len(region_codes))
+    sum_iflat = sum_iflat.reshape(n_bins, len(region_codes))
+    sum_mag = sum_mag.reshape(n_bins, len(region_codes))
+    sum_vquiet = sum_vquiet.reshape(n_bins, len(region_codes))
+    sum_int_q = sum_int_q.reshape(n_bins, len(region_codes))
+    sum_pix = sum_pix.reshape(n_bins, len(region_codes))
+
+    quiet_idx = np.argmax(np.array(region_codes) == quiet_sun_code)
+
+    for j in range(n_bins):
+        lo_mu = bins[j]
+        hi_mu = bins[j+1]
+
+        dq_mu = sum_int_q[j, quiet_idx]
+        v_q_mu = sum_vquiet[j, quiet_idx] / dq_mu if dq_mu > 0 else 0.0
+
+        for ir, r in enumerate(region_codes):
+            denom_int = sum_int[j, ir]
+            denom_pix = sum_pix[j, ir]
+            if denom_int == 0:
+                rows.append([mjd, r, lo_mu, hi_mu, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+                continue
+
+            pix_frac = denom_pix / np.nansum(flat_mu >= mu_thresh)
+            light_frac = denom_int / np.nansum(flat_int[flat_mu >= mu_thresh])
+
+            v_hat = sum_vhat[j, ir] / denom_int
+            v_phot = sum_vphot[j, ir] / denom_int
+
+            dq = sum_int_q[j, ir]
+            v_q = sum_vquiet[j, ir] / dq if dq > 0 else 0.0
+            v_conv = v_hat - v_q_mu
+
+            mag_u = sum_mag[j, ir] / denom_int
+            avg_i = sum_int[j, ir] / denom_pix
+            avg_if = sum_iflat[j, ir] / denom_pix
+
+            rows.append([mjd, r, lo_mu, hi_mu,
+                         pix_frac, light_frac,
+                         v_hat, v_phot, v_q, v_conv,
+                         mag_u, avg_i, avg_if])
+    return rows

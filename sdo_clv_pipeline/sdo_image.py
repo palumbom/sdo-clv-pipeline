@@ -86,11 +86,9 @@ class SDOImage(object):
 
         # get data quality flag
         self.instrument = head["TELESCOP"]
-        if self.instrument == "SDO/AIA":
-            self.quality = head["QUALITY"]
-        elif self.instrument == "SDO/HMI":
-            self.quality = head["QUALITY"]
+        self.quality = head["QUALITY"]
 
+        # export full header
         self.head = head
         return None
 

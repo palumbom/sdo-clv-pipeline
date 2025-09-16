@@ -158,7 +158,7 @@ def plot_image(sdo_image, outdir=None, fname=None):
 def plot_mask(mask, outdir=None, fname=None):
     # merge the penumbra
     mask_copy = np.copy(mask.regions)
-    mask_copy[mask_copy >= 3] -= 1
+    # mask_copy[mask_copy >= 3] -= 1
 
     # get cmap
     cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white", "blue"])

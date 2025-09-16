@@ -57,7 +57,8 @@ def sort_data(f_list):
 
 def get_date(f):
     if "aia" in f:
-        s = re.search(r'\d{4}_\d{2}_\d{2}t\d{2}_\d{2}_\d{2}', f)
+        # s = re.search(r'\d{4}_\d{2}_\d{2}t\d{2}_\d{2}_\d{2}', f)
+        s = re.search(r'\d{4}_\d{2}_\d{2}[tT]\d{2}_\d{2}_\d{2}(?:\.\d+)?Z?', f)
     elif "720s" in f:
         s = re.search(r'\d{4}\d{2}\d{2}_\d{2}\d{2}\d{2}', f)
     else:
@@ -66,6 +67,8 @@ def get_date(f):
     # standardize time formats
     s = s.group()
     s = s.replace("t", "_")
+    s = s.replace("T", "_")
+    s = re.sub(r'\.\d+Z?$', '', s)  # remove .###Z
 
     if "720s" in f:
         return round_time(date=dt.datetime.strptime(s, "%Y%m%d_%H%M%S"))

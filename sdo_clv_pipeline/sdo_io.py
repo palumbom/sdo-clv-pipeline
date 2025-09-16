@@ -29,7 +29,7 @@ def find_data(indir, globexp=""):
     con_files, con_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.*.{globexp}*.continuum.fits")))
     mag_files, mag_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.*.{globexp}*.magnetogram.fits")))
     dop_files, dop_dates = sort_data(glob.glob(os.path.join(indir, f"hmi.*.{globexp}*.Dopplergram.fits")))
-    aia_files, aia_dates = sort_data(glob.glob(os.path.join(indir, f"aia_lev1_1700a_{globexp}*t*_image_lev1*")))
+    aia_files, aia_dates = sort_data(glob.glob(os.path.join(indir, f"aia*lev1*1700*{globexp}*lev1*.fits")))
     # aia_files, aia_dates = sort_data(glob.glob(indir + "*aia*" + globexp + ".fits"))
 
     # find datetimes that are in *all* lists

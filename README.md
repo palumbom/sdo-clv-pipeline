@@ -11,4 +11,4 @@ If you use this code in your research, please cite the relevant [software releas
 ## Author & Contact
 [![GitHub followers](https://img.shields.io/github/followers/palumbom?label=Follow&style=social)](https://github.com/palumbom)
 
-This repo is maintained by Michael Palumbo. You may may contact him via his email - [palumbo@psu.edu](mailto:mpalumbo@flatironinstitute.org)
+This repo is maintained by Michael Palumbo. You may may contact him via his email - [mpalumbo@flatironinstitute.org](mailto:mpalumbo@flatironinstitute.org)

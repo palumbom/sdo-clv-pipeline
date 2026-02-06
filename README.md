@@ -7,6 +7,22 @@
 This package processes SDO data to recover trends in the center-to-limbv ariability of the solar radial velocity. v0.x.y is described in [Palumbo et al.
 (2024b)](https://arxiv.org/abs/2404.16747). The results of this paper can be reproduced using the [showyourwork workflow](https://github.com/showyourwork/showyourwork) from [this repo](https://github.com/palumbom/sdo-clv).
 
+## Installation
+
+The `sdo-clv-pipeline` package can be trivially installed using the [`uv` tool](https://docs.astral.sh/uv/):
+
+```bash
+git clone https://github.com/palumbom/sdo-clv-pipeline.git
+cd sdo-clv-pipeline
+uv sync
+```
+
+Then in Python, simply:
+
+```python
+import sdo_clv_pipeline
+```
+
 ## Citation
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8273623.svg)](https://doi.org/10.5281/zenodo.8273622)
 [![arXiv](https://img.shields.io/badge/arXiv-2404.16747-b31b1b.svg)](https://arxiv.org/abs/2404.16747)

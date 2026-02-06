@@ -25,3 +25,4 @@ extra:
 
 nav:
   - Home: index.md
+  - License: license.md

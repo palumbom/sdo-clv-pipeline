@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/palumbom/sdo-clv-pipeline/main/docs/assets/logo.png" height="24"> SDO Center-to-Limb Variability (CLV) Pipeline
+# <img src="docs/assets/logo.png" height="24"> SDO Center-to-Limb Variability (CLV) Pipeline
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://palumbom.github.io/sdo-clv-pipeline/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://palumbom.github.io/sdo-clv-pipeline/dev/)
 [![CI](https://github.com/palumbom/sdo-clv-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/palumbom/sdo-clv-pipeline/actions/workflows/ci.yml)

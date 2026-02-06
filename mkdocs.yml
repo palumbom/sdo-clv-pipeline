@@ -26,9 +26,9 @@ theme:
 plugins:
   - search
   - mkdocstrings:
+      custom_templates: docs/_templates
       handlers:
         python:
-          custom_templates: docs/_templates
           options:
             show_source: false
 

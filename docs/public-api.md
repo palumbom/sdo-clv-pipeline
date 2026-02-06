@@ -1,34 +1,11 @@
 # Public API
 
-## sdo_clv_pipeline.sdo_io
-::: sdo_clv_pipeline.sdo_io
-    options:
-      members:
-        - read_header
-        - read_data
-        - find_data
-        - sort_data
-        - get_date
-        - get_dates
-        - round_time
-        - organize_IO
-        - clean_output_directory
-        - truncate_output_file
-        - find_all_dates
-        - create_file
-        - write_results_to_file
-        - stitch_output_files
-
 ## sdo_clv_pipeline.sdo_image
 ::: sdo_clv_pipeline.sdo_image
     options:
       members:
         - SDOImage
         - SunMask
-        - calculate_weights
-        - calculate_pixel_area
-        - pad_max_len
-        - get_areas
 
 ## sdo_clv_pipeline.sdo_process
 ::: sdo_clv_pipeline.sdo_process
@@ -61,13 +38,6 @@
       members:
         - download_data
 
-## sdo_clv_pipeline.limbdark
-::: sdo_clv_pipeline.limbdark
-    options:
-      members:
-        - quad_darkening
-        - quad_darkening_two
-
 ## sdo_clv_pipeline.legendre
 ::: sdo_clv_pipeline.legendre
     options:
@@ -81,13 +51,3 @@
       members:
         - compute_pixel_mapping
         - bilinear_reproject
-
-## sdo_clv_pipeline.paths
-::: sdo_clv_pipeline.paths
-    options:
-      members:
-        - root
-        - src
-        - data
-        - scripts
-        - figures

@@ -31,10 +31,16 @@ plugins:
         python:
           options:
             show_source: false
+            docstring_style: numpy
+            docstring_section_style: list
+            heading_level: 3
 
 markdown_extensions:
   - pymdownx.snippets:
       check_paths: true
+
+extra_css:
+  - stylesheets/mkdocstrings-details.css
 
 extra:
   version:

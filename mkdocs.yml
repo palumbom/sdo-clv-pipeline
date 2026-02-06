@@ -28,6 +28,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          custom_templates: docs/_templates
           options:
             show_source: false
 
@@ -41,5 +42,5 @@ extra:
 
 nav:
   - Home: index.md
-  - License: license.md
   - Public API: public-api.md
+  - License: license.md

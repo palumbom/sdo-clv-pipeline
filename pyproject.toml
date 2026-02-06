@@ -38,6 +38,9 @@ docs = [
     "mike",
     "pymdown-extensions",
 ]
+test = [
+    "pytest",
+]
 
 [dependency-groups]
 dev = [

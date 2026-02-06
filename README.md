@@ -1,4 +1,7 @@
 # SDO Center-to-Limb Variability (CLV) Pipeline
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://palumbom.github.io/sdo-clv-pipeline/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://palumbom.github.io/sdo-clv-pipeline/dev/)
+[![Build Status](https://github.com/palumbom/sdo-clv-pipeline/workflows/CI/badge.svg)](https://github.com/palumbom/sdo-clv-pipeline/actions)
 [![arXiv](https://img.shields.io/badge/arXiv-2404.16747-b31b1b.svg)](https://arxiv.org/abs/2404.16747)
 
 This package processes SDO data to recover trends in the center-to-limbv ariability of the solar radial velocity. v0.x.y is described in [Palumbo et al.
@@ -13,4 +16,4 @@ If you use this code in your research, please cite the relevant [software releas
 ## Author & Contact
 [![GitHub followers](https://img.shields.io/github/followers/palumbom?label=Follow&style=social)](https://github.com/palumbom)
 
-This repo is maintained by Michael Palumbo. You may may contact him via his email - [mpalumbo@flatironinstitute.org](mailto:mpalumbo@flatironinstitute.org)
+This repo is maintained by [Michael Palumbo](https://michaelpalumbo.me). You may may contact him via his email - [mpalumbo@flatironinstitute.org](mailto:mpalumbo@flatironinstitute.org)

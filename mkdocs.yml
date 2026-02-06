@@ -1,0 +1,27 @@
+site_name: SDO CLV Pipeline
+site_description: Documentation for the SDO Center-to-Limb Variability Pipeline
+site_url: https://palumbom.github.io/sdo-clv-pipeline/
+repo_url: https://github.com/palumbom/sdo-clv-pipeline
+repo_name: palumbom/sdo-clv-pipeline
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - toc.follow
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.snippets:
+      check_paths: true
+
+extra:
+  version:
+    provider: mike
+
+nav:
+  - Home: index.md

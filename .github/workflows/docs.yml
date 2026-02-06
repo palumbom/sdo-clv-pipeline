@@ -1,0 +1,43 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .[docs]
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy docs with mike
+        env:
+          GIT_REF: ${{ github.ref }}
+          GIT_REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "${GIT_REF}" = "refs/heads/main" ]; then
+            mike deploy --push --update-aliases dev
+          elif [[ "${GIT_REF}" == refs/tags/* ]]; then
+            mike deploy --push --update-aliases "${GIT_REF_NAME}" latest
+          else
+            mike deploy --push dev
+          fi

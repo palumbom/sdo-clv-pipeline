@@ -32,6 +32,13 @@ dependencies = [
     "pip-system-certs>=5.2",
 ]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material",
+    "mike",
+    "pymdown-extensions",
+]
+
 [dependency-groups]
 dev = [
     "ipykernel>=6.29.5",

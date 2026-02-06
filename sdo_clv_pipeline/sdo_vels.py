@@ -1,3 +1,5 @@
+"""Velocity aggregation helpers for disk- and region-level summaries."""
+
 import numpy as np
 import pdb
 from .sdo_image import *
@@ -5,6 +7,25 @@ from .sdo_image import *
 def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                          flat_ld, flat_iflat, flat_w_quiet, flat_w_active,
                          flat_abs_mag, mu_thresh, k_hat_con):
+    """Compute disk-integrated velocity and intensity metrics.
+
+    Parameters
+    ----------
+    mjd : float
+        Observation time in modified Julian date.
+    flat_mu, flat_int, flat_v_corr, flat_v_rot : array-like
+        Flattened arrays of mu, intensity, corrected velocity, and rotation velocity.
+    flat_ld, flat_iflat : array-like
+        Flattened limb-darkening model and flattened intensity.
+    flat_w_quiet, flat_w_active : array-like
+        Boolean weights for quiet and active regions.
+    flat_abs_mag : array-like
+        Absolute magnetogram values.
+    mu_thresh : float
+        Minimum mu to include in the aggregation.
+    k_hat_con : float
+        Continuum scaling factor for the photometric term.
+    """
     valid = flat_mu >= mu_thresh
     all_pixels = np.nansum(valid)
     all_light = np.nansum(flat_int[valid])
@@ -30,6 +51,7 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                                 flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, 
                                 flat_w_active, flat_reg, region_codes, 
                                 mu_thresh, k_hat_con):
+    """Compute region-aggregated metrics across the full disk."""
     valid_mask = flat_mu >= mu_thresh
 
     # aggregate sums by region
@@ -83,6 +105,7 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                            flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, flat_w_active,
                            flat_reg, region_codes, mu_thresh, n_rings, k_hat_con):
+    """Compute region-aggregated metrics in mu rings."""
     bins = np.linspace(mu_thresh, 1.0, n_rings)
     bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings-2)
     valid_mask = (flat_mu >= mu_thresh)

@@ -25,6 +25,11 @@ theme:
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
 
 markdown_extensions:
   - pymdownx.snippets:
@@ -37,3 +42,4 @@ extra:
 nav:
   - Home: index.md
   - License: license.md
+  - Public API: public-api.md

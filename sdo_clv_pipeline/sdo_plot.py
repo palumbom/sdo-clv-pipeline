@@ -1,3 +1,5 @@
+"""Plotting helpers for SDO images and region masks."""
+
 import numpy as np
 from .sdo_io import *
 from .sdo_image import *
@@ -15,6 +17,17 @@ from astropy.io.fits.verify import VerifyWarning
 
 
 def plot_image(sdo_image, outdir=None, fname=None):
+    """Plot an SDOImage with WCS axes and type-specific styling.
+
+    Parameters
+    ----------
+    sdo_image : SDOImage
+        Image to plot (magnetogram, dopplergram, continuum, or filtergram).
+    outdir : str, optional
+        If provided, save to this directory instead of showing.
+    fname : str, optional
+        Filename for the saved figure (auto-generated if None).
+    """
     # get the WCS
     wcs = sdo_image.wcs
 
@@ -156,6 +169,7 @@ def plot_image(sdo_image, outdir=None, fname=None):
         return None
 
 def plot_mask(mask, outdir=None, fname=None):
+    """Plot a SunMask classification map with labeled region colors."""
     # merge the penumbra
     mask_copy = np.copy(mask.regions)
     # mask_copy[mask_copy >= 3] -= 1
@@ -195,6 +209,7 @@ def plot_mask(mask, outdir=None, fname=None):
     return None
 
 def label_moats_on_sun(mask, outdir=None, fname=None):
+    """Overlay moat region labels using precomputed moat data."""
     # get spot mask and letters for labels from separate file
     moat_file = os.path.join(root, "data", "moats_data.npz")
     data = np.load(moat_file, allow_pickle=True)  # allow_pickle for arrays of arrays

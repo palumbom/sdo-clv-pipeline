@@ -1,3 +1,5 @@
+"""SDO processing pipeline entry points for per-epoch reductions."""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import gc, os, re, pdb, csv, glob, time, argparse
@@ -17,9 +19,15 @@ from multiprocessing import get_context
 import multiprocessing as mp
 
 def is_quality_data(sdo_image):
+    """Return True when the SDO image passes the QUALITY flag check."""
     return sdo_image.quality == 0
 
 def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False, **kwargs):
+    """Load, validate, and reduce a set of SDO images for a single epoch.
+
+    This handles geometry setup, limb darkening, doppler/magnetogram corrections,
+    and region classification.
+    """
     # assertions
     assert exists(con_file)
     assert exists(mag_file)
@@ -90,6 +98,7 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
 
 
 def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh, n_rings, datadir):
+    """Wrapper for multiprocessing that forwards to process_data_set."""
     process_data_set(con_file, mag_file, dop_file, aia_file,
                      mu_thresh=mu_thresh, n_rings=n_rings,
                      suffix=str(mp.current_process().pid), datadir=datadir,
@@ -99,6 +108,7 @@ def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh,
 def process_data_set(con_file, mag_file, dop_file, aia_file, 
                      mu_thresh, n_rings=10, suffix=None, 
                      datadir=None, **kwargs):
+    """Run the full processing pipeline and persist per-epoch outputs."""
     iso = get_date(con_file).isoformat()
     print(">>> Running epoch %s " % iso, flush=True)
 

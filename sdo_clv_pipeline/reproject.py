@@ -1,9 +1,22 @@
+"""Lightweight WCS-based reprojection helpers."""
+
 import numpy as np
 from numba import njit, prange
 from astropy.wcs import WCS
 import math
 
 def compute_pixel_mapping(src_wcs, dst_wcs, shape):
+    """Compute source pixel coordinates for each destination pixel.
+
+    Parameters
+    ----------
+    src_wcs : astropy.wcs.WCS
+        Source image WCS.
+    dst_wcs : astropy.wcs.WCS
+        Destination image WCS.
+    shape : tuple
+        Destination image shape as (H, W).
+    """
     H, W = shape
     y_idx, x_idx = np.indices((H, W), dtype=np.float32)
 
@@ -16,6 +29,7 @@ def compute_pixel_mapping(src_wcs, dst_wcs, shape):
 
 @njit(parallel=False)
 def bilinear_reproject(src, src_x, src_y, dst):
+    """Bilinearly sample src into dst using precomputed pixel mappings."""
     H, W = dst.shape
     Hs, Ws = src.shape
     for idx in prange(H*W):

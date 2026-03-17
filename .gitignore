@@ -11,6 +11,7 @@ uv.lock
 # directories
 data/*
 figures/*
+.claude/*
 
 # other
 __pycache__

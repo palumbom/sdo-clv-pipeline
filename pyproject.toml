@@ -30,6 +30,8 @@ dependencies = [
     "ipdb>=0.13.13",
     "certifi>=2025.8.3",
     "pip-system-certs>=5.2",
+    "pyqt5>=5.15.11",
+    "pyqt6>=6.9.1",
 ]
 
 [dependency-groups]

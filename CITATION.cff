@@ -11,8 +11,8 @@ authors:
   - given-names: Michael Louis
     family-names: Palumbo
     name-suffix: III
-    email: palumbo@psu.edu
-    affiliation: Pennsylvania State University
+    email: mpalumbo@flatironinstitute.org
+    affiliation: Flatiron Insitute
     orcid: 'https://orcid.org/0000-0002-4677-8796'
   - affiliation: Center for Astrophysics | Harvard & Smithsonian
     orcid: 'https://orcid.org/0000-0001-7032-8480'
@@ -24,6 +24,11 @@ authors:
     email: R.D.Haywood@exeter.ac.uk
     affiliation: 'Astrophysics Group, University of Exeter'
     orcid: 'https://orcid.org/0000-0001-9140-3574'
+identifiers:
+  - type: url
+    value: 'https://arxiv.org/abs/2404.16747'
+  - type: doi
+    value: '10.5281/zenodo.8273622.'
 repository-code: 'https://github.com/palumbom/sdo-clv'
 license: MIT
-version: v0.1.0
+version: v0.5.2

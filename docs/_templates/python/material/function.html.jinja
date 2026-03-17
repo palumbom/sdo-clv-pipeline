@@ -1,0 +1,114 @@
+{#- Custom template to render functions inside collapsible details. -#}
+
+{% block logs scoped %}
+  {{ log.debug("Rendering " + function.path) }}
+{% endblock logs %}
+
+{% import "language.html.jinja" as lang with context %}
+
+<div class="doc doc-object doc-function">
+  {% with obj = function, html_id = function.path %}
+
+    {% if root %}
+      {% set show_full_path = config.show_root_full_path %}
+      {% set root_members = True %}
+    {% elif root_members %}
+      {% set show_full_path = config.show_root_members_full_path or config.show_object_full_path %}
+      {% set root_members = False %}
+    {% else %}
+      {% set show_full_path = config.show_object_full_path %}
+    {% endif %}
+
+    {% set function_name = function.path if show_full_path else function.name %}
+    {% set symbol_type = "method" if function.parent.is_class else "function" %}
+
+    {% if not root or config.show_root_heading %}
+      {% filter heading(
+          heading_level,
+          role="function",
+          id=html_id,
+          class="doc doc-heading",
+          toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else function.name),
+          hidden=True,
+          skip_inventory=config.skip_local_inventory,
+        ) %}
+      {% endfilter %}
+    {% else %}
+      {% if config.show_root_toc_entry %}
+        {% filter heading(
+            heading_level,
+            role="function",
+            id=html_id,
+            toc_label=(('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;')|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else function.name),
+            hidden=True,
+            skip_inventory=config.skip_local_inventory,
+          ) %}
+        {% endfilter %}
+      {% endif %}
+      {% set heading_level = heading_level - 1 %}
+    {% endif %}
+
+    <details class="doc-member" open>
+      <summary class="doc doc-heading">
+        <svg class="doc-member-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+          <path fill-rule="evenodd" d="M5 4a2 2 0 0 0-2 2v1h10.968l-1.9-2.28A2 2 0 0 0 10.532 4H5ZM3 19V9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm11.707-7.707a1 1 0 0 0-1.414 1.414l.293.293H8a1 1 0 1 0 0 2h5.586l-.293.293a1 1 0 0 0 1.414 1.414l2-2a1 1 0 0 0 0-1.414l-2-2Z" clip-rule="evenodd"/>
+        </svg>
+        {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-{{ symbol_type }}"></code>{% endif %}
+        {% if config.heading and root %}
+          {{ config.heading }}
+        {% elif config.separate_signature %}
+          <span class="doc doc-object-name doc-function-name">{{ function_name }}</span>
+        {% else %}
+          {%+ filter highlight(language="python", inline=True) -%}
+            {{ function_name }}
+            {%- include "type_parameters.html.jinja" with context -%}
+            {%- include "signature.html.jinja" with context -%}
+          {%- endfilter %}
+        {% endif %}
+      </summary>
+
+      {% with labels = function.labels %}
+        {% include "labels.html.jinja" with context %}
+      {% endwith %}
+
+      {% if function.overloads and config.show_overloads %}
+        <div class="doc-overloads">
+          {% for overload in function.overloads %}
+            {% filter format_signature(overload, config.line_length, annotations=True, crossrefs=config.signature_crossrefs) %}
+              {{ overload.name }}
+            {% endfilter %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if config.separate_signature and not (config.show_overloads and function.overloads and config.overloads_only) %}
+        {% filter format_signature(function, config.line_length, crossrefs=config.signature_crossrefs) %}
+          {{ function.name }}
+        {% endfilter %}
+      {% endif %}
+
+      <div class="doc doc-contents {% if root %}first{% endif %}">
+        {% with docstring_sections = function.docstring.parsed %}
+          {% include "docstring.html.jinja" with context %}
+        {% endwith %}
+
+        {% if config.backlinks %}
+          <backlinks identifier="{{ html_id }}" handler="python" />
+        {% endif %}
+
+        {% if config.show_source and function.source %}
+          <details class="mkdocstrings-source">
+            <summary>{{ lang.t("Source code in") }} <code>
+              {%- if function.relative_filepath.is_absolute() -%}
+                {{ function.relative_package_filepath }}
+              {%- else -%}
+                {{ function.relative_filepath }}
+              {%- endif -%}
+            </code></summary>
+            {{ function.source|highlight(language="python", linestart=function.lineno or 0, linenums=True) }}
+          </details>
+        {% endif %}
+      </div>
+    </details>
+
+  {% endwith %}
+</div>

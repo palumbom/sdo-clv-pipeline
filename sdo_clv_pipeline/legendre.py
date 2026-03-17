@@ -2,12 +2,25 @@
 # original author: Samarth Ganesh Kashyap (g.samarth@tifr.res.in)
 # original associated publication: https://arxiv.org/abs/2105.12055
 
+"""Legendre basis helpers used for dopplergram bulk-velocity fits."""
+
 import numpy as np
 from math import pi
 from scipy.special import eval_legendre
 
 
 def gen_leg_vec(lmax, theta):
+    """Generate normalized Legendre basis and derivative vs latitude.
+
+    This is used by dopplergram bulk-velocity modeling to build design matrices.
+
+    Parameters
+    ----------
+    lmax : int
+        Maximum degree of the Legendre series.
+    theta : astropy.units.Quantity
+        Colatitude in degrees.
+    """
     # build cos, sin and l arrays
     theta = theta.value * np.pi / 180.0
     cost = np.cos(theta)
@@ -41,6 +54,17 @@ def gen_leg_vec(lmax, theta):
 
 
 def gen_leg_x_vec(lmax, x):
+    """Generate normalized Legendre basis and derivative vs x.
+
+    This is used by dopplergram bulk-velocity modeling to build design matrices.
+
+    Parameters
+    ----------
+    lmax : int
+        Maximum degree of the Legendre series.
+    x : astropy.units.Quantity
+        Coordinate in degrees (converted to radians internally).
+    """
     # switch to radians
     x = x.value * np.pi / 180.0
 

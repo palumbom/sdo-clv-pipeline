@@ -1,3 +1,5 @@
+"""SDO image handling and region masking utilities."""
+
 import numpy as np
 import pdb, ipdb, time, warnings
 import astropy.units as u
@@ -41,6 +43,15 @@ moat_code = 6
 region_codes = [umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code, moat_code]
 
 class SDOImage(object):
+    """Load an SDO image and provide geometry, corrections, and metadata.
+
+    Parameters
+    ----------
+    file : str
+        Path to the FITS file to load.
+    dtype : numpy dtype, optional
+        Data type for the image array.
+    """
     def __init__(self, file, dtype=np.float32):
         # set the filename
         self.filename = file
@@ -173,12 +184,20 @@ class SDOImage(object):
         return None
 
     def correct_magnetogram(self):
+        """Apply mu correction to magnetogram values."""
         assert self.is_magnetogram()
         self.B_obs = self.image.copy()
         self.image /= self.mu
         return None
 
     def correct_dopplergram(self, fit_cbs=False):
+        """Compute velocity corrections and derived components for dopplergrams.
+
+        Parameters
+        ----------
+        fit_cbs : bool, optional
+            If True, fit convective blueshift components in the bulk velocity model.
+        """
         assert self.is_dopplergram()
 
         # get mask excluding nans / sqrts of negatives
@@ -304,6 +323,17 @@ class SDOImage(object):
         return None
 
     def calc_limb_darkening(self, mu_lim=0.1, num_mu=25, n_sigma=2.0):
+        """Estimate limb darkening and flatten continuum/filtergram intensity.
+
+        Parameters
+        ----------
+        mu_lim : float, optional
+            Minimum mu used in the fit.
+        num_mu : int, optional
+            Number of mu bins between mu_lim and 1.
+        n_sigma : float, optional
+            Sigma clipping threshold within each bin.
+        """
         assert (self.is_continuum() | self.is_filtergram())
 
         # flatten & mask
@@ -351,6 +381,13 @@ class SDOImage(object):
         return None
 
     def rescale_to_hmi(self, hmi_image):
+        """Resample a filtergram onto an HMI image grid and inherit geometry.
+
+        Parameters
+        ----------
+        hmi_image : SDOImage
+            Target HMI image providing the output WCS and geometry.
+        """
         assert self.is_filtergram()
 
         # compute pixel mapping 
@@ -368,6 +405,7 @@ class SDOImage(object):
 
 # for creating pixel mask with thresholded regions
 def calculate_weights(mag):
+    """Return active and quiet masks based on magnetogram thresholds."""
     # set magnetic threshold
     mag_thresh = 24.0 / mag.mu
 
@@ -385,6 +423,7 @@ def calculate_weights(mag):
     return w_active, w_quiet
 
 def calculate_pixel_area(lat, lon):
+    """Compute per-pixel areas from heliographic latitude/longitude grids."""
     # convert to radians
     lat_rad = lat.value * np.pi / 180.0
     lon_rad = lon.value * np.pi / 180.0
@@ -400,9 +439,11 @@ def calculate_pixel_area(lat, lon):
     return pix_area
 
 def pad_max_len(data, max_length):
+    """Pad a 1D array with NaNs up to max_length."""
     return np.hstack([data, np.repeat(np.nan, max_length - len(data))]).astype(float)
 
 def get_areas(labels, intensity_image):
+    """Compute region areas and intensity-weighted areas from label map."""
     properties = ("label","area","mean_intensity")
     rprops_tab = regionprops_table(labels, intensity_image=intensity_image, properties=properties)    
     area = np.r_[0, rprops_tab['area']]
@@ -412,6 +453,15 @@ def get_areas(labels, intensity_image):
     return areas_pix, areas_mic
 
 class SunMask(object):
+    """Classify solar regions using continuum, magnetogram, doppler, and AIA data.
+
+    Parameters
+    ----------
+    con, mag, dop, aia : SDOImage
+        Continuum, magnetogram, dopplergram, and filtergram images. These are
+        used to derive masks for umbrae, penumbrae, quiet sun, network, plage,
+        and moat flow regions.
+    """
     def __init__(self, con, mag, dop, aia, **kwargs):
         # check argument order/names are correct
         # print("Entered SunMask.__init__")
@@ -746,35 +796,46 @@ class SunMask(object):
         return None
     
     def is_unclassified(self):
+        """Return mask for pixels with no valid region classification."""
         return np.logical_or(np.isnan(self.regions), ~np.isin(self.regions, region_codes))
 
     def is_umbra(self):
+        """Return mask for umbra regions."""
         return self.regions == umbrae_code
 
     def is_penumbra(self):
+        """Return mask for penumbra regions."""
         # return np.logical_or(self.regions == 2, self.regions == 3)
         return self.regions == penumbrae_code
 
     def is_blue_penumbra(self):
+        """Return mask for blue-shifted penumbra regions."""
         return self.blue_penumbrae
 
     def is_red_penumbra(self):
+        """Return mask for red-shifted penumbra regions."""
         return self.red_penumbrae
 
     def is_quiet_sun(self):
+        """Return mask for quiet sun regions."""
         return self.regions == quiet_sun_code
 
     def is_network(self):
+        """Return mask for network regions."""
         return self.regions == network_code
 
     def is_plage(self):
+        """Return mask for plage regions."""
         return self.regions == plage_code
     
     def is_moat_flow(self):
+        """Return mask for moat flow regions."""
         return self.regions == moat_code
     
     def is_left_moat(self):
+        """Return mask for left-hand moat flow regions."""
         return self.left_moat
     
     def is_right_moat(self):
+        """Return mask for right-hand moat flow regions."""
         return self.right_moat

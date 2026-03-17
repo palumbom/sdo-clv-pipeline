@@ -34,6 +34,17 @@ dependencies = [
     "pyqt6>=6.9.1",
 ]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material",
+    "mike",
+    "pymdown-extensions",
+    "mkdocstrings[python]",
+]
+test = [
+    "pytest",
+]
+
 [dependency-groups]
 dev = [
     "ipykernel>=6.29.5",

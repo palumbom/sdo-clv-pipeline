@@ -1,0 +1,97 @@
+details.doc-member {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.35rem;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  box-sizing: border-box;
+  margin: 0.6rem 0;
+  background: var(--md-default-bg-color);
+}
+
+details.doc-member > summary {
+  cursor: pointer;
+  list-style: none;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  padding: 0.4rem 0.7rem 0.4rem 0.3rem !important;
+  padding-right: 1.4rem;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+details.doc-member > summary.doc.doc-heading {
+  padding-left: 0.3rem !important;
+  margin-left: 0 !important;
+}
+
+details.doc-member > .doc.doc-contents {
+  padding: 0 0.7rem 0.5rem 0.3rem !important;
+}
+
+details.doc-member > summary > code,
+details.doc-member > summary > .highlight {
+  margin-left: 0 !important;
+}
+
+details.doc-member .doc-member-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--md-default-fg-color--light);
+  flex: 0 0 auto;
+}
+
+details.doc-member > summary .doc-symbol,
+details.doc-member > summary .doc-symbol-heading,
+details.doc-member > summary .headerlink,
+details.doc-member > summary .md-ellipsis .headerlink {
+  display: none !important;
+}
+
+details.doc-member > summary svg:not(.doc-member-icon) {
+  display: none !important;
+}
+
+.doc.doc-object .headerlink {
+  display: none !important;
+}
+
+.doc.doc-object a.md-clipboard,
+.doc.doc-object .md-clipboard,
+.doc.doc-object .md-headerlink,
+.doc.doc-object .md-clipboard:hover,
+.doc.doc-object a.headerlink {
+  display: none !important;
+}
+
+details.doc-member > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.doc-member > summary::marker {
+  content: "";
+}
+
+details.doc-member > summary::after {
+  content: "▸";
+  position: absolute;
+  right: 0.4rem;
+  color: var(--md-default-fg-color--light);
+  font-family: var(--md-code-font);
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+
+details.doc-member > summary::before {
+  content: none !important;
+}
+
+details.doc-member[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+details.doc-member .doc.doc-heading .headerlink {
+  display: none !important;
+}

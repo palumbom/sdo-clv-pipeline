@@ -5,9 +5,16 @@
 ```
 
 ```{toctree}
-:maxdepth: 2
 :hidden:
 
-public-api
 license
+```
+
+```{toctree}
+:hidden:
+:caption: Public API
+
+api-preprocessing
+api-velocities
+api-utilities
 ```

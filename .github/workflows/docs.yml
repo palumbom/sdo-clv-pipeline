@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -26,7 +28,18 @@ jobs:
           python -m pip install .[docs]
 
       - name: Build docs
-        run: sphinx-build -b html docs docs/_build/html
+        env:
+          GIT_REF: ${{ github.ref }}
+          GIT_REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "${GIT_REF}" = "refs/heads/main" ]; then
+            export DOCS_VERSION="dev"
+          elif [[ "${GIT_REF}" == refs/tags/* ]]; then
+            export DOCS_VERSION="${GIT_REF_NAME}"
+          else
+            export DOCS_VERSION="dev"
+          fi
+          sphinx-build -b html docs docs/_build/html
 
       - name: Configure git
         run: |
@@ -37,8 +50,9 @@ jobs:
         env:
           GIT_REF: ${{ github.ref }}
           GIT_REF_NAME: ${{ github.ref_name }}
+          SITE_URL: https://palumbom.github.io/sdo-clv-pipeline
         run: |
-          # Save build output before switching branches (checkout will wipe it)
+          # Save build output before switching branches
           cp -r docs/_build/html /tmp/docs-build
 
           # Checkout or create the gh-pages branch
@@ -48,6 +62,7 @@ jobs:
             git clean -fdx
           }
 
+          # Determine version label
           if [ "${GIT_REF}" = "refs/heads/main" ]; then
             VERSION="dev"
           elif [[ "${GIT_REF}" == refs/tags/* ]]; then
@@ -56,7 +71,7 @@ jobs:
             VERSION="dev"
           fi
 
-          # Remove old version directory, copy new build
+          # Deploy versioned docs
           rm -rf "${VERSION}"
           cp -r /tmp/docs-build "${VERSION}"
 
@@ -66,19 +81,42 @@ jobs:
             cp -r /tmp/docs-build latest
           fi
 
-          # Ensure GitHub Pages doesn't run Jekyll (which ignores _static/, _sources/)
+          # Disable Jekyll processing
           touch .nojekyll
 
-          # Create a top-level redirect to latest (or dev)
-          if [ ! -f index.html ] || [[ "${GIT_REF}" == refs/tags/* ]]; then
-            cat > index.html <<'REDIRECT'
+          # Generate switcher.json from version directories
+          python3 -c "
+          import json, os, re
+          site = os.environ['SITE_URL']
+          versions = []
+          if os.path.isdir('dev'):
+              versions.append({'name': 'dev', 'version': 'dev', 'url': f'{site}/dev/'})
+          if os.path.isdir('latest'):
+              versions.append({'name': 'latest', 'version': 'latest', 'url': f'{site}/latest/', 'preferred': True})
+          tags = sorted(
+              [d for d in os.listdir('.') if re.match(r'^v\d', d) and os.path.isdir(d)],
+              key=lambda x: [int(n) for n in re.findall(r'\d+', x)],
+              reverse=True,
+          )
+          for tag in tags:
+              versions.append({'name': tag, 'version': tag, 'url': f'{site}/{tag}/'})
+          with open('switcher.json', 'w') as f:
+              json.dump(versions, f, indent=2)
+          "
+
+          # Top-level redirect (prefer latest, fall back to dev)
+          if [ -d "latest" ]; then
+            REDIRECT_TARGET="latest"
+          else
+            REDIRECT_TARGET="dev"
+          fi
+          cat > index.html <<EOF
           <!DOCTYPE html>
           <html>
-            <head><meta http-equiv="refresh" content="0; url=latest/"></head>
-            <body><a href="latest/">Redirect</a></body>
+            <head><meta http-equiv="refresh" content="0; url=${REDIRECT_TARGET}/"></head>
+            <body><a href="${REDIRECT_TARGET}/">Redirect</a></body>
           </html>
-          REDIRECT
-          fi
+          EOF
 
           git add -A
           git commit -m "deploy docs: ${VERSION}" || echo "No changes to commit"

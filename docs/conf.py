@@ -1,10 +1,14 @@
 """Sphinx configuration for SDO CLV Pipeline documentation."""
-import sdo_clv_pipeline
+import os
 
 project = "SDO CLV Pipeline"
 author = "Michael Palumbo"
-version = sdo_clv_pipeline.__version__ if hasattr(sdo_clv_pipeline, "__version__") else "0.5.2"
+version = "0.5.2"
 release = version
+
+# Set by CI workflow to match the gh-pages directory name (dev, v0.5.2, etc.)
+# Falls back to "dev" for local builds.
+docs_version = os.environ.get("DOCS_VERSION", "dev")
 
 extensions = [
     "myst_parser",
@@ -12,6 +16,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
+    "sphinx_design",
 ]
 
 # MyST settings
@@ -38,15 +43,25 @@ napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = True
 
 # Theme
-html_theme = "furo"
+html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_logo = "assets/logo.png"
 html_title = "SDO CLV Pipeline"
 
 html_theme_options = {
-    "light_css_variables": {},
-    "dark_css_variables": {},
+    "repository_url": "https://github.com/palumbom/sdo-clv-pipeline",
+    "use_repository_button": True,
+    "show_toc_level": 2,
+    "use_fullscreen_button": False,
+    "home_page_in_toc": True,
+    "switcher": {
+        "json_url": "https://palumbom.github.io/sdo-clv-pipeline/switcher.json",
+        "version_match": docs_version,
+    },
+    "check_switcher": False,
+    "navbar_start": [],
+    "primary_sidebar_end": ["version-switcher"],
 }
 
 exclude_patterns = ["_build", "superpowers"]

@@ -1,6 +1,0 @@
-/* Custom styles for SDO CLV Pipeline docs */
-
-/* Tighten autodoc member spacing */
-dl.py dt {
-    margin-top: 1rem;
-}

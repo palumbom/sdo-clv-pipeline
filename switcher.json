@@ -2,17 +2,11 @@
   {
     "name": "dev",
     "version": "dev",
-    "url": "https://palumbom.github.io/sdo-clv-pipeline/dev/"
-  },
-  {
-    "name": "latest",
-    "version": "latest",
-    "url": "https://palumbom.github.io/sdo-clv-pipeline/latest/",
-    "preferred": true
+    "url": "https://michaelpalumbo.me/sdo-clv-pipeline/dev/"
   },
   {
     "name": "v0.5.2",
     "version": "v0.5.2",
-    "url": "https://palumbom.github.io/sdo-clv-pipeline/v0.5.2/"
+    "url": "https://michaelpalumbo.me/sdo-clv-pipeline/v0.5.2/"
   }
 ]

@@ -49,15 +49,4 @@ html_theme_options = {
     "dark_css_variables": {},
 }
 
-# Suppress warnings for missing type stubs in third-party libs
-autodoc_mock_imports = [
-    "sunpy",
-    "astropy",
-    "scipy",
-    "skimage",
-    "numba",
-    "tqdm",
-    "pandas",
-    "matplotlib",
-    "numpy",
-]
+exclude_patterns = ["_build", "superpowers"]

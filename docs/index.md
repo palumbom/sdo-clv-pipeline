@@ -1,2 +1,5 @@
 # SDO Center-to-Limb Variability (CLV) Pipeline
---8<-- "README.md:2"
+
+```{include} ../README.md
+:start-after: # <img src="docs/assets/logo.png" height="24"> SDO Center-to-Limb Variability (CLV) Pipeline
+```

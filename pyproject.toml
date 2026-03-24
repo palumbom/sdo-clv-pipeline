@@ -36,10 +36,10 @@ dependencies = [
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs-material",
-    "mike",
-    "pymdown-extensions",
-    "mkdocstrings[python]",
+    "sphinx>=7.4",
+    "myst-parser>=4.0",
+    "furo",
+    "sphinx-copybutton",
 ]
 test = [
     "pytest",

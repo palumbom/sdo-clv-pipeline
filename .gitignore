@@ -13,6 +13,7 @@ data/*
 figures/*
 .claude/*
 build/*
+docs/_build/
 
 # other
 __pycache__

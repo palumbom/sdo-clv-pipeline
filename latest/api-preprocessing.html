@@ -1,0 +1,812 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Preprocessing &#8212; SDO CLV Pipeline</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=810fe235" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=4861a642"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api-preprocessing';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.5.3';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Velocities" href="api-velocities.html" />
+    <link rel="prev" title="License" href="license.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="SDO CLV Pipeline - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="SDO CLV Pipeline - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    SDO Center-to-Limb Variability (CLV) Pipeline
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Public API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-velocities.html">Velocities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-utilities.html">Ancillary Utilities</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/palumbom/sdo-clv-pipeline" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/api-preprocessing.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Preprocessing</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage"><code class="docutils literal notranslate"><span class="pre">SDOImage</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.parse_header"><code class="docutils literal notranslate"><span class="pre">SDOImage.parse_header()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.inherit_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_magnetogram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_magnetogram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_dopplergram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_continuum"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_continuum()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_filtergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_filtergram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.mask_low_mu"><code class="docutils literal notranslate"><span class="pre">SDOImage.mask_low_mu()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_magnetogram"><code class="docutils literal notranslate"><span class="pre">SDOImage.correct_magnetogram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.correct_dopplergram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_spacecraft_vel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_bulk_vel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_limb_darkening()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi"><code class="docutils literal notranslate"><span class="pre">SDOImage.rescale_to_hmi()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask"><code class="docutils literal notranslate"><span class="pre">SunMask</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.inherit_geometry"><code class="docutils literal notranslate"><span class="pre">SunMask.inherit_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.identify_regions"><code class="docutils literal notranslate"><span class="pre">SunMask.identify_regions()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.get_moat_properties"><code class="docutils literal notranslate"><span class="pre">SunMask.get_moat_properties()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.mask_low_mu"><code class="docutils literal notranslate"><span class="pre">SunMask.mask_low_mu()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_unclassified"><code class="docutils literal notranslate"><span class="pre">SunMask.is_unclassified()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_umbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_umbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_penumbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_penumbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_blue_penumbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_blue_penumbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_red_penumbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_red_penumbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_quiet_sun"><code class="docutils literal notranslate"><span class="pre">SunMask.is_quiet_sun()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_network"><code class="docutils literal notranslate"><span class="pre">SunMask.is_network()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_plage"><code class="docutils literal notranslate"><span class="pre">SunMask.is_plage()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_moat_flow"><code class="docutils literal notranslate"><span class="pre">SunMask.is_moat_flow()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_left_moat"><code class="docutils literal notranslate"><span class="pre">SunMask.is_left_moat()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_right_moat"><code class="docutils literal notranslate"><span class="pre">SunMask.is_right_moat()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_download.download_data"><code class="docutils literal notranslate"><span class="pre">download_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.is_quality_data"><code class="docutils literal notranslate"><span class="pre">is_quality_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.reduce_sdo_images"><code class="docutils literal notranslate"><span class="pre">reduce_sdo_images()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.process_data_set_parallel"><code class="docutils literal notranslate"><span class="pre">process_data_set_parallel()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.process_data_set"><code class="docutils literal notranslate"><span class="pre">process_data_set()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.reproject.compute_pixel_mapping"><code class="docutils literal notranslate"><span class="pre">compute_pixel_mapping()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.reproject.bilinear_reproject"><code class="docutils literal notranslate"><span class="pre">bilinear_reproject()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="preprocessing">
+<h1>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">#</a></h1>
+<p>Image data types, downloading, processing, and reprojection.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3" open="open">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">sdo_clv_pipeline.sdo_image</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<dl class="py class">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_image.</span></span><span class="sig-name descname"><span class="pre">SDOImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="sd-card-text">Load an SDO image and provide geometry, corrections, and metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>file</strong> (<em>str</em>) – Path to the FITS file to load.</p></li>
+<li><p class="sd-card-text"><strong>dtype</strong> (<em>numpy dtype</em><em>, </em><em>optional</em>) – Data type for the image array.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.parse_header">
+<span class="sig-name descname"><span class="pre">parse_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.parse_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.parse_header" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry">
+<span class="sig-name descname"><span class="pre">calc_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry">
+<span class="sig-name descname"><span class="pre">inherit_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.inherit_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.is_magnetogram">
+<span class="sig-name descname"><span class="pre">is_magnetogram</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.is_magnetogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_magnetogram" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.is_dopplergram">
+<span class="sig-name descname"><span class="pre">is_dopplergram</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.is_dopplergram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_dopplergram" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.is_continuum">
+<span class="sig-name descname"><span class="pre">is_continuum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.is_continuum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_continuum" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.is_filtergram">
+<span class="sig-name descname"><span class="pre">is_filtergram</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.is_filtergram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_filtergram" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.mask_low_mu">
+<span class="sig-name descname"><span class="pre">mask_low_mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.mask_low_mu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.mask_low_mu" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.correct_magnetogram">
+<span class="sig-name descname"><span class="pre">correct_magnetogram</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.correct_magnetogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_magnetogram" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Apply mu correction to magnetogram values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.correct_dopplergram">
+<span class="sig-name descname"><span class="pre">correct_dopplergram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_cbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.correct_dopplergram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_dopplergram" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Compute velocity corrections and derived components for dopplergrams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>fit_cbs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, fit convective blueshift components in the bulk velocity model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel">
+<span class="sig-name descname"><span class="pre">calc_spacecraft_vel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_spacecraft_vel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel">
+<span class="sig-name descname"><span class="pre">calc_bulk_vel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_cbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_bulk_vel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening">
+<span class="sig-name descname"><span class="pre">calc_limb_darkening</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_limb_darkening"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Estimate limb darkening and flatten continuum/filtergram intensity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>mu_lim</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum mu used in the fit.</p></li>
+<li><p class="sd-card-text"><strong>num_mu</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of mu bins between mu_lim and 1.</p></li>
+<li><p class="sd-card-text"><strong>n_sigma</strong> (<em>float</em><em>, </em><em>optional</em>) – Sigma clipping threshold within each bin.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi">
+<span class="sig-name descname"><span class="pre">rescale_to_hmi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hmi_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.rescale_to_hmi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Resample a filtergram onto an HMI image grid and inherit geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p class="sd-card-text"><strong>hmi_image</strong> (<a class="reference internal" href="#sdo_clv_pipeline.sdo_image.SDOImage" title="sdo_clv_pipeline.sdo_image.SDOImage"><em>SDOImage</em></a>) – Target HMI image providing the output WCS and geometry.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_image.</span></span><span class="sig-name descname"><span class="pre">SunMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="sd-card-text">Classify solar regions using continuum, magnetogram, doppler, and AIA data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>con</strong> (<a class="reference internal" href="#sdo_clv_pipeline.sdo_image.SDOImage" title="sdo_clv_pipeline.sdo_image.SDOImage"><em>SDOImage</em></a>) – Continuum, magnetogram, dopplergram, and filtergram images. These are
+used to derive masks for umbrae, penumbrae, quiet sun, network, plage,
+and moat flow regions.</p></li>
+<li><p class="sd-card-text"><strong>mag</strong> (<a class="reference internal" href="#sdo_clv_pipeline.sdo_image.SDOImage" title="sdo_clv_pipeline.sdo_image.SDOImage"><em>SDOImage</em></a>) – Continuum, magnetogram, dopplergram, and filtergram images. These are
+used to derive masks for umbrae, penumbrae, quiet sun, network, plage,
+and moat flow regions.</p></li>
+<li><p class="sd-card-text"><strong>dop</strong> (<a class="reference internal" href="#sdo_clv_pipeline.sdo_image.SDOImage" title="sdo_clv_pipeline.sdo_image.SDOImage"><em>SDOImage</em></a>) – Continuum, magnetogram, dopplergram, and filtergram images. These are
+used to derive masks for umbrae, penumbrae, quiet sun, network, plage,
+and moat flow regions.</p></li>
+<li><p class="sd-card-text"><strong>aia</strong> (<a class="reference internal" href="#sdo_clv_pipeline.sdo_image.SDOImage" title="sdo_clv_pipeline.sdo_image.SDOImage"><em>SDOImage</em></a>) – Continuum, magnetogram, dopplergram, and filtergram images. These are
+used to derive masks for umbrae, penumbrae, quiet sun, network, plage,
+and moat flow regions.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.inherit_geometry">
+<span class="sig-name descname"><span class="pre">inherit_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.inherit_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.inherit_geometry" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.identify_regions">
+<span class="sig-name descname"><span class="pre">identify_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_moat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classify_moat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.identify_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.identify_regions" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.get_moat_properties">
+<span class="sig-name descname"><span class="pre">get_moat_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.get_moat_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.get_moat_properties" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.mask_low_mu">
+<span class="sig-name descname"><span class="pre">mask_low_mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.mask_low_mu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.mask_low_mu" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_unclassified">
+<span class="sig-name descname"><span class="pre">is_unclassified</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_unclassified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_unclassified" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for pixels with no valid region classification.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_umbra">
+<span class="sig-name descname"><span class="pre">is_umbra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_umbra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_umbra" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for umbra regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_penumbra">
+<span class="sig-name descname"><span class="pre">is_penumbra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_penumbra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_penumbra" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for penumbra regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_blue_penumbra">
+<span class="sig-name descname"><span class="pre">is_blue_penumbra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_blue_penumbra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_blue_penumbra" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for blue-shifted penumbra regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_red_penumbra">
+<span class="sig-name descname"><span class="pre">is_red_penumbra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_red_penumbra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_red_penumbra" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for red-shifted penumbra regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_quiet_sun">
+<span class="sig-name descname"><span class="pre">is_quiet_sun</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_quiet_sun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_quiet_sun" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for quiet sun regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_network">
+<span class="sig-name descname"><span class="pre">is_network</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_network" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for network regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_plage">
+<span class="sig-name descname"><span class="pre">is_plage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_plage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_plage" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for plage regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_moat_flow">
+<span class="sig-name descname"><span class="pre">is_moat_flow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_moat_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_moat_flow" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for moat flow regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_left_moat">
+<span class="sig-name descname"><span class="pre">is_left_moat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_left_moat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_left_moat" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for left-hand moat flow regions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SunMask.is_right_moat">
+<span class="sig-name descname"><span class="pre">is_right_moat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SunMask.is_right_moat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SunMask.is_right_moat" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return mask for right-hand moat flow regions.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">sdo_clv_pipeline.sdo_download</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_download.download_data">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_download.</span></span><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'720'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_download.html#download_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_download.download_data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">sdo_clv_pipeline.sdo_process</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_process.is_quality_data">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_process.</span></span><span class="sig-name descname"><span class="pre">is_quality_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sdo_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_process.html#is_quality_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_process.is_quality_data" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Return True when the SDO image passes the QUALITY flag check.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_process.reduce_sdo_images">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_process.</span></span><span class="sig-name descname"><span class="pre">reduce_sdo_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_cbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_process.html#reduce_sdo_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_process.reduce_sdo_images" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Load, validate, and reduce a set of SDO images for a single epoch.</p>
+<p class="sd-card-text">This handles geometry setup, limb darkening, doppler/magnetogram corrections,
+and region classification.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_process.process_data_set_parallel">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_process.</span></span><span class="sig-name descname"><span class="pre">process_data_set_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_process.html#process_data_set_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_process.process_data_set_parallel" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Wrapper for multiprocessing that forwards to process_data_set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_process.process_data_set">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_process.</span></span><span class="sig-name descname"><span class="pre">process_data_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_process.html#process_data_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_process.process_data_set" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Run the full processing pipeline and persist per-epoch outputs.</p>
+</dd></dl>
+
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">sdo_clv_pipeline.reproject</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.reproject.compute_pixel_mapping">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.reproject.</span></span><span class="sig-name descname"><span class="pre">compute_pixel_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/reproject.html#compute_pixel_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.reproject.compute_pixel_mapping" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Compute source pixel coordinates for each destination pixel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p class="sd-card-text"><strong>src_wcs</strong> (<em>astropy.wcs.WCS</em>) – Source image WCS.</p></li>
+<li><p class="sd-card-text"><strong>dst_wcs</strong> (<em>astropy.wcs.WCS</em>) – Destination image WCS.</p></li>
+<li><p class="sd-card-text"><strong>shape</strong> (<em>tuple</em>) – Destination image shape as (H, W).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.reproject.bilinear_reproject">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.reproject.</span></span><span class="sig-name descname"><span class="pre">bilinear_reproject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/reproject.html#bilinear_reproject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.reproject.bilinear_reproject" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Bilinearly sample src into dst using precomputed pixel mappings.</p>
+</dd></dl>
+
+</div>
+</details></section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="license.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">License</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="api-velocities.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Velocities</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage"><code class="docutils literal notranslate"><span class="pre">SDOImage</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.parse_header"><code class="docutils literal notranslate"><span class="pre">SDOImage.parse_header()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.inherit_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_magnetogram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_magnetogram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_dopplergram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_continuum"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_continuum()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_filtergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_filtergram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.mask_low_mu"><code class="docutils literal notranslate"><span class="pre">SDOImage.mask_low_mu()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_magnetogram"><code class="docutils literal notranslate"><span class="pre">SDOImage.correct_magnetogram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.correct_dopplergram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_spacecraft_vel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_bulk_vel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_limb_darkening()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi"><code class="docutils literal notranslate"><span class="pre">SDOImage.rescale_to_hmi()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask"><code class="docutils literal notranslate"><span class="pre">SunMask</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.inherit_geometry"><code class="docutils literal notranslate"><span class="pre">SunMask.inherit_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.identify_regions"><code class="docutils literal notranslate"><span class="pre">SunMask.identify_regions()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.get_moat_properties"><code class="docutils literal notranslate"><span class="pre">SunMask.get_moat_properties()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.mask_low_mu"><code class="docutils literal notranslate"><span class="pre">SunMask.mask_low_mu()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_unclassified"><code class="docutils literal notranslate"><span class="pre">SunMask.is_unclassified()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_umbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_umbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_penumbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_penumbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_blue_penumbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_blue_penumbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_red_penumbra"><code class="docutils literal notranslate"><span class="pre">SunMask.is_red_penumbra()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_quiet_sun"><code class="docutils literal notranslate"><span class="pre">SunMask.is_quiet_sun()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_network"><code class="docutils literal notranslate"><span class="pre">SunMask.is_network()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_plage"><code class="docutils literal notranslate"><span class="pre">SunMask.is_plage()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_moat_flow"><code class="docutils literal notranslate"><span class="pre">SunMask.is_moat_flow()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_left_moat"><code class="docutils literal notranslate"><span class="pre">SunMask.is_left_moat()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SunMask.is_right_moat"><code class="docutils literal notranslate"><span class="pre">SunMask.is_right_moat()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_download.download_data"><code class="docutils literal notranslate"><span class="pre">download_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.is_quality_data"><code class="docutils literal notranslate"><span class="pre">is_quality_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.reduce_sdo_images"><code class="docutils literal notranslate"><span class="pre">reduce_sdo_images()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.process_data_set_parallel"><code class="docutils literal notranslate"><span class="pre">process_data_set_parallel()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_process.process_data_set"><code class="docutils literal notranslate"><span class="pre">process_data_set()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.reproject.compute_pixel_mapping"><code class="docutils literal notranslate"><span class="pre">compute_pixel_mapping()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.reproject.bilinear_reproject"><code class="docutils literal notranslate"><span class="pre">bilinear_reproject()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Palumbo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

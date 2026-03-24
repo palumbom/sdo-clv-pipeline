@@ -5,6 +5,17 @@
     "url": "https://michaelpalumbo.me/sdo-clv-pipeline/dev/"
   },
   {
+    "name": "latest",
+    "version": "latest",
+    "url": "https://michaelpalumbo.me/sdo-clv-pipeline/latest/",
+    "preferred": true
+  },
+  {
+    "name": "v0.5.3",
+    "version": "v0.5.3",
+    "url": "https://michaelpalumbo.me/sdo-clv-pipeline/v0.5.3/"
+  },
+  {
     "name": "v0.5.2",
     "version": "v0.5.2",
     "url": "https://michaelpalumbo.me/sdo-clv-pipeline/v0.5.2/"

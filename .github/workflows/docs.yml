@@ -50,7 +50,7 @@ jobs:
         env:
           GIT_REF: ${{ github.ref }}
           GIT_REF_NAME: ${{ github.ref_name }}
-          SITE_URL: https://palumbom.github.io/sdo-clv-pipeline
+          SITE_URL: https://michaelpalumbo.me/sdo-clv-pipeline
         run: |
           # Save build output before switching branches
           cp -r docs/_build/html /tmp/docs-build
@@ -71,11 +71,17 @@ jobs:
             VERSION="dev"
           fi
 
+          # Clean up any symlinks left by old mike-based deployments
+          find . -maxdepth 1 -type l -delete
+
+          # Remove stale mike artifacts
+          rm -rf build sdo_clv_pipeline.egg-info docs versions.json 2>/dev/null || true
+
           # Deploy versioned docs
           rm -rf "${VERSION}"
           cp -r /tmp/docs-build "${VERSION}"
 
-          # Update latest alias for tagged releases
+          # Update latest alias for tagged releases (real copy, not symlink)
           if [[ "${GIT_REF}" == refs/tags/* ]]; then
             rm -rf latest
             cp -r /tmp/docs-build latest

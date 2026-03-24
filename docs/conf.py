@@ -56,7 +56,7 @@ html_theme_options = {
     "use_fullscreen_button": False,
     "home_page_in_toc": True,
     "switcher": {
-        "json_url": "https://palumbom.github.io/sdo-clv-pipeline/switcher.json",
+        "json_url": "https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json",
         "version_match": docs_version,
     },
     "check_switcher": False,

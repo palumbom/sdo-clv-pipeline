@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sdo_clv_pipeline.sdo_vels &#8212; SDO CLV Pipeline</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=810fe235" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=4861a642"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sdo_clv_pipeline/sdo_vels';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://palumbom.github.io/sdo-clv-pipeline/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="SDO CLV Pipeline - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="SDO CLV Pipeline - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    SDO Center-to-Limb Variability (CLV) Pipeline
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Public API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../api-preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api-velocities.html">Velocities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api-utilities.html">Ancillary Utilities</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/palumbom/sdo-clv-pipeline" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sdo_clv_pipeline.sdo_vels</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Velocity aggregation helpers for disk- and region-level summaries.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pdb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_image</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="compute_disk_results">
+<a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_disk_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_disk_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
+                         <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span>
+                         <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute disk-integrated velocity and intensity metrics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mjd : float</span>
+<span class="sd">        Observation time in modified Julian date.</span>
+<span class="sd">    flat_mu, flat_int, flat_v_corr, flat_v_rot : array-like</span>
+<span class="sd">        Flattened arrays of mu, intensity, corrected velocity, and rotation velocity.</span>
+<span class="sd">    flat_ld, flat_iflat : array-like</span>
+<span class="sd">        Flattened limb-darkening model and flattened intensity.</span>
+<span class="sd">    flat_w_quiet, flat_w_active : array-like</span>
+<span class="sd">        Boolean weights for quiet and active regions.</span>
+<span class="sd">    flat_abs_mag : array-like</span>
+<span class="sd">        Absolute magnetogram values.</span>
+<span class="sd">    mu_thresh : float</span>
+<span class="sd">        Minimum mu to include in the aggregation.</span>
+<span class="sd">    k_hat_con : float</span>
+<span class="sd">        Continuum scaling factor for the photometric term.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span>
+    <span class="n">all_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+    <span class="n">all_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span>
+
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span>
+    <span class="n">v_hat_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_v_corr</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
+    <span class="n">v_phot_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_v_rot</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">flat_int</span> <span class="o">-</span> <span class="n">k_hat_con</span> <span class="o">*</span> <span class="n">flat_ld</span><span class="p">)[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_w_active</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
+    <span class="n">v_quiet_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_v_corr</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_w_quiet</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_w_quiet</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span>
+    <span class="n">v_cbs_di</span> <span class="o">=</span> <span class="n">v_hat_di</span> <span class="o">-</span> <span class="n">v_quiet_di</span>
+
+    <span class="n">mag_unsigned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_abs_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+    <span class="n">avg_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">count</span>
+    <span class="n">avg_int_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">count</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">mjd</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="n">all_pixels</span><span class="p">,</span> <span class="n">all_light</span><span class="p">,</span>
+            <span class="n">v_hat_di</span><span class="p">,</span> <span class="n">v_phot_di</span><span class="p">,</span> <span class="n">v_quiet_di</span><span class="p">,</span> <span class="n">v_cbs_di</span><span class="p">,</span>
+            <span class="n">mag_unsigned</span><span class="p">,</span> <span class="n">avg_int</span><span class="p">,</span> <span class="n">avg_int_flat</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compute_region_only_results">
+<a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_region_only_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_region_only_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
+                                <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> 
+                                <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span> 
+                                <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute region-aggregated metrics across the full disk.&quot;&quot;&quot;</span>
+    <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span>
+
+    <span class="c1"># aggregate sums by region</span>
+    <span class="n">regions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)</span>
+    <span class="n">reg_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">:</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)}</span>
+    <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">reg_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">flat_reg</span><span class="p">])</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">,</span> <span class="n">reg_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span>
+
+    <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_v_corr</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_v_rot</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">flat_int</span> <span class="o">-</span> <span class="n">k_hat_con</span> <span class="o">*</span> <span class="n">flat_ld</span><span class="p">)[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_w_active</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_abs_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">valid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="n">quiet_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">regions</span> <span class="o">==</span> <span class="n">quiet_sun_code</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">q_valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">flat_w_quiet</span>
+    <span class="n">grp_q</span> <span class="o">=</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+    <span class="n">sum_vquiet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_v_corr</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">sum_int_q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+    <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+    <span class="n">pix_frac</span> <span class="o">=</span> <span class="n">sum_pix</span> <span class="o">/</span> <span class="n">total_pixels</span>
+    <span class="n">light_frac</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">total_light</span>
+
+    <span class="n">sum_int_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_int</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sum_int_q_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_int_q</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_int_q</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sum_pix_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_pix</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_pix</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">v_hat</span> <span class="o">=</span> <span class="n">sum_vhat</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+    <span class="n">v_phot</span> <span class="o">=</span> <span class="n">sum_vphot</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+    <span class="n">v_q</span> <span class="o">=</span> <span class="n">sum_vquiet</span> <span class="o">/</span> <span class="n">sum_int_q_safe</span>
+    <span class="n">v_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v_hat</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v_hat</span> <span class="o">-</span> <span class="n">v_q</span><span class="p">[</span><span class="n">quiet_idx</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">mag_u</span> <span class="o">=</span> <span class="n">sum_mag</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+    <span class="n">avg_i</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">sum_pix_safe</span>
+    <span class="n">avg_if</span> <span class="o">=</span> <span class="n">sum_iflat</span> <span class="o">/</span> <span class="n">sum_pix_safe</span>
+
+    <span class="n">regs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span>
+    <span class="n">mjd_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span> <span class="n">mjd</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">nan_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mjd_arr</span><span class="p">,</span> <span class="n">regs</span><span class="p">,</span> <span class="n">nan_arr</span><span class="p">,</span> <span class="n">nan_arr</span><span class="p">,</span>
+                      <span class="n">pix_frac</span><span class="p">,</span> <span class="n">light_frac</span><span class="p">,</span> <span class="n">v_hat</span><span class="p">,</span> 
+                      <span class="n">v_phot</span><span class="p">,</span> <span class="n">v_q</span><span class="p">,</span> <span class="n">v_conv</span><span class="p">,</span> <span class="n">mag_u</span><span class="p">,</span> 
+                      <span class="n">avg_i</span><span class="p">,</span> <span class="n">avg_if</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="compute_region_results">
+<a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_region_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_region_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
+                           <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span>
+                           <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute region-aggregated metrics in mu rings.&quot;&quot;&quot;</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu_thresh</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">)</span>
+    <span class="n">bin_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">flat_mu</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_rings</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">valid_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span><span class="p">)</span>
+
+    <span class="c1"># aggregate sums by (bin, region)</span>
+    <span class="n">regions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)</span>
+    <span class="n">reg_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">:</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)}</span>
+    <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">reg_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">flat_reg</span><span class="p">])</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="n">valid_mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">reg_idx</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span> <span class="o">+</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span>
+
+    <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span><span class="o">*</span><span class="n">flat_v_corr</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_v_rot</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">flat_int</span><span class="o">-</span><span class="n">k_hat_con</span><span class="o">*</span><span class="n">flat_ld</span><span class="p">)[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">flat_w_active</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_abs_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span><span class="o">*</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">valid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+
+    <span class="c1"># quiet-sun sums</span>
+    <span class="n">quiet_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">regions</span> <span class="o">==</span> <span class="n">quiet_sun_code</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">q_valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">flat_w_quiet</span>
+    <span class="n">grp_q</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span> <span class="o">+</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+    <span class="n">sum_vquiet_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_v_corr</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span><span class="o">*</span><span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">sum_int_q_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+
+    <span class="c1"># compute metrics</span>
+    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+    <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+    <span class="n">pix_frac</span> <span class="o">=</span> <span class="n">sum_pix</span><span class="o">/</span><span class="n">total_pixels</span>
+    <span class="n">light_frac</span> <span class="o">=</span> <span class="n">sum_int</span><span class="o">/</span><span class="n">total_light</span>
+
+    <span class="c1"># avoid division by zero</span>
+    <span class="n">sum_int_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_int</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sum_int_q_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_int_q_flat</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_int_q_flat</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sum_pix_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_pix</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_pix</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># get velocities</span>
+    <span class="n">v_hat</span> <span class="o">=</span> <span class="n">sum_vhat</span><span class="o">/</span><span class="n">sum_int_safe</span>
+    <span class="n">v_phot</span> <span class="o">=</span> <span class="n">sum_vphot</span><span class="o">/</span><span class="n">sum_int_safe</span>
+    <span class="n">v_q</span> <span class="o">=</span> <span class="n">sum_vquiet_flat</span><span class="o">/</span><span class="n">sum_int_q_safe</span>
+    <span class="n">v_q_mu</span> <span class="o">=</span> <span class="n">v_q</span><span class="p">[:,</span><span class="n">quiet_idx</span><span class="p">][:,</span><span class="kc">None</span><span class="p">]</span>
+    <span class="n">v_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v_hat</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v_hat</span> <span class="o">-</span> <span class="n">v_q_mu</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">mag_u</span> <span class="o">=</span> <span class="n">sum_mag</span><span class="o">/</span><span class="n">sum_int_safe</span>
+    <span class="n">avg_i</span> <span class="o">=</span> <span class="n">sum_int</span><span class="o">/</span><span class="n">sum_pix_safe</span>
+    <span class="n">avg_if</span> <span class="o">=</span> <span class="n">sum_iflat</span><span class="o">/</span><span class="n">sum_pix_safe</span>
+
+    <span class="c1"># build rows</span>
+    <span class="n">lo_mu</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">hi_mu</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">bin_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">lo_mu</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">hi_mu</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="n">region_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lo_mu</span><span class="p">))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">v_phot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">mjd</span><span class="p">),</span> <span class="n">region_list</span><span class="p">,</span> <span class="n">bin_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                      <span class="n">bin_idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pix_frac</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">light_frac</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> 
+                      <span class="n">v_hat</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_phot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_q</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_conv</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> 
+                      <span class="n">mag_u</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">avg_i</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">avg_if</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Palumbo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

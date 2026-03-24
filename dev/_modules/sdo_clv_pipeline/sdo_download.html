@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sdo_clv_pipeline.sdo_download &#8212; SDO CLV Pipeline</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=810fe235" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=4861a642"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sdo_clv_pipeline/sdo_download';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://palumbom.github.io/sdo-clv-pipeline/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="SDO CLV Pipeline - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="SDO CLV Pipeline - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    SDO Center-to-Limb Variability (CLV) Pipeline
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Public API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../api-preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api-velocities.html">Velocities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api-utilities.html">Ancillary Utilities</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/palumbom/sdo-clv-pipeline" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sdo_clv_pipeline.sdo_download</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span><span class="o">,</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy</span><span class="w"> </span><span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sunpy.net</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fido</span><span class="p">,</span> <span class="n">attrs</span> <span class="k">as</span> <span class="n">a</span>
+<span class="c1"># from astropy.units.quantity import AstropyDeprecationWarning</span>
+
+<span class="n">email</span>   <span class="o">=</span> <span class="s1">&#39;mlp95@psu.edu&#39;</span> <span class="c1"># be kind</span>
+
+<div class="viewcode-block" id="download_data">
+<a class="viewcode-back" href="../../api-preprocessing.html#sdo_clv_pipeline.sdo_download.download_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="n">series</span><span class="o">=</span><span class="s2">&quot;720&quot;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># setup arguments</span>
+    <span class="n">trange</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Time</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Sample</span><span class="p">(</span><span class="n">sample</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
+    <span class="n">provider</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Provider</span><span class="p">(</span><span class="s2">&quot;JSOC&quot;</span><span class="p">)</span>
+    <span class="n">notify</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Notify</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+    <span class="c1"># quality = a.jsoc.Keyword(&quot;QUALLEV1&quot;) == 0</span>
+
+    <span class="c1"># set attributes for HMI query</span>
+    <span class="n">instr1</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">hmi</span>
+    <span class="k">if</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;45&quot;</span><span class="p">:</span>
+        <span class="n">physobs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">intensity</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">los_magnetic_field</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">los_velocity</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;720&quot;</span><span class="p">:</span>
+        <span class="n">physobs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;hmi.M_720s&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;hmi.V_720s&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;hmi.Ic_720s&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># get query for HMI and download data, retry failed downloads</span>
+    <span class="k">if</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;45&quot;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">instr1</span><span class="p">,</span> <span class="n">physobs</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;720&quot;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">physobs</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span><span class="c1">#, quality)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;About to fetch HMI files starting at date </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">hmi_files</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+    <span class="c1"># while len(hmi_files.errors) &gt; 0:</span>
+    <span class="c1">#     hmi_files = Fido.fetch(hmi_files, path=outdir, overwrite=overwrite, progress=progress)</span>
+
+    <span class="c1"># set attributes for AIA query</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Level</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">instr2</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">aia</span>
+    <span class="n">wavelength</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Wavelength</span><span class="p">(</span><span class="mf">1700.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">AA</span><span class="p">)</span>
+
+    <span class="c1"># get query for AIA and download data</span>
+    <span class="n">aia</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">instr2</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;About to fetch AIA files starting at date </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">start</span><span class="p">)</span>
+    <span class="n">aia_files</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">aia</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+    <span class="c1"># while len(aia_files.errors) &gt; 0:</span>
+    <span class="c1">#     aia_files = Fido.fetch(aia_files, path=outdir, overwrite=overwrite, progress=progress)</span>
+
+    <span class="c1"># sort out filenames into categories for output</span>
+    <span class="n">con_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">&quot;cont&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">mag_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">&quot;magn&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">dop_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">&quot;dopp&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">aia_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">aia_files</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">con_files</span><span class="p">,</span> <span class="n">mag_files</span><span class="p">,</span> <span class="n">dop_files</span><span class="p">,</span> <span class="n">aia_files</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># supress warnings</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+    <span class="c1"># warnings.simplefilter(action=&#39;ignore&#39;, category=AstropyDeprecationWarning)</span>
+
+    <span class="c1"># initialize argparser</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Download SDO/HMI data using sunpy&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--outdir&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;full directory path for file writeout&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--start_date&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;start_date&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>   <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2024-01-01&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Start date for query [yyyy-mm-dd]&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--stop_date&#39;</span><span class="p">,</span>  <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;stop_date&#39;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>   <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2024-01-03&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Stop date for query [yyyy-mm-dd]&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--cadence&#39;</span><span class="p">,</span>    <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;cadence&#39;</span><span class="p">,</span>    <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Cadence for query [hours]&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--overwrite&#39;</span><span class="p">,</span>  <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;overwrite&#39;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to overwrite existing files&#39;</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--fast&#39;</span><span class="p">,</span>       <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span>       <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to use the fast (45 sec) data. Default is False (720 sec.)&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">series</span> <span class="o">=</span> <span class="s2">&quot;45&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">fast</span> <span class="k">else</span> <span class="s2">&quot;720&quot;</span>
+
+    <span class="c1"># Download per-day in order to catch failures </span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">start_date</span><span class="p">)</span>
+    <span class="n">tstop</span>  <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">stop_date</span><span class="p">)</span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">tstart</span><span class="p">,</span> <span class="n">tstop</span><span class="o">+</span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+    <span class="n">outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">outdir</span><span class="p">)</span>
+
+    <span class="c1"># chunk the queries to manage lenght of file downloads</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isot</span>
+        <span class="n">end</span>   <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isot</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">download_data</span><span class="p">(</span><span class="n">series</span><span class="o">=</span><span class="n">series</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span> 
+                                  <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cadence</span><span class="p">,</span> 
+                                  <span class="n">overwrite</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">overwrite</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Fido fetch failed for </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Palumbo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

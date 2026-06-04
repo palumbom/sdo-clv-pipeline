@@ -497,7 +497,7 @@
 <a class="viewcode-back" href="../../api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.correct_magnetogram">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">correct_magnetogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply mu correction to magnetogram values.&quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_magnetogram</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_magnetogram</span><span class="p">(),</span> <span class="s2">&quot;expected magnetogram, got content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">B_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
         <span class="k">return</span> <span class="kc">None</span></div>
@@ -513,7 +513,7 @@
 <span class="sd">        fit_cbs : bool, optional</span>
 <span class="sd">            If True, fit convective blueshift components in the bulk velocity model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">(),</span> <span class="s2">&quot;expected dopplergram, got content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># get mask excluding nans / sqrts of negatives</span>
         <span class="c1"># self.mask_nan = np.logical_and((self.rr &lt;= 0.95), ~np.isnan(self.lat))</span>
@@ -532,7 +532,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">calc_spacecraft_vel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># methods adapted from https://arxiv.org/abs/2105.12055</span>
         <span class="c1"># original implementation at https://github.com/samarth-kashyap/hmi-clean-ls</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">(),</span> <span class="s2">&quot;expected dopplergram, got content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># pre-compute trigonometric quantities</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rr</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsun_solrad</span><span class="p">)</span>
@@ -559,7 +559,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">calc_bulk_vel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_cbs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># methods adapted from https://arxiv.org/abs/2105.12055</span>
         <span class="c1"># original implementation at https://github.com/samarth-kashyap/hmi-clean-ls</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">(),</span> <span class="s2">&quot;expected dopplergram, got content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># pre-compute trigonometric quantities</span>
         <span class="n">cos_B0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">B0</span><span class="p">)</span>
@@ -658,7 +658,7 @@
 <span class="sd">        n_sigma : float, optional</span>
 <span class="sd">            Sigma clipping threshold within each bin.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_continuum</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_filtergram</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_continuum</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_filtergram</span><span class="p">()),</span> <span class="s2">&quot;expected continuum or filtergram, got content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># flatten &amp; mask</span>
         <span class="n">mu_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -715,7 +715,7 @@
 <span class="sd">        hmi_image : SDOImage</span>
 <span class="sd">            Target HMI image providing the output WCS and geometry.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_filtergram</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_filtergram</span><span class="p">(),</span> <span class="s2">&quot;expected filtergram, got content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># compute pixel mapping </span>
         <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">hmi_image</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span>
@@ -797,10 +797,10 @@
         <span class="c1"># check argument order/names are correct</span>
         <span class="c1"># print(&quot;Entered SunMask.__init__&quot;)</span>
         
-        <span class="k">assert</span> <span class="n">con</span><span class="o">.</span><span class="n">is_continuum</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">mag</span><span class="o">.</span><span class="n">is_magnetogram</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">dop</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">aia</span><span class="o">.</span><span class="n">is_filtergram</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">con</span><span class="o">.</span><span class="n">is_continuum</span><span class="p">(),</span> <span class="s2">&quot;con is not a continuum image: content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">con</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">mag</span><span class="o">.</span><span class="n">is_magnetogram</span><span class="p">(),</span> <span class="s2">&quot;mag is not a magnetogram: content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mag</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">mag</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dop</span><span class="o">.</span><span class="n">is_dopplergram</span><span class="p">(),</span> <span class="s2">&quot;dop is not a dopplergram: content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">dop</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">aia</span><span class="o">.</span><span class="n">is_filtergram</span><span class="p">(),</span> <span class="s2">&quot;aia is not a filtergram: content=</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">aia</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">aia</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># copy observation date</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">date_obs</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">date_obs</span>

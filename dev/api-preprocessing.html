@@ -629,14 +629,18 @@ and moat flow regions.</p></li>
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_process.reduce_sdo_images">
 <span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_process.</span></span><span class="sig-name descname"><span class="pre">reduce_sdo_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_cbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_process.html#reduce_sdo_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_process.reduce_sdo_images" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Load, validate, and reduce a set of SDO images for a single epoch.</p>
-<p class="sd-card-text">This handles geometry setup, limb darkening, doppler/magnetogram corrections,
-and region classification.</p>
+<p class="sd-card-text">Public API. Returns a 5-tuple <code class="docutils literal notranslate"><span class="pre">(con,</span> <span class="pre">mag,</span> <span class="pre">dop,</span> <span class="pre">aia,</span> <span class="pre">mask)</span></code> on success or
+<code class="docutils literal notranslate"><span class="pre">None</span></code> when the epoch is skipped; in the skip case a specific diagnostic
+has already been printed by <code class="docutils literal notranslate"><span class="pre">_reduce_sdo_images</span></code>. External callers rely on
+this exact contract, so the skip reason is intentionally not exposed here.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_process.process_data_set_parallel">
 <span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_process.</span></span><span class="sig-name descname"><span class="pre">process_data_set_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">con_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dop_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aia_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_process.html#process_data_set_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_process.process_data_set_parallel" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Wrapper for multiprocessing that forwards to process_data_set.</p>
+<p class="sd-card-text">Returns the per-epoch status so pool.starmap carries it back to the parent
+for the end-of-run summary.</p>
 </dd></dl>
 
 <dl class="py function">

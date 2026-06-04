@@ -349,7 +349,7 @@
 <span class="sd-summary-text">sdo_clv_pipeline.sdo_plot</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <dl class="py function">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_plot.plot_image">
-<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_plot.</span></span><span class="sig-name descname"><span class="pre">plot_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sdo_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_plot.html#plot_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_plot.plot_image" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_plot.</span></span><span class="sig-name descname"><span class="pre">plot_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sdo_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_plot.html#plot_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_plot.plot_image" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Plot an SDOImage with WCS axes and type-specific styling.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -357,6 +357,14 @@
 <li><p class="sd-card-text"><strong>sdo_image</strong> (<a class="reference internal" href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage" title="sdo_clv_pipeline.sdo_image.SDOImage"><em>SDOImage</em></a>) – Image to plot (magnetogram, dopplergram, continuum, or filtergram).</p></li>
 <li><p class="sd-card-text"><strong>outdir</strong> (<em>str</em><em>, </em><em>optional</em>) – If provided, save to this directory instead of showing.</p></li>
 <li><p class="sd-card-text"><strong>fname</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for the saved figure (auto-generated if None).</p></li>
+<li><p class="sd-card-text"><strong>vmin</strong> (<em>float</em><em>, </em><em>optional</em>) – Fixed color-scale limits. When None, magnetogram/dopplergram fall back
+to their built-in fixed limits and continuum/filtergram autoscale to the
+frame. Pass explicit values to keep the colorbar identical across frames
+(e.g. when animating a sequence).</p></li>
+<li><p class="sd-card-text"><strong>vmax</strong> (<em>float</em><em>, </em><em>optional</em>) – Fixed color-scale limits. When None, magnetogram/dopplergram fall back
+to their built-in fixed limits and continuum/filtergram autoscale to the
+frame. Pass explicit values to keep the colorbar identical across frames
+(e.g. when animating a sequence).</p></li>
 </ul>
 </dd>
 </dl>

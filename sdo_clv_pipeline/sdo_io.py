@@ -92,9 +92,11 @@ def round_time(date=None, round_to=3600):
 
 def organize_IO(indir, datadir=None, clobber=False, globexp=""):
     # find the input data and check the lengths
-    assert isdir(indir)
+    assert isdir(indir), "input directory does not exist: " + str(indir)
     con_files, mag_files, dop_files, aia_files = find_data(indir, globexp=globexp)
-    assert (len(con_files) == len(mag_files) == len(dop_files) == len(aia_files))
+    assert (len(con_files) == len(mag_files) == len(dop_files) == len(aia_files)), \
+        "mismatched file counts after matching: CON=%d MAG=%d DOP=%d AIA=%d" % (
+            len(con_files), len(mag_files), len(dop_files), len(aia_files))
 
     # figure out data directories
     if datadir is None:
@@ -187,7 +189,7 @@ def create_file(fname, header=None):
     return None
 
 def write_results_to_file(fname, *args):
-    assert exists(fname)
+    assert exists(fname), "output file does not exist (was it created?): " + str(fname)
 
     # parse out args
     lines = [a for a in args]

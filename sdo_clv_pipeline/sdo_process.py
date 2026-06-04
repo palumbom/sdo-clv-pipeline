@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import gc, os, re, pdb, csv, glob, time, argparse
+import gc, os, re, pdb, csv, glob, time, argparse, traceback
 from astropy.time import Time
 from os.path import exists, split, isdir, getsize
 from multiprocessing import get_context
@@ -13,10 +13,21 @@ from .paths import root
 from .sdo_io import *
 from .sdo_vels import *
 from .sdo_image import *
+from .quality import *
 
 # multiprocessing imports
 from multiprocessing import get_context
 import multiprocessing as mp
+
+# per-epoch outcome codes; STATUS_OK marks success, the SKIP_* codes name the
+# reason an epoch was skipped so callers can tally a run summary
+status_ok = "ok"
+skip_invalid_file = "invalid_file"
+skip_quality = "quality"
+skip_limb_dark = "limb_darkening"
+skip_doppler = "dopplergram"
+skip_regions = "region_id"
+skip_unknown = "unknown"
 
 def is_quality_data(sdo_image):
     """Return True when the SDO image passes the QUALITY flag check."""
@@ -25,32 +36,56 @@ def is_quality_data(sdo_image):
 def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False, **kwargs):
     """Load, validate, and reduce a set of SDO images for a single epoch.
 
+    Public API. Returns a 5-tuple ``(con, mag, dop, aia, mask)`` on success or
+    ``None`` when the epoch is skipped; in the skip case a specific diagnostic
+    has already been printed by ``_reduce_sdo_images``. External callers rely on
+    this exact contract, so the skip reason is intentionally not exposed here.
+    """
+    images, _reason = _reduce_sdo_images(con_file, mag_file, dop_file, aia_file,
+                                         mu_thresh=mu_thresh, fit_cbs=fit_cbs, **kwargs)
+    return images
+
+
+def _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit_cbs=False, **kwargs):
+    """Load, validate, and reduce a set of SDO images for a single epoch.
+
     This handles geometry setup, limb darkening, doppler/magnetogram corrections,
     and region classification.
+
+    Returns ``(images, reason)`` where on success ``images`` is the 5-tuple
+    ``(con, mag, dop, aia, mask)`` and ``reason`` is None, and on a skip
+    ``images`` is None and ``reason`` is one of the module-level skip_* codes.
+    A specific diagnostic is printed at each skip point.
     """
     # assertions
-    assert exists(con_file)
-    assert exists(mag_file)
-    assert exists(dop_file)
-    assert exists(aia_file)
+    assert exists(con_file), "missing continuum file: " + str(con_file)
+    assert exists(mag_file), "missing magnetogram file: " + str(mag_file)
+    assert exists(dop_file), "missing dopplergram file: " + str(dop_file)
+    assert exists(aia_file), "missing aia file: " + str(aia_file)
 
     # get the datetime
     iso = get_date(con_file).isoformat()
 
-    # make SDOImage instances
-    try:
-        con = SDOImage(con_file)
-        mag = SDOImage(mag_file)
-        dop = SDOImage(dop_file)
-        aia = SDOImage(aia_file)
-    except OSError:
-        print("\t >>> Invalid file, skipping " + iso, flush=True)
-        return None
+    # make SDOImage instances; load one at a time so a bad file is named
+    images = {}
+    for label, fname in (("CON", con_file), ("MAG", mag_file),
+                         ("DOP", dop_file), ("AIA", aia_file)):
+        try:
+            images[label] = SDOImage(fname)
+        except OSError as e:
+            print("\t >>> Invalid file, skipping %s: %s %s (%r)"
+                  % (iso, label, fname, e), flush=True)
+            return None, skip_invalid_file
+    con, mag, dop, aia = images["CON"], images["MAG"], images["DOP"], images["AIA"]
 
-    # check for data quality issue
-    if not all(list(map(is_quality_data, [con, mag, dop, aia]))):
-        print("\t >>> Data quality issue, skipping " + iso, flush=True)
-        return None
+    # check for data quality issue; report which instrument failed and decode bits
+    bad = [(label, images[label]) for label in ("CON", "MAG", "DOP", "AIA")
+           if not is_quality_data(images[label])]
+    if bad:
+        for label, im in bad:
+            print("\t >>> Quality skip %s: %s (%s)"
+                  % (iso, format_quality(im.instrument, im.quality), label), flush=True)
+        return None, skip_quality
 
     # calculate geometries
     dop.calc_geometry()
@@ -64,9 +99,11 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
     try:
         con.calc_limb_darkening()
         aia.calc_limb_darkening()
-    except:
-        print("\t >>> Limb darkening fit failed, skipping " + iso, flush=True)
-        return None
+    except Exception as e:
+        print("\t >>> Limb darkening fit failed, skipping %s: %s: %s"
+              % (iso, type(e).__name__, e), flush=True)
+        traceback.print_exc()
+        return None, skip_limb_dark
 
     # correct magnetogram for foreshortening
     mag.correct_magnetogram()
@@ -75,10 +112,12 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
     dop.correct_dopplergram(fit_cbs=fit_cbs)
 
     # check that the dopplergram correction went well
-    if np.nanmax(np.abs(dop.v_rot)) < 1000.0:
-        print("\t >>> Dopplergram correction failed, skipping " + iso, flush=True)
-        return None
-    
+    v_rot_max = float(np.nanmax(np.abs(dop.v_rot)))
+    if v_rot_max < 1000.0:
+        print("\t >>> Dopplergram correction failed %s: max|v_rot|=%.3f m/s < 1000.0, skipping"
+              % (iso, v_rot_max), flush=True)
+        return None, skip_doppler
+
     # set values to nan for mu less than mu_thresh
     con.mask_low_mu(mu_thresh)
     dop.mask_low_mu(mu_thresh)
@@ -90,20 +129,25 @@ def reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fit
         # print("About to construct SunMask")
         mask = SunMask(con, mag, dop, aia, **kwargs)
         mask.mask_low_mu(mu_thresh)
-    except:
-        print("\t >>> Region identification failed, skipping " + iso, flush=True)
-        return None
+    except Exception as e:
+        print("\t >>> Region identification failed, skipping %s: %s: %s"
+              % (iso, type(e).__name__, e), flush=True)
+        traceback.print_exc()
+        return None, skip_regions
 
-    return con, mag, dop, aia, mask
+    return (con, mag, dop, aia, mask), None
 
 
 def process_data_set_parallel(con_file, mag_file, dop_file, aia_file, mu_thresh, n_rings, datadir):
-    """Wrapper for multiprocessing that forwards to process_data_set."""
-    process_data_set(con_file, mag_file, dop_file, aia_file,
-                     mu_thresh=mu_thresh, n_rings=n_rings,
-                     suffix=str(mp.current_process().pid), datadir=datadir,
-                     plot_moat=False, classify_moat=False)
-    return None
+    """Wrapper for multiprocessing that forwards to process_data_set.
+
+    Returns the per-epoch status so pool.starmap carries it back to the parent
+    for the end-of-run summary.
+    """
+    return process_data_set(con_file, mag_file, dop_file, aia_file,
+                            mu_thresh=mu_thresh, n_rings=n_rings,
+                            suffix=str(mp.current_process().pid), datadir=datadir,
+                            plot_moat=False, classify_moat=False)
 
 def process_data_set(con_file, mag_file, dop_file, aia_file, 
                      mu_thresh, n_rings=10, suffix=None, 
@@ -130,93 +174,98 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         fname1 = os.path.join(tmpdir, "thresholds_" + suffix + ".csv")
         fname2 = os.path.join(tmpdir, "region_output_" + suffix + ".csv")
 
-    # check if the files exist, create otherwise
-    for file in (fname1, fname2):
+    try:
+        # reduce the data set; skip cleanly (no disk touched) on a known issue
+        images, reason = _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, **kwargs)
+        if images is None:
+            return reason
+        con, mag, dop, aia, mask = images
+
+        # now that we have results, create the output files if needed
+        for file in (fname1, fname2):
             if not exists(file):
                 create_file(file)
 
-    # reduce the data set
-    try:
-        con, mag, dop, aia, mask = reduce_sdo_images(con_file, mag_file, dop_file, aia_file, **kwargs)
-    except:
-        print("\t >>> Epoch %s reduction failed for unknown reasons :(" % iso, flush=True)
-        return None
+        # get the MJD of the obs
+        mjd = Time(con.date_obs).mjd
 
-    # get the MJD of the obs
-    mjd = Time(con.date_obs).mjd
+        # write the limb darkening parameters, velocities, etc. to disk
+        write_results_to_file(fname1, mjd, mask.aia_thresh, *aia.ld_coeffs,
+                              mask.con_thresh1, mask.con_thresh2, *con.ld_coeffs,
+                              np.nanmax(dop.v_cbs),
+                              np.nanmin(dop.v_obs), np.nanmax(dop.v_obs), np.nanmean(dop.v_obs),
+                              np.nanmin(dop.v_rot), np.nanmax(dop.v_rot), np.nanmean(dop.v_rot),
+                              np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer))
 
-    # write the limb darkening parameters, velocities, etc. to disk
-    write_results_to_file(fname1, mjd, mask.aia_thresh, *aia.ld_coeffs,
-                          mask.con_thresh1, mask.con_thresh2, *con.ld_coeffs,
-                          np.nanmax(dop.v_cbs),
-                          np.nanmin(dop.v_obs), np.nanmax(dop.v_obs), np.nanmean(dop.v_obs),
-                          np.nanmin(dop.v_rot), np.nanmax(dop.v_rot), np.nanmean(dop.v_rot),
-                          np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer))
+        # flatten per-pixel arrays
+        flat_mu = mask.mu.ravel()
+        flat_reg = mask.regions.ravel()
+        flat_int = con.image.ravel()
+        flat_v_corr = dop.v_corr.ravel()
+        flat_v_rot = dop.v_rot.ravel()
+        flat_abs_mag = np.abs(mag.B_obs).ravel()
+        flat_iflat = con.iflat.ravel()
+        flat_ld = con.ldark.ravel()
+        flat_w_quiet = mask.is_quiet_sun().ravel()
+        flat_w_active = np.logical_not(flat_w_quiet)
 
-    # flatten per-pixel arrays
-    flat_mu = mask.mu.ravel()
-    flat_reg = mask.regions.ravel()
-    flat_int = con.image.ravel()
-    flat_v_corr = dop.v_corr.ravel()
-    flat_v_rot = dop.v_rot.ravel()
-    flat_abs_mag = np.abs(mag.B_obs).ravel()
-    flat_iflat = con.iflat.ravel()
-    flat_ld = con.ldark.ravel()
-    flat_w_quiet = mask.is_quiet_sun().ravel()
-    flat_w_active = np.logical_not(flat_w_quiet)
+        # calculate k_hat
+        w_quiet = mask.is_quiet_sun()
+        k_hat_con = np.nansum(con.image * con.ldark * w_quiet) / np.nansum(con.ldark**2 * w_quiet)
 
-    # calculate k_hat
-    w_quiet = mask.is_quiet_sun()
-    k_hat_con = np.nansum(con.image * con.ldark * w_quiet) / np.nansum(con.ldark**2 * w_quiet)
+        # create arrays to hold velocity, magnetic field, and pixel fraction results
+        results = []
 
-    # create arrays to hold velocity, magnetic field, and pixel fraction results
-    results = []
+        # calculate disk-integrataed quantities
+        results.append(compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
+                                            flat_v_rot, flat_ld, flat_iflat,
+                                            flat_w_quiet, flat_w_active, flat_abs_mag,
+                                            mu_thresh, k_hat_con))
 
-    # calculate disk-integrataed quantities
-    results.append(compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
-                                        flat_v_rot, flat_ld, flat_iflat,
-                                        flat_w_quiet, flat_w_active, flat_abs_mag,
-                                        mu_thresh, k_hat_con))
-    
-    # calculate velocities for regions, not binning by mu
-    results.extend(compute_region_only_results(mjd, flat_mu, flat_int,
-                                               flat_v_corr, flat_v_rot,
-                                               flat_ld, flat_iflat,
-                                               flat_abs_mag, flat_w_quiet, 
-                                               flat_w_active, 
-                                               flat_reg, region_codes,
-                                               mu_thresh, k_hat_con))
+        # calculate velocities for regions, not binning by mu
+        results.extend(compute_region_only_results(mjd, flat_mu, flat_int,
+                                                   flat_v_corr, flat_v_rot,
+                                                   flat_ld, flat_iflat,
+                                                   flat_abs_mag, flat_w_quiet,
+                                                   flat_w_active,
+                                                   flat_reg, region_codes,
+                                                   mu_thresh, k_hat_con))
 
-    # calculate disk-resovled quantities
-    results.extend(compute_region_results(mjd, flat_mu, flat_int, flat_v_corr,
-                                          flat_v_rot, flat_ld, flat_iflat,
-                                          flat_abs_mag, flat_w_quiet, 
-                                          flat_w_active, flat_reg, 
-                                          region_codes, mu_thresh, 
-                                          n_rings, k_hat_con))
+        # calculate disk-resovled quantities
+        results.extend(compute_region_results(mjd, flat_mu, flat_int, flat_v_corr,
+                                              flat_v_rot, flat_ld, flat_iflat,
+                                              flat_abs_mag, flat_w_quiet,
+                                              flat_w_active, flat_reg,
+                                              region_codes, mu_thresh,
+                                              n_rings, k_hat_con))
 
-    # write to disk
-    write_results_to_file(fname2, results)
+        # write to disk
+        write_results_to_file(fname2, results)
 
-    # do some memory cleanup
-    del con
-    del mag
-    del dop
-    del aia
-    del flat_mu
-    del flat_ld
-    del flat_reg
-    del flat_int
-    del flat_v_rot
-    del flat_iflat
-    del flat_v_corr
-    del flat_abs_mag 
-    del flat_w_quiet
-    gc.collect() 
-    
-    # end the timer
-    end_time = time.perf_counter()
+        # do some memory cleanup (success path: all names are bound)
+        del con
+        del mag
+        del dop
+        del aia
+        del flat_mu
+        del flat_ld
+        del flat_reg
+        del flat_int
+        del flat_v_rot
+        del flat_iflat
+        del flat_v_corr
+        del flat_abs_mag
+        del flat_w_quiet
 
-    # report success and return
-    print("\t >>> Run successfully in %s seconds" % str(end_time - start_time), flush=True)
-    return None
+        # end the timer
+        end_time = time.perf_counter()
+
+        # report success and return
+        print("\t >>> Run successfully in %s seconds" % str(end_time - start_time), flush=True)
+        return status_ok
+    except Exception as e:
+        print("\t >>> Epoch %s failed unexpectedly: %s: %s" % (iso, type(e).__name__, e), flush=True)
+        traceback.print_exc()
+        return skip_unknown
+    finally:
+        gc.collect()

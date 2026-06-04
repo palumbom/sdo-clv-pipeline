@@ -16,7 +16,7 @@ from astropy.wcs import FITSFixedWarning
 from astropy.io.fits.verify import VerifyWarning
 
 
-def plot_image(sdo_image, outdir=None, fname=None):
+def plot_image(sdo_image, outdir=None, fname=None, vmin=None, vmax=None):
     """Plot an SDOImage with WCS axes and type-specific styling.
 
     Parameters
@@ -27,6 +27,11 @@ def plot_image(sdo_image, outdir=None, fname=None):
         If provided, save to this directory instead of showing.
     fname : str, optional
         Filename for the saved figure (auto-generated if None).
+    vmin, vmax : float, optional
+        Fixed color-scale limits. When None, magnetogram/dopplergram fall back
+        to their built-in fixed limits and continuum/filtergram autoscale to the
+        frame. Pass explicit values to keep the colorbar identical across frames
+        (e.g. when animating a sequence).
     """
     # get the WCS
     wcs = sdo_image.wcs
@@ -41,8 +46,10 @@ def plot_image(sdo_image, outdir=None, fname=None):
         cmap = plt.get_cmap("RdYlBu").copy()
         cmap.set_bad(color="white")
 
-        # get the norm
-        norm = colors.SymLogNorm(1, vmin=-4200, vmax=4200)
+        # get the norm (fall back to fixed limits when not overridden)
+        norm = colors.SymLogNorm(1,
+                                 vmin=-4200 if vmin is None else vmin,
+                                 vmax=4200 if vmax is None else vmax)
 
         # plot the sun
         img = ax1.imshow(sdo_image.image, cmap=cmap, origin="lower", norm=norm, interpolation=None)
@@ -76,7 +83,9 @@ def plot_image(sdo_image, outdir=None, fname=None):
         cmap.set_bad(color="white")
 
         # plot the sun
-        img = ax1.imshow(sdo_image.v_corr, origin="lower", cmap=cmap, vmin=-2000, vmax=2000, interpolation=None)
+        img = ax1.imshow(sdo_image.v_corr, origin="lower", cmap=cmap,
+                         vmin=-2000 if vmin is None else vmin,
+                         vmax=2000 if vmax is None else vmax, interpolation=None)
         sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
                                                                      color="k", alpha=0.5, ls="--", lw=0.5)
         limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
@@ -109,7 +118,8 @@ def plot_image(sdo_image, outdir=None, fname=None):
         cmap.set_bad(color="white")
 
         # plot the sun
-        img = ax1.imshow(sdo_image.iflat/sdo_image.ld_coeffs[0], cmap=cmap, origin="lower", interpolation=None)#, vmin=20000)
+        img = ax1.imshow(sdo_image.iflat/sdo_image.ld_coeffs[0], cmap=cmap, origin="lower",
+                         vmin=vmin, vmax=vmax, interpolation=None)
         sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
                                                                      color="k", alpha=0.5, ls="--", lw=0.5)
         limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
@@ -142,7 +152,8 @@ def plot_image(sdo_image, outdir=None, fname=None):
         cmap.set_bad(color="white")
 
         # plot the sun
-        img = ax1.imshow(sdo_image.iflat/sdo_image.ld_coeffs[0], cmap=cmap, origin="lower", interpolation=None)#, vmin=20000)
+        img = ax1.imshow(sdo_image.iflat/sdo_image.ld_coeffs[0], cmap=cmap, origin="lower",
+                         vmin=vmin, vmax=vmax, interpolation=None)
         sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
                                                                      color="k", alpha=0.5, ls="--", lw=0.5)
         limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)

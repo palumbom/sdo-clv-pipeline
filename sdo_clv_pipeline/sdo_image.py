@@ -185,7 +185,7 @@ class SDOImage(object):
 
     def correct_magnetogram(self):
         """Apply mu correction to magnetogram values."""
-        assert self.is_magnetogram()
+        assert self.is_magnetogram(), "expected magnetogram, got content=%s (%s)" % (self.content, self.filename)
         self.B_obs = self.image.copy()
         self.image /= self.mu
         return None
@@ -198,7 +198,7 @@ class SDOImage(object):
         fit_cbs : bool, optional
             If True, fit convective blueshift components in the bulk velocity model.
         """
-        assert self.is_dopplergram()
+        assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
         # get mask excluding nans / sqrts of negatives
         # self.mask_nan = np.logical_and((self.rr <= 0.95), ~np.isnan(self.lat))
@@ -214,7 +214,7 @@ class SDOImage(object):
     def calc_spacecraft_vel(self):
         # methods adapted from https://arxiv.org/abs/2105.12055
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
-        assert self.is_dopplergram()
+        assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
         # pre-compute trigonometric quantities
         sig = np.arctan(self.rr / self.rsun_solrad)
@@ -238,7 +238,7 @@ class SDOImage(object):
     def calc_bulk_vel(self, fit_cbs=False):
         # methods adapted from https://arxiv.org/abs/2105.12055
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
-        assert self.is_dopplergram()
+        assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
         # pre-compute trigonometric quantities
         cos_B0 = np.cos(self.B0)
@@ -334,7 +334,7 @@ class SDOImage(object):
         n_sigma : float, optional
             Sigma clipping threshold within each bin.
         """
-        assert (self.is_continuum() | self.is_filtergram())
+        assert (self.is_continuum() | self.is_filtergram()), "expected continuum or filtergram, got content=%s (%s)" % (self.content, self.filename)
 
         # flatten & mask
         mu_flat = self.mu.ravel()
@@ -388,7 +388,7 @@ class SDOImage(object):
         hmi_image : SDOImage
             Target HMI image providing the output WCS and geometry.
         """
-        assert self.is_filtergram()
+        assert self.is_filtergram(), "expected filtergram, got content=%s (%s)" % (self.content, self.filename)
 
         # compute pixel mapping 
         H, W = hmi_image.image.shape
@@ -466,10 +466,10 @@ class SunMask(object):
         # check argument order/names are correct
         # print("Entered SunMask.__init__")
         
-        assert con.is_continuum()
-        assert mag.is_magnetogram()
-        assert dop.is_dopplergram()
-        assert aia.is_filtergram()
+        assert con.is_continuum(), "con is not a continuum image: content=%s (%s)" % (con.content, con.filename)
+        assert mag.is_magnetogram(), "mag is not a magnetogram: content=%s (%s)" % (mag.content, mag.filename)
+        assert dop.is_dopplergram(), "dop is not a dopplergram: content=%s (%s)" % (dop.content, dop.filename)
+        assert aia.is_filtergram(), "aia is not a filtergram: content=%s (%s)" % (aia.content, aia.filename)
 
         # copy observation date
         self.date_obs = con.date_obs

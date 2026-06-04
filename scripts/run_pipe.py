@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os, pdb, glob, time, argparse
 from os.path import exists, split, isdir, getsize
+from collections import Counter
 
 # bring functions into scope
 from sdo_clv_pipeline.paths import root
@@ -15,6 +16,19 @@ import multiprocessing as mp
 
 # use style
 plt.style.use(str(root) + "/" + "my.mplstyle"); plt.ioff()
+
+def print_run_summary(statuses):
+    """Print an end-of-run tally of processed vs. skipped epochs by reason."""
+    tally = Counter(statuses)
+    total = sum(tally.values())
+    n_ok = tally.get(status_ok, 0)
+    print()
+    print(">>> RUN SUMMARY: %d epochs, %d processed, %d skipped"
+          % (total, n_ok, total - n_ok), flush=True)
+    for reason in (skip_quality, skip_limb_dark, skip_doppler,
+                   skip_regions, skip_invalid_file, skip_unknown):
+        print("       skipped[%s] = %d" % (reason, tally.get(reason, 0)), flush=True)
+    return None
 
 def get_parser_args():
     # initialize argparser
@@ -59,8 +73,10 @@ def main():
         print(">>> OS claims %s CPUs are available..." % len(sched_getaffinity(0)))
         ncpus = len(sched_getaffinity(0)) - 1
         # ncpus = 33 - 1
-    except:
+    except Exception as e:
         # ncpus = np.min([len(con_files), mp.cpu_count()])
+        print(">>> Could not query CPU affinity (%s: %s); falling back to 1 process"
+              % (type(e).__name__, e), flush=True)
         ncpus = 1
 
     # ncpus = 1
@@ -94,8 +110,8 @@ def main():
                                np.zeros((1,1),np.float32),
                                dummy_dst)
 
-            # run the analysis
-            pool.starmap(process_data_set_parallel, items, chunksize=4)
+            # run the analysis; keep the per-epoch statuses for the summary
+            statuses = pool.starmap(process_data_set_parallel, items, chunksize=4)
 
         # find the output data sets
         outfiles1 = glob.glob(os.path.join(tmpdir,"thresholds_*"))
@@ -108,18 +124,22 @@ def main():
 
         # print run time
         print("Parallel: --- %s seconds ---" % (time.time() - t0))
+        print_run_summary(statuses)
     else:
         # run serially
         print(">>> Processing %s epochs on a single process" % len(con_files))
         print()
         t0 = time.time()
+        statuses = []
         for i in range(len(con_files)):
-            process_data_set(con_files[i], mag_files[i], dop_files[i], aia_files[i],
-                             mu_thresh=mu_thresh, n_rings=n_rings, datadir=datadir,
-                             plot_moat=False, classify_moat=False)
+            statuses.append(
+                process_data_set(con_files[i], mag_files[i], dop_files[i], aia_files[i],
+                                 mu_thresh=mu_thresh, n_rings=n_rings, datadir=datadir,
+                                 plot_moat=False, classify_moat=False))
 
         # print run time
         print("Serial: --- %s seconds ---" % (time.time() - t0))
+        print_run_summary(statuses)
     return None
 
 if __name__ == "__main__":

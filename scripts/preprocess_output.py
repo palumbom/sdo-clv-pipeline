@@ -3,12 +3,16 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.cm as cm
-import os, sys, pdb, csv, glob
+import os, sys, pdb, csv, glob, logging
 import pandas as pd
 
 from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_image import region_codes
 from sdo_clv_pipeline.sdo_image import umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code, moat_code
+from sdo_clv_pipeline.logging_setup import configure_logging
+
+configure_logging()
+logger = logging.getLogger(__name__)
 
 
 def mask_all_zero_rows(df, return_idx=False):
@@ -66,8 +70,7 @@ if not os.path.isdir(os.path.join(datadir, "processed")):
 
 outdir = os.path.join(datadir, "processed")
 
-print(datadir)
-print(outdir)
+logger.info("reading from %s, writing processed output to %s", datadir, outdir)
 
 # read in and sort by mjd
 df_all = pd.read_csv(os.path.join(datadir, "region_output.csv"))

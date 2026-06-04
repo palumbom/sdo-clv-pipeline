@@ -35,6 +35,34 @@ hmi_quality_bits = {
 }
 
 
+# Soft "approximation used" QUALITY bits we tolerate: the epoch is still processed,
+# but tagged so it can be masked downstream. Any OTHER nonzero bit is fatal (skip).
+#   10 = QUAL_NOCOSMICRAY   (some cosmic-ray hit lists unreadable)
+#   15 = QUAL_LOWKEYWORDNUM (keywords interpolated by closest-neighbor)
+#   16 = QUAL_LOWINTERPNUM  (low temporal-interpolation point count)
+tolerable_quality_bits = {10, 15, 16}
+tolerable_quality_mask = 0
+for _b in tolerable_quality_bits:
+    tolerable_quality_mask |= (1 << _b)
+
+
+def is_tolerable_quality(quality):
+    """True if `quality` is clean or sets only tolerable bits (no fatal bit set)."""
+    return (int(quality) & ~tolerable_quality_mask & 0xFFFFFFFF) == 0
+
+
+def combine_quality(*qualities):
+    """Bitwise-OR of QUALITY values across instruments (the single combined flag).
+
+    The result is nonzero when any instrument was flagged; individual bits remain
+    decodable with decode_quality / format_quality.
+    """
+    out = 0
+    for q in qualities:
+        out |= int(q)
+    return out & 0xFFFFFFFF
+
+
 def decode_quality(quality, instrument=""):
     """Return a list of human-readable strings, one per set bit of `quality`.
 

@@ -1,14 +1,18 @@
 import numpy as np
 import pandas as pd
-import os, pdb, glob, time, argparse
+import os, pdb, glob, time, argparse, logging
 from os.path import exists, split, isdir, getsize
 
 # bring functions into scope
 from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_io import *
 from sdo_clv_pipeline.sdo_process import *
+from sdo_clv_pipeline.logging_setup import configure_logging
+
+logger = logging.getLogger(__name__)
 
 def main():
+    configure_logging()
     # figure out data directories
     files = []
     datadir = os.path.join(root, "data")
@@ -27,14 +31,9 @@ def main():
     fname1 = os.path.join(datadir, "thresholds.csv")
     fname2 = os.path.join(datadir, "region_output.csv")
 
-    # headers for output files
-    header1 = ["mjd", "aia_thresh", "a_aia", "b_aia", "c_aia",
-               "hmi_thresh1", "hmi_thresh2", "a_hmi", "b_hmi", "c_hmi",
-               "vel_cbs_off",
-               "min_vel_sat", "max_vel_sat", "avg_vel_sat",
-               "min_vel_rot", "max_vel_rot", "avg_vel_rot",
-               "min_vel_mer", "max_vel_mer", "avg_vel_mer"]
-    header2 = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac", "light_frac", "v_hat", "v_phot", "v_quiet", "v_conv", "mag_unsigned", "avg_int", "avg_int_flat"]
+    # headers for output files (shared schema; defined once in sdo_io)
+    header1 = header_thresholds
+    header2 = header_region
 
     # delete old files if they exists
     fileset = (fname1, fname2)
@@ -56,6 +55,7 @@ def main():
         for f in in_fname:
             data = pd.read_csv(f)
             data.to_csv(file, mode="a", index=False, header=False)
+        logger.info("merged %d files into %s", len(in_fname), file)
 
     return None
 

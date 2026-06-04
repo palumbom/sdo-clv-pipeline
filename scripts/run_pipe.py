@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os, pdb, glob, time, argparse
+import os, pdb, glob, time, argparse, logging
 from os.path import exists, split, isdir, getsize
 from collections import Counter
 
@@ -9,25 +9,28 @@ from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_io import *
 from sdo_clv_pipeline.sdo_process import *
 from sdo_clv_pipeline.reproject import *
+from sdo_clv_pipeline.logging_setup import configure_logging
 
 # multiprocessing imports
 from multiprocessing import get_context
 import multiprocessing as mp
 
+logger = logging.getLogger(__name__)
+
 # use style
 plt.style.use(str(root) + "/" + "my.mplstyle"); plt.ioff()
 
 def print_run_summary(statuses):
-    """Print an end-of-run tally of processed vs. skipped epochs by reason."""
+    """Log an end-of-run tally of processed vs. skipped epochs by reason."""
     tally = Counter(statuses)
     total = sum(tally.values())
     n_ok = tally.get(status_ok, 0)
-    print()
-    print(">>> RUN SUMMARY: %d epochs, %d processed, %d skipped"
-          % (total, n_ok, total - n_ok), flush=True)
+    lines = ["RUN SUMMARY: %d epochs, %d processed, %d skipped"
+             % (total, n_ok, total - n_ok)]
     for reason in (skip_quality, skip_limb_dark, skip_doppler,
                    skip_regions, skip_invalid_file, skip_unknown):
-        print("       skipped[%s] = %d" % (reason, tally.get(reason, 0)), flush=True)
+        lines.append("    skipped[%s] = %d" % (reason, tally.get(reason, 0)))
+    logger.info("\n".join(lines))
     return None
 
 def get_parser_args():
@@ -36,13 +39,16 @@ def get_parser_args():
     parser.add_argument("--fitsdir", type=str, default="/mnt/ceph/users/mpalumbo/sdo_data/")
     parser.add_argument("--clobber", action="store_true", default=False)
     parser.add_argument("--globexp", type=str, default="")
+    parser.add_argument("--log-level", type=str, default="INFO",
+                        help="logging level (DEBUG, INFO, WARNING, ERROR)")
 
     # parse the command line arguments
     args = parser.parse_args()
     fitsdir = args.fitsdir
     clobber = args.clobber
     globexp = args.globexp
-    return fitsdir, clobber, globexp
+    log_level = args.log_level
+    return fitsdir, clobber, globexp, log_level
 
 def main():
     # make raw data dir if it does not exist
@@ -50,7 +56,8 @@ def main():
         os.mkdir(os.path.join(root, "data"))
 
     # sort out input/output data files
-    fitsdir, clobber, globexp = get_parser_args()
+    fitsdir, clobber, globexp, log_level = get_parser_args()
+    configure_logging(log_level)
     globdir = globexp.replace("*","")
     # fitsdir = os.path.join(root, "data", "fits")
     files = organize_IO(fitsdir, clobber=clobber, globexp=globexp)
@@ -69,14 +76,13 @@ def main():
     # get number of cpus
     try:
         from os import sched_getaffinity
-        print()
-        print(">>> OS claims %s CPUs are available..." % len(sched_getaffinity(0)))
+        logger.info("OS claims %d CPUs are available", len(sched_getaffinity(0)))
         ncpus = len(sched_getaffinity(0)) - 1
         # ncpus = 33 - 1
     except Exception as e:
         # ncpus = np.min([len(con_files), mp.cpu_count()])
-        print(">>> Could not query CPU affinity (%s: %s); falling back to 1 process"
-              % (type(e).__name__, e), flush=True)
+        logger.warning("Could not query CPU affinity (%s: %s); falling back to 1 process",
+                       type(e).__name__, e)
         ncpus = 1
 
     # ncpus = 1
@@ -94,11 +100,12 @@ def main():
             items.append((con_files[i], mag_files[i], dop_files[i], aia_files[i], mu_thresh, n_rings, datadir))
 
         # run in parellel
-        print(">>> Processing %s epochs with %s processes..." % (len(con_files), ncpus))
-        print()
+        logger.info("Processing %d epochs with %d processes", len(con_files), ncpus)
         t0 = time.time()
         pids = []
-        with get_context("spawn").Pool(ncpus, maxtasksperchild=4) as pool:
+        with get_context("spawn").Pool(ncpus, maxtasksperchild=4,
+                                       initializer=configure_logging,
+                                       initargs=(log_level,)) as pool:
             # get PIDs of workers
             for child in mp.active_children():
                 pids.append(child.pid)
@@ -122,13 +129,12 @@ def main():
         stitch_output_files(os.path.join(datadir, "thresholds.csv"), outfiles1, delete=delete)
         stitch_output_files(os.path.join(datadir, "region_output.csv"), outfiles2, delete=delete)
 
-        # print run time
-        print("Parallel: --- %s seconds ---" % (time.time() - t0))
+        # log run time
+        logger.info("Parallel run complete in %.1f seconds", time.time() - t0)
         print_run_summary(statuses)
     else:
         # run serially
-        print(">>> Processing %s epochs on a single process" % len(con_files))
-        print()
+        logger.info("Processing %d epochs on a single process", len(con_files))
         t0 = time.time()
         statuses = []
         for i in range(len(con_files)):
@@ -137,8 +143,8 @@ def main():
                                  mu_thresh=mu_thresh, n_rings=n_rings, datadir=datadir,
                                  plot_moat=False, classify_moat=False))
 
-        # print run time
-        print("Serial: --- %s seconds ---" % (time.time() - t0))
+        # log run time
+        logger.info("Serial run complete in %.1f seconds", time.time() - t0)
         print_run_summary(statuses)
     return None
 

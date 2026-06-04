@@ -1,6 +1,8 @@
 """Tests for the QUALITY bitmask decoder."""
 
-from sdo_clv_pipeline.quality import decode_quality, format_quality, hmi_quality_bits
+from sdo_clv_pipeline.quality import (decode_quality, format_quality, hmi_quality_bits,
+                                      is_tolerable_quality, combine_quality,
+                                      tolerable_quality_bits)
 
 
 def test_clean_flag_returns_empty():
@@ -53,3 +55,32 @@ def test_format_quality_clean_flag():
 def test_hmi_table_only_has_documented_bits():
     # guard against accidental edits adding out-of-range bit positions
     assert all(0 <= b <= 31 for b in hmi_quality_bits)
+
+
+def test_clean_quality_is_tolerable():
+    assert is_tolerable_quality(0)
+
+
+def test_soft_bits_are_tolerable():
+    # each tolerable bit alone, and combined, must pass
+    for b in tolerable_quality_bits:
+        assert is_tolerable_quality(1 << b)
+    combined = 0
+    for b in tolerable_quality_bits:
+        combined |= (1 << b)
+    assert is_tolerable_quality(combined)
+
+
+def test_fatal_bit_is_not_tolerable():
+    assert not is_tolerable_quality(0x200)            # bit 9, eclipse
+
+
+def test_one_fatal_bit_taints_otherwise_soft_flag():
+    # bit 16 (tolerable) + bit 9 (fatal) -> not tolerable
+    assert not is_tolerable_quality((1 << 16) | (1 << 9))
+
+
+def test_combine_quality_is_bitwise_or():
+    assert combine_quality(0x10000, 0, 0x10000, 0) == 0x10000
+    assert combine_quality(0, 0, 0, 0) == 0
+    assert combine_quality(1 << 16, 1 << 15, 0, 0) == (1 << 16) | (1 << 15)

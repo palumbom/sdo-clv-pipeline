@@ -1,6 +1,7 @@
 # necessary modules
 import numpy as np
 import sunpy as sp
+import logging
 import datetime as dt
 import os, re, pdb, csv, glob
 from astropy.io import fits
@@ -8,6 +9,21 @@ from astropy.time import Time
 from os.path import exists, split, isdir, getsize, splitext
 
 from .paths import root
+
+logger = logging.getLogger(__name__)
+
+# output CSV schemas (single source of truth; also imported by scripts/merge_output.py)
+header_thresholds = ["mjd", "aia_thresh", "a_aia", "b_aia", "c_aia",
+                     "hmi_thresh1", "hmi_thresh2", "a_hmi", "b_hmi", "c_hmi",
+                     "vel_cbs_off",
+                     "min_vel_sat", "max_vel_sat", "avg_vel_sat",
+                     "min_vel_rot", "max_vel_rot", "avg_vel_rot",
+                     "min_vel_mer", "max_vel_mer", "avg_vel_mer",
+                     "quality_flag"]
+header_region = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac",
+                 "light_frac", "v_hat", "v_phot", "v_quiet",
+                 "v_conv", "mag_unsigned", "avg_int", "avg_int_flat",
+                 "quality_flag"]
 
 # read headers and data
 def read_header(file):
@@ -42,11 +58,8 @@ def find_data(indir, globexp=""):
     dop_files = [dop_files[idx] for idx, date in enumerate(dop_dates) if date in common_dates]
     aia_files = [aia_files[idx] for idx, date in enumerate(aia_dates) if date in common_dates]
 
-    print("File counts:")
-    print("\t >>> CON:", len(con_files))
-    print("\t >>> MAG:", len(mag_files))
-    print("\t >>> DOP:", len(dop_files))
-    print("\t >>> AIA:", len(aia_files))
+    logger.info("File counts: CON=%d MAG=%d DOP=%d AIA=%d",
+                len(con_files), len(mag_files), len(dop_files), len(aia_files))
 
     return con_files, mag_files, dop_files, aia_files
 
@@ -113,16 +126,9 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
     fname1 = os.path.join(datadir, "thresholds.csv")
     fname2 = os.path.join(datadir, "region_output.csv")
 
-    # headers for output files
-    header1 = ["mjd", "aia_thresh", "a_aia", "b_aia", "c_aia",
-               "hmi_thresh1", "hmi_thresh2", "a_hmi", "b_hmi", "c_hmi",
-               "vel_cbs_off",
-               "min_vel_sat", "max_vel_sat", "avg_vel_sat",
-               "min_vel_rot", "max_vel_rot", "avg_vel_rot",
-               "min_vel_mer", "max_vel_mer", "avg_vel_mer"]
-    header2 = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac", 
-               "light_frac", "v_hat", "v_phot", "v_quiet", 
-               "v_conv", "mag_unsigned", "avg_int", "avg_int_flat"]
+    # headers for output files (defined once at module scope)
+    header1 = header_thresholds
+    header2 = header_region
 
     # replace/create/modify output files
     fileset = (fname1, fname2)

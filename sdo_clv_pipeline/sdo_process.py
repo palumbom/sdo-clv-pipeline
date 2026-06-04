@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import gc, os, re, pdb, csv, glob, time, argparse, traceback
+import gc, os, re, pdb, csv, glob, time, argparse, logging
 from astropy.time import Time
 from os.path import exists, split, isdir, getsize
 from multiprocessing import get_context
@@ -18,6 +18,8 @@ from .quality import *
 # multiprocessing imports
 from multiprocessing import get_context
 import multiprocessing as mp
+
+logger = logging.getLogger(__name__)
 
 # per-epoch outcome codes; STATUS_OK marks success, the SKIP_* codes name the
 # reason an epoch was skipped so callers can tally a run summary
@@ -55,7 +57,7 @@ def _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fi
     Returns ``(images, reason)`` where on success ``images`` is the 5-tuple
     ``(con, mag, dop, aia, mask)`` and ``reason`` is None, and on a skip
     ``images`` is None and ``reason`` is one of the module-level skip_* codes.
-    A specific diagnostic is printed at each skip point.
+    A specific diagnostic is logged at each skip point.
     """
     # assertions
     assert exists(con_file), "missing continuum file: " + str(con_file)
@@ -73,19 +75,24 @@ def _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fi
         try:
             images[label] = SDOImage(fname)
         except OSError as e:
-            print("\t >>> Invalid file, skipping %s: %s %s (%r)"
-                  % (iso, label, fname, e), flush=True)
+            logger.warning("Invalid file, skipping %s: %s %s (%r)", iso, label, fname, e)
             return None, skip_invalid_file
     con, mag, dop, aia = images["CON"], images["MAG"], images["DOP"], images["AIA"]
 
-    # check for data quality issue; report which instrument failed and decode bits
-    bad = [(label, images[label]) for label in ("CON", "MAG", "DOP", "AIA")
-           if not is_quality_data(images[label])]
-    if bad:
-        for label, im in bad:
-            print("\t >>> Quality skip %s: %s (%s)"
-                  % (iso, format_quality(im.instrument, im.quality), label), flush=True)
+    # check QUALITY flags: any fatal bit skips the epoch; tolerable (soft) bits are
+    # processed but warned about, and recorded downstream via the combined quality_flag
+    fatal = [(label, images[label]) for label in ("CON", "MAG", "DOP", "AIA")
+             if not is_tolerable_quality(images[label].quality)]
+    if fatal:
+        for label, im in fatal:
+            logger.warning("Quality skip %s: %s (%s)",
+                           iso, format_quality(im.instrument, im.quality), label)
         return None, skip_quality
+    flagged = [(label, images[label]) for label in ("CON", "MAG", "DOP", "AIA")
+               if images[label].quality != 0]
+    for label, im in flagged:
+        logger.warning("Quality warning %s: %s (%s) [tolerated, processing]",
+                       iso, format_quality(im.instrument, im.quality), label)
 
     # calculate geometries
     dop.calc_geometry()
@@ -99,10 +106,8 @@ def _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fi
     try:
         con.calc_limb_darkening()
         aia.calc_limb_darkening()
-    except Exception as e:
-        print("\t >>> Limb darkening fit failed, skipping %s: %s: %s"
-              % (iso, type(e).__name__, e), flush=True)
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Limb darkening fit failed, skipping %s", iso)
         return None, skip_limb_dark
 
     # correct magnetogram for foreshortening
@@ -114,8 +119,8 @@ def _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fi
     # check that the dopplergram correction went well
     v_rot_max = float(np.nanmax(np.abs(dop.v_rot)))
     if v_rot_max < 1000.0:
-        print("\t >>> Dopplergram correction failed %s: max|v_rot|=%.3f m/s < 1000.0, skipping"
-              % (iso, v_rot_max), flush=True)
+        logger.warning("Dopplergram correction failed %s: max|v_rot|=%.3f m/s < 1000.0, skipping",
+                       iso, v_rot_max)
         return None, skip_doppler
 
     # set values to nan for mu less than mu_thresh
@@ -129,10 +134,8 @@ def _reduce_sdo_images(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1, fi
         # print("About to construct SunMask")
         mask = SunMask(con, mag, dop, aia, **kwargs)
         mask.mask_low_mu(mu_thresh)
-    except Exception as e:
-        print("\t >>> Region identification failed, skipping %s: %s: %s"
-              % (iso, type(e).__name__, e), flush=True)
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Region identification failed, skipping %s", iso)
         return None, skip_regions
 
     return (con, mag, dop, aia, mask), None
@@ -154,7 +157,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                      datadir=None, **kwargs):
     """Run the full processing pipeline and persist per-epoch outputs."""
     iso = get_date(con_file).isoformat()
-    print(">>> Running epoch %s " % iso, flush=True)
+    logger.info("Running epoch %s", iso)
 
     # start the timer
     start_time = time.perf_counter()
@@ -181,6 +184,10 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
             return reason
         con, mag, dop, aia, mask = images
 
+        # single combined quality flag (bitwise-OR across instruments); nonzero means
+        # the epoch carried tolerated soft QUALITY bits and can be masked downstream
+        quality_flag = combine_quality(con.quality, mag.quality, dop.quality, aia.quality)
+
         # now that we have results, create the output files if needed
         for file in (fname1, fname2):
             if not exists(file):
@@ -195,7 +202,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                               np.nanmax(dop.v_cbs),
                               np.nanmin(dop.v_obs), np.nanmax(dop.v_obs), np.nanmean(dop.v_obs),
                               np.nanmin(dop.v_rot), np.nanmax(dop.v_rot), np.nanmean(dop.v_rot),
-                              np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer))
+                              np.nanmin(dop.v_mer), np.nanmax(dop.v_mer), np.nanmean(dop.v_mer),
+                              quality_flag)
 
         # flatten per-pixel arrays
         flat_mu = mask.mu.ravel()
@@ -239,7 +247,9 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                               region_codes, mu_thresh,
                                               n_rings, k_hat_con))
 
-        # write to disk
+        # tag every region row with the per-epoch quality flag, then write to disk
+        for row in results:
+            row.append(quality_flag)
         write_results_to_file(fname2, results)
 
         # do some memory cleanup (success path: all names are bound)
@@ -261,11 +271,10 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         end_time = time.perf_counter()
 
         # report success and return
-        print("\t >>> Run successfully in %s seconds" % str(end_time - start_time), flush=True)
+        logger.info("Epoch %s reduced successfully in %.2f seconds", iso, end_time - start_time)
         return status_ok
-    except Exception as e:
-        print("\t >>> Epoch %s failed unexpectedly: %s: %s" % (iso, type(e).__name__, e), flush=True)
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Epoch %s failed unexpectedly", iso)
         return skip_unknown
     finally:
         gc.collect()

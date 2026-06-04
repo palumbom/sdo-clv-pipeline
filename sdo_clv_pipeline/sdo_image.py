@@ -24,6 +24,7 @@ from .sdo_io import *
 from .limbdark import *
 from .legendre import *
 from .reproject import *
+from .geometry import pixel_to_hpc, hpc_to_hcc, hcc_to_hgs
 
 import sdo_clv_pipeline.plot_moats_data as plot_moats_data
 from sdo_clv_pipeline.plot_moats_data import load_and_plot
@@ -104,6 +105,54 @@ class SDOImage(object):
         return None
 
     def calc_geometry(self):
+        # Analytic replacement for the sunpy/astropy coordinate-transform chain.
+        # Reproduces calc_geometry_sunpy() (retained below) to numerical precision
+        # but skips per-pixel SkyCoord construction and frame transforms, which
+        # dominated runtime. See geometry.py and scripts/verify_geometry.py.
+
+        # the authoritative observer (B0, L0) comes from the same sunpy machinery
+        # the reference path uses; this is a cheap scalar lookup (~20 ms), unlike
+        # the per-pixel transforms it replaces
+        smap = sun_map(self.image, self.head)
+        obs = smap.observer_coordinate
+        b0 = obs.lat.to_value(u.rad)
+        l0 = obs.lon.to_value(u.rad)
+
+        # helioprojective Tx, Ty (radians) via low-level WCS (no SkyCoord)
+        Tx, Ty = pixel_to_hpc(self.wcs, self.naxis1, self.naxis2)
+        self.rsun_solrad = self.dsun_obs / self.rsun_ref
+
+        # HPC -> Heliocentric (meters); off-disk pixels become NaN
+        x, y, z = hpc_to_hcc(Tx, Ty, self.dsun_obs, self.rsun_ref)
+        self.xx = x * u.m
+        self.yy = y * u.m
+
+        # radial coordinate in solar radii (same formula/units as the sunpy path)
+        Tx_arcsec = (Tx * u.rad).to_value(u.arcsec)
+        Ty_arcsec = (Ty * u.rad).to_value(u.arcsec)
+        self.rr = (np.sqrt(Tx_arcsec**2 + Ty_arcsec**2) / self.rsun_obs) * u.dimensionless_unscaled
+
+        # HCC -> Heliographic Stonyhurst (with observer Stonyhurst longitude L0)
+        lon, lat = hcc_to_hgs(x, y, z, b0, l0)
+        self.lat = (np.rad2deg(lat) + 90.0) * u.deg
+        self.lon = np.rad2deg(lon) * u.deg
+
+        # calculate the pixel areas (unchanged helper)
+        self.pix_area = calculate_pixel_area(self.lat, self.lon)
+
+        # get mu (identical to the sunpy path)
+        rr2 = self.rr.value**2.0
+        diff = 1.0 - rr2
+        np.clip(diff, 0.0, None, out=diff)
+        with np.errstate(invalid='ignore'):
+            np.sqrt(diff, out=diff)
+        self.mu = diff.astype(self.image.dtype)
+        self.mu[rr2 >= 1.0] = np.nan
+        return None
+
+    def calc_geometry_sunpy(self):
+        # Reference implementation (slow). Retained as the verification oracle for
+        # the analytic calc_geometry above; not used in the production pipeline.
         # methods adapted from https://arxiv.org/abs/2105.12055
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
         # get sun map

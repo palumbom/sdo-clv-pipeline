@@ -288,9 +288,11 @@
 
 <span class="sd">&quot;&quot;&quot;Legendre basis helpers used for dopplergram bulk-velocity fits.&quot;&quot;&quot;</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">pi</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">eval_legendre</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
 
 
 <div class="viewcode-block" id="gen_leg_vec">
@@ -352,10 +354,14 @@
 <span class="sd">    lmax : int</span>
 <span class="sd">        Maximum degree of the Legendre series.</span>
 <span class="sd">    x : astropy.units.Quantity</span>
-<span class="sd">        Coordinate in degrees (converted to radians internally).</span>
+<span class="sd">        Dimensionless disk-plane radial coordinate (rho in [0, 1]). Used directly</span>
+<span class="sd">        as the Legendre argument, matching the upstream hmi-clean-ls gen_leg_x.</span>
+<span class="sd">        (A previous version erroneously scaled this by pi/180 as if it were an</span>
+<span class="sd">        angle in degrees, which collapsed the argument to ~[0, 0.017] and made</span>
+<span class="sd">        the fit_cbs=True normal-equations system singular; cond ~3e18.)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># switch to radians</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
+    <span class="c1"># rho is already the (dimensionless) Legendre argument; no angle conversion</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span>
 
     <span class="c1"># degree index l=0…lmax</span>
     <span class="n">ell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -385,6 +391,128 @@
     <span class="n">leg_d1_out</span> <span class="o">=</span> <span class="n">leg_dx</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_l</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">leg_out</span><span class="p">,</span> <span class="n">leg_d1_out</span></div>
 
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Fused numba kernels for the dopplergram bulk-velocity fit.</span>
+<span class="c1">#</span>
+<span class="c1"># These reproduce, in a single per-pixel pass, the design-matrix construction in</span>
+<span class="c1"># SDOImage.calc_bulk_vel: the theta basis from gen_leg_vec (derivative form,</span>
+<span class="c1"># degrees l=1..5) and the rho basis from gen_leg_x_vec (value form, l=0..5),</span>
+<span class="c1"># combined with the projection factors lt, lp. Instead of materializing the</span>
+<span class="c1"># (n_poly x N) design matrix and ~6 (6 x N) Legendre intermediates, we directly</span>
+<span class="c1"># accumulate the normal-equations A (n_poly x n_poly) and RHS (n_poly), then a</span>
+<span class="c1"># second pass reconstructs the velocity components. Single-threaded, so it is</span>
+<span class="c1"># safe under the per-epoch multiprocessing pool.</span>
+<span class="c1">#</span>
+<span class="c1"># Normalizations match gen_leg_vec / gen_leg_x_vec exactly:</span>
+<span class="c1">#   norm_l   = sqrt(l(l+1)), with norm_l[0] := 1</span>
+<span class="c1">#   norm_sht = sqrt(2l+1)</span>
+<span class="c1">#   basis scaling = norm_sht[l] / (sqrt(2) * norm_l[l])</span>
+<span class="c1"># theta basis additionally carries the -sin(theta) factor and uses the Legendre</span>
+<span class="c1"># derivative dP_l/dz; rho basis uses P_l(x) directly with x = rho * pi/180.</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="c1"># precomputed norm_sht[l] / (sqrt(2)*norm_l[l]) for l = 0..5</span>
+<span class="n">_SQRT2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">basis_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">_SQRT2</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">),</span>                        <span class="c1"># l=0 (norm_l[0] := 1)</span>
+    <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">_SQRT2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)),</span>  <span class="c1"># l=1</span>
+    <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">_SQRT2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span><span class="p">)),</span>  <span class="c1"># l=2</span>
+    <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">7.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">_SQRT2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">12.0</span><span class="p">)),</span> <span class="c1"># l=3</span>
+    <span class="mf">3.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">_SQRT2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">20.0</span><span class="p">)),</span>            <span class="c1"># l=4 (sqrt(9)=3)</span>
+    <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">11.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">_SQRT2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">30.0</span><span class="p">)),</span><span class="c1"># l=5</span>
+<span class="p">])</span>
+
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bulk_vel_basis</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fill b[0:n_poly] with the bulk-velocity design row for one pixel.&quot;&quot;&quot;</span>
+    <span class="n">deg2rad</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">lat_deg</span> <span class="o">*</span> <span class="n">deg2rad</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">sint</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">lon_deg</span> <span class="o">*</span> <span class="n">deg2rad</span>
+    <span class="n">cphi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">sphi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+
+    <span class="n">lt</span> <span class="o">=</span> <span class="n">sin_B0</span> <span class="o">*</span> <span class="n">sint</span> <span class="o">-</span> <span class="n">cos_B0</span> <span class="o">*</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">cphi</span>
+    <span class="n">lp</span> <span class="o">=</span> <span class="n">cos_B0</span> <span class="o">*</span> <span class="n">sphi</span>
+
+    <span class="c1"># Legendre P_l(cost), l=0..5 (standard recurrence, matches eval_legendre)</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">cost</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">p3</span> <span class="o">=</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span>
+    <span class="n">p4</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.0</span> <span class="o">*</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p3</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">p2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span>
+    <span class="n">p5</span> <span class="o">=</span> <span class="p">(</span><span class="mf">9.0</span> <span class="o">*</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p4</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">p3</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.0</span>
+
+    <span class="c1"># derivative dP_l/dz = l*(P_{l-1} - z*P_l)/(1 - z^2), z = cost</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">cost</span>
+    <span class="n">dp1</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">p0</span> <span class="o">-</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">dp2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p2</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">dp3</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p3</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">dp4</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">p3</span> <span class="o">-</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p4</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">dp5</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">p4</span> <span class="o">-</span> <span class="n">cost</span> <span class="o">*</span> <span class="n">p5</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+
+    <span class="c1"># theta basis dt_pl_theta[l] = -sint * dP_l * scale[l]</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="o">-</span><span class="n">sint</span>
+    <span class="n">dt1</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">dp1</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dt2</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">dp2</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">dt3</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">dp3</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">dt4</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">dp4</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">dt5</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">dp5</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt1</span> <span class="o">*</span> <span class="n">lp</span>
+    <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt3</span> <span class="o">*</span> <span class="n">lp</span>
+    <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt5</span> <span class="o">*</span> <span class="n">lp</span>
+    <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt2</span> <span class="o">*</span> <span class="n">lt</span>
+    <span class="n">b</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt4</span> <span class="o">*</span> <span class="n">lt</span>
+
+    <span class="k">if</span> <span class="n">n_poly</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="c1"># rho is the dimensionless Legendre argument directly (see gen_leg_x_vec)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rho</span>
+        <span class="n">px0</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">b</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">px0</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">n_poly</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">px1</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">px2</span> <span class="o">=</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">px1</span> <span class="o">-</span> <span class="n">px0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="n">px3</span> <span class="o">=</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">px2</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">px1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span>
+            <span class="n">px4</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">px3</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">px2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span>
+            <span class="n">px5</span> <span class="o">=</span> <span class="p">(</span><span class="mf">9.0</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">px4</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">px3</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.0</span>
+            <span class="n">b</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">px1</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">b</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">px2</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">b</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">px3</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">b</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">px4</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">px5</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+
+
+<span class="nd">@njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bulk_vel_design</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the design matrix (n_poly x N) for the bulk-velocity fit.</span>
+
+<span class="sd">    Drop-in fast replacement for the gen_leg_vec / gen_leg_x_vec basis generation</span>
+<span class="sd">    plus the im_arr assembly in calc_bulk_vel: same columns, generated by an</span>
+<span class="sd">    in-kernel Legendre recurrence instead of scipy.special.eval_legendre, and</span>
+<span class="sd">    without the six (6 x N) Legendre intermediates. The caller then runs the</span>
+<span class="sd">    identical normal-equations solve (im_arr @ im_arr.T), which keeps results</span>
+<span class="sd">    faithful even for the ill-conditioned fit_cbs=True system.</span>
+
+<span class="sd">    Returns im_arr with shape (n_poly, N), matching the original layout. Each</span>
+<span class="sd">    pixel writes a disjoint column, so the prange loop is thread-count invariant</span>
+<span class="sd">    (identical results on 1 vs many threads); thread count is set at runtime via</span>
+<span class="sd">    parallel.set_compute_threads (default 1). The per-pixel basis buffer is</span>
+<span class="sd">    allocated inside the loop so it is private to each thread.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">lat_deg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">im_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_poly</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_poly</span><span class="p">)</span>
+        <span class="n">_bulk_vel_basis</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lon_deg</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_poly</span><span class="p">):</span>
+            <span class="n">im_arr</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">im_arr</span>
 </pre></div>
 
                 </article>

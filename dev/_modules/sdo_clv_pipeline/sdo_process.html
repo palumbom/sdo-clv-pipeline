@@ -286,7 +286,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span><span class="o">,</span><span class="w"> </span><span class="nn">pdb</span><span class="o">,</span><span class="w"> </span><span class="nn">csv</span><span class="o">,</span><span class="w"> </span><span class="nn">glob</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span><span class="o">,</span><span class="w"> </span><span class="nn">argparse</span><span class="o">,</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span><span class="o">,</span><span class="w"> </span><span class="nn">pdb</span><span class="o">,</span><span class="w"> </span><span class="nn">csv</span><span class="o">,</span><span class="w"> </span><span class="nn">glob</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span><span class="o">,</span><span class="w"> </span><span class="nn">argparse</span><span class="o">,</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">exists</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">getsize</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_context</span>
@@ -302,6 +302,8 @@
 <span class="c1"># multiprocessing imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_context</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="c1"># per-epoch outcome codes; STATUS_OK marks success, the SKIP_* codes name the</span>
 <span class="c1"># reason an epoch was skipped so callers can tally a run summary</span>
@@ -345,7 +347,7 @@
 <span class="sd">    Returns ``(images, reason)`` where on success ``images`` is the 5-tuple</span>
 <span class="sd">    ``(con, mag, dop, aia, mask)`` and ``reason`` is None, and on a skip</span>
 <span class="sd">    ``images`` is None and ``reason`` is one of the module-level skip_* codes.</span>
-<span class="sd">    A specific diagnostic is printed at each skip point.</span>
+<span class="sd">    A specific diagnostic is logged at each skip point.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># assertions</span>
     <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">con_file</span><span class="p">),</span> <span class="s2">&quot;missing continuum file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">con_file</span><span class="p">)</span>
@@ -363,19 +365,24 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">SDOImage</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Invalid file, skipping </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%r</span><span class="s2">)&quot;</span>
-                  <span class="o">%</span> <span class="p">(</span><span class="n">iso</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Invalid file, skipping </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%r</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_invalid_file</span>
     <span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;CON&quot;</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;MAG&quot;</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;DOP&quot;</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;AIA&quot;</span><span class="p">]</span>
 
-    <span class="c1"># check for data quality issue; report which instrument failed and decode bits</span>
-    <span class="n">bad</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="s2">&quot;MAG&quot;</span><span class="p">,</span> <span class="s2">&quot;DOP&quot;</span><span class="p">,</span> <span class="s2">&quot;AIA&quot;</span><span class="p">)</span>
-           <span class="k">if</span> <span class="ow">not</span> <span class="n">is_quality_data</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])]</span>
-    <span class="k">if</span> <span class="n">bad</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">bad</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Quality skip </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span>
-                  <span class="o">%</span> <span class="p">(</span><span class="n">iso</span><span class="p">,</span> <span class="n">format_quality</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">im</span><span class="o">.</span><span class="n">quality</span><span class="p">),</span> <span class="n">label</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># check QUALITY flags: any fatal bit skips the epoch; tolerable (soft) bits are</span>
+    <span class="c1"># processed but warned about, and recorded downstream via the combined quality_flag</span>
+    <span class="n">fatal</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="s2">&quot;MAG&quot;</span><span class="p">,</span> <span class="s2">&quot;DOP&quot;</span><span class="p">,</span> <span class="s2">&quot;AIA&quot;</span><span class="p">)</span>
+             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_tolerable_quality</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">quality</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">fatal</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">fatal</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Quality skip </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                           <span class="n">iso</span><span class="p">,</span> <span class="n">format_quality</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">im</span><span class="o">.</span><span class="n">quality</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_quality</span>
+    <span class="n">flagged</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="s2">&quot;MAG&quot;</span><span class="p">,</span> <span class="s2">&quot;DOP&quot;</span><span class="p">,</span> <span class="s2">&quot;AIA&quot;</span><span class="p">)</span>
+               <span class="k">if</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">quality</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">flagged</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Quality warning </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">) [tolerated, processing]&quot;</span><span class="p">,</span>
+                       <span class="n">iso</span><span class="p">,</span> <span class="n">format_quality</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">im</span><span class="o">.</span><span class="n">quality</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span>
 
     <span class="c1"># calculate geometries</span>
     <span class="n">dop</span><span class="o">.</span><span class="n">calc_geometry</span><span class="p">()</span>
@@ -389,10 +396,8 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">con</span><span class="o">.</span><span class="n">calc_limb_darkening</span><span class="p">()</span>
         <span class="n">aia</span><span class="o">.</span><span class="n">calc_limb_darkening</span><span class="p">()</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Limb darkening fit failed, skipping </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span>
-              <span class="o">%</span> <span class="p">(</span><span class="n">iso</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Limb darkening fit failed, skipping </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_limb_dark</span>
 
     <span class="c1"># correct magnetogram for foreshortening</span>
@@ -404,8 +409,8 @@
     <span class="c1"># check that the dopplergram correction went well</span>
     <span class="n">v_rot_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_rot</span><span class="p">)))</span>
     <span class="k">if</span> <span class="n">v_rot_max</span> <span class="o">&lt;</span> <span class="mf">1000.0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Dopplergram correction failed </span><span class="si">%s</span><span class="s2">: max|v_rot|=</span><span class="si">%.3f</span><span class="s2"> m/s &lt; 1000.0, skipping&quot;</span>
-              <span class="o">%</span> <span class="p">(</span><span class="n">iso</span><span class="p">,</span> <span class="n">v_rot_max</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Dopplergram correction failed </span><span class="si">%s</span><span class="s2">: max|v_rot|=</span><span class="si">%.3f</span><span class="s2"> m/s &lt; 1000.0, skipping&quot;</span><span class="p">,</span>
+                       <span class="n">iso</span><span class="p">,</span> <span class="n">v_rot_max</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_doppler</span>
 
     <span class="c1"># set values to nan for mu less than mu_thresh</span>
@@ -419,10 +424,8 @@
         <span class="c1"># print(&quot;About to construct SunMask&quot;)</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">SunMask</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">mask</span><span class="o">.</span><span class="n">mask_low_mu</span><span class="p">(</span><span class="n">mu_thresh</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Region identification failed, skipping </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span>
-              <span class="o">%</span> <span class="p">(</span><span class="n">iso</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Region identification failed, skipping </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_regions</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span><span class="p">,</span> <span class="n">mask</span><span class="p">),</span> <span class="kc">None</span>
@@ -449,7 +452,7 @@
                      <span class="n">datadir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the full processing pipeline and persist per-epoch outputs.&quot;&quot;&quot;</span>
     <span class="n">iso</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">con_file</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt; Running epoch </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">iso</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running epoch </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
 
     <span class="c1"># start the timer</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -476,6 +479,10 @@
             <span class="k">return</span> <span class="n">reason</span>
         <span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">images</span>
 
+        <span class="c1"># single combined quality flag (bitwise-OR across instruments); nonzero means</span>
+        <span class="c1"># the epoch carried tolerated soft QUALITY bits and can be masked downstream</span>
+        <span class="n">quality_flag</span> <span class="o">=</span> <span class="n">combine_quality</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">mag</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">dop</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">aia</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span>
+
         <span class="c1"># now that we have results, create the output files if needed</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">(</span><span class="n">fname1</span><span class="p">,</span> <span class="n">fname2</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
@@ -490,7 +497,8 @@
                               <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_cbs</span><span class="p">),</span>
                               <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_obs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_obs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_obs</span><span class="p">),</span>
                               <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_rot</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_rot</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_rot</span><span class="p">),</span>
-                              <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_mer</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_mer</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_mer</span><span class="p">))</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_mer</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_mer</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_mer</span><span class="p">),</span>
+                              <span class="n">quality_flag</span><span class="p">)</span>
 
         <span class="c1"># flatten per-pixel arrays</span>
         <span class="n">flat_mu</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">mu</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -508,6 +516,11 @@
         <span class="n">w_quiet</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">is_quiet_sun</span><span class="p">()</span>
         <span class="n">k_hat_con</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">image</span> <span class="o">*</span> <span class="n">con</span><span class="o">.</span><span class="n">ldark</span> <span class="o">*</span> <span class="n">w_quiet</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">ldark</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">w_quiet</span><span class="p">)</span>
 
+        <span class="c1"># shared per-pixel weighted products (computed once, reused by all three</span>
+        <span class="c1"># aggregations below instead of being recomputed in each)</span>
+        <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span> <span class="o">=</span> <span class="n">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
+                                                 <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">)</span>
+
         <span class="c1"># create arrays to hold velocity, magnetic field, and pixel fraction results</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -515,7 +528,8 @@
         <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compute_disk_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span>
                                             <span class="n">flat_v_rot</span><span class="p">,</span> <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span>
                                             <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span>
-                                            <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">))</span>
+                                            <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
+                                            <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">))</span>
 
         <span class="c1"># calculate velocities for regions, not binning by mu</span>
         <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_only_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span>
@@ -524,7 +538,8 @@
                                                    <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span>
                                                    <span class="n">flat_w_active</span><span class="p">,</span>
                                                    <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span>
-                                                   <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">))</span>
+                                                   <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
+                                                   <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">))</span>
 
         <span class="c1"># calculate disk-resovled quantities</span>
         <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span>
@@ -532,9 +547,12 @@
                                               <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span>
                                               <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span>
                                               <span class="n">region_codes</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span>
-                                              <span class="n">n_rings</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">))</span>
+                                              <span class="n">n_rings</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
+                                              <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">))</span>
 
-        <span class="c1"># write to disk</span>
+        <span class="c1"># tag every region row with the per-epoch quality flag, then write to disk</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quality_flag</span><span class="p">)</span>
         <span class="n">write_results_to_file</span><span class="p">(</span><span class="n">fname2</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
 
         <span class="c1"># do some memory cleanup (success path: all names are bound)</span>
@@ -556,11 +574,10 @@
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
         <span class="c1"># report success and return</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Run successfully in </span><span class="si">%s</span><span class="s2"> seconds&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">%s</span><span class="s2"> reduced successfully in </span><span class="si">%.2f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">status_ok</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> &gt;&gt;&gt; Epoch </span><span class="si">%s</span><span class="s2"> failed unexpectedly: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">iso</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">%s</span><span class="s2"> failed unexpectedly&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">skip_unknown</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span></div>

@@ -331,6 +331,8 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage"><code class="docutils literal notranslate"><span class="pre">SDOImage</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.parse_header"><code class="docutils literal notranslate"><span class="pre">SDOImage.parse_header()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_numpy"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry_numpy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_sunpy"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry_sunpy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.inherit_geometry()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_magnetogram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_magnetogram()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_dopplergram()</span></code></a></li>
@@ -341,6 +343,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.correct_dopplergram()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_spacecraft_vel()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_bulk_vel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel_numpy"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_bulk_vel_numpy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_limb_darkening()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi"><code class="docutils literal notranslate"><span class="pre">SDOImage.rescale_to_hmi()</span></code></a></li>
 </ul>
@@ -411,6 +414,16 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_numpy">
+<span class="sig-name descname"><span class="pre">calc_geometry_numpy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_geometry_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_numpy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_sunpy">
+<span class="sig-name descname"><span class="pre">calc_geometry_sunpy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_geometry_sunpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_sunpy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry">
 <span class="sig-name descname"><span class="pre">inherit_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.inherit_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -465,6 +478,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel">
 <span class="sig-name descname"><span class="pre">calc_bulk_vel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_cbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_bulk_vel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel_numpy">
+<span class="sig-name descname"><span class="pre">calc_bulk_vel_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fit_cbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_image.html#SDOImage.calc_bulk_vel_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel_numpy" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -655,14 +673,29 @@ for the end-of-run summary.</p>
 <span class="sd-summary-text">sdo_clv_pipeline.reproject</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <dl class="py function">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.reproject.compute_pixel_mapping">
-<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.reproject.</span></span><span class="sig-name descname"><span class="pre">compute_pixel_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/reproject.html#compute_pixel_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.reproject.compute_pixel_mapping" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.reproject.</span></span><span class="sig-name descname"><span class="pre">compute_pixel_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_wcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/reproject.html#compute_pixel_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.reproject.compute_pixel_mapping" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Compute source pixel coordinates for each destination pixel.</p>
+<p class="sd-card-text">Fast path that preserves the <em>exact</em> high-level transform physics (including
+the cross-observer parallax between the HMI and AIA exposures, which a pure
+2D WCS composition would drop). The destination-&gt;source pixel map is a very
+smooth, near-affine TAN-&gt;TAN warp, so the expensive SkyCoord transform is
+evaluated only on a coarse subgrid (every <code class="docutils literal notranslate"><span class="pre">stride</span></code> pixels) and bilinearly
+upsampled to full resolution. With stride=8 this is ~64x fewer SkyCoord
+transforms, reducing ~12 s to &lt;1 s while matching the reference to well under
+0.01 px on disk.</p>
+<p class="sd-card-text">Off-disk coarse nodes come back as NaN (the high-level transform projects
+through the solar surface); they are nearest-filled before upsampling so the
+usable disk is not eroded. Any residual error stays in the <code class="docutils literal notranslate"><span class="pre">mu</span> <span class="pre">&lt;</span> <span class="pre">mu_thresh</span></code>
+limb ring that is masked downstream. The original full-resolution
+implementation is retained as <code class="docutils literal notranslate"><span class="pre">compute_pixel_mapping_highlevel</span></code> and used as
+the verification oracle in <code class="docutils literal notranslate"><span class="pre">scripts/verify_geometry.py</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p class="sd-card-text"><strong>src_wcs</strong> (<em>astropy.wcs.WCS</em>) – Source image WCS.</p></li>
 <li><p class="sd-card-text"><strong>dst_wcs</strong> (<em>astropy.wcs.WCS</em>) – Destination image WCS.</p></li>
 <li><p class="sd-card-text"><strong>shape</strong> (<em>tuple</em>) – Destination image shape as (H, W).</p></li>
+<li><p class="sd-card-text"><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – Coarse-grid spacing in pixels. Smaller is more accurate but slower.</p></li>
 </ul>
 </dd>
 </dl>
@@ -672,6 +705,9 @@ for the end-of-run summary.</p>
 <dt class="sig sig-object py" id="sdo_clv_pipeline.reproject.bilinear_reproject">
 <span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.reproject.</span></span><span class="sig-name descname"><span class="pre">bilinear_reproject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/reproject.html#bilinear_reproject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.reproject.bilinear_reproject" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Bilinearly sample src into dst using precomputed pixel mappings.</p>
+<p class="sd-card-text">Each output pixel is independent, so the prange loop is thread-count
+invariant; thread count is set at runtime via parallel.set_compute_threads
+(default 1, safe under the across-epoch pool).</p>
 </dd></dl>
 
 </div>
@@ -727,6 +763,8 @@ for the end-of-run summary.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage"><code class="docutils literal notranslate"><span class="pre">SDOImage</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.parse_header"><code class="docutils literal notranslate"><span class="pre">SDOImage.parse_header()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_numpy"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry_numpy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_sunpy"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_geometry_sunpy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.inherit_geometry"><code class="docutils literal notranslate"><span class="pre">SDOImage.inherit_geometry()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_magnetogram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_magnetogram()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.is_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.is_dopplergram()</span></code></a></li>
@@ -737,6 +775,7 @@ for the end-of-run summary.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.correct_dopplergram"><code class="docutils literal notranslate"><span class="pre">SDOImage.correct_dopplergram()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_spacecraft_vel()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_bulk_vel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_bulk_vel_numpy"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_bulk_vel_numpy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening"><code class="docutils literal notranslate"><span class="pre">SDOImage.calc_limb_darkening()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi"><code class="docutils literal notranslate"><span class="pre">SDOImage.rescale_to_hmi()</span></code></a></li>
 </ul>

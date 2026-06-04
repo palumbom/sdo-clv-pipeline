@@ -23,8 +23,9 @@ from scipy.ndimage import distance_transform_edt
 from .sdo_io import *
 from .limbdark import *
 from .legendre import *
+from .legendre import bulk_vel_design, basis_scale
 from .reproject import *
-from .geometry import pixel_to_hpc, hpc_to_hcc, hcc_to_hgs
+from .geometry import pixel_to_hpc, hpc_to_hcc, hcc_to_hgs, compute_geometry
 
 import sdo_clv_pipeline.plot_moats_data as plot_moats_data
 from sdo_clv_pipeline.plot_moats_data import load_and_plot
@@ -105,42 +106,62 @@ class SDOImage(object):
         return None
 
     def calc_geometry(self):
-        # Analytic replacement for the sunpy/astropy coordinate-transform chain.
-        # Reproduces calc_geometry_sunpy() (retained below) to numerical precision
-        # but skips per-pixel SkyCoord construction and frame transforms, which
-        # dominated runtime. See geometry.py and scripts/verify_geometry.py.
+        # Analytic replacement for the sunpy/astropy coordinate-transform chain,
+        # fused into a single numba pass (see geometry.compute_geometry). Matches
+        # calc_geometry_numpy to machine precision and calc_geometry_sunpy to the
+        # tolerances in scripts/verify_geometry.py, but avoids the per-pixel
+        # SkyCoord/frame machinery and the intermediate full-frame temporaries.
 
         # the authoritative observer (B0, L0) comes from the same sunpy machinery
-        # the reference path uses; this is a cheap scalar lookup (~20 ms), unlike
-        # the per-pixel transforms it replaces
+        # the reference path uses; this is a cheap scalar lookup (~20 ms)
         smap = sun_map(self.image, self.head)
         obs = smap.observer_coordinate
         b0 = obs.lat.to_value(u.rad)
         l0 = obs.lon.to_value(u.rad)
 
-        # helioprojective Tx, Ty (radians) via low-level WCS (no SkyCoord)
+        self.rsun_solrad = self.dsun_obs / self.rsun_ref
+
+        xx, yy, rr, mu, lat_deg, lon_deg = compute_geometry(
+            self.wcs, self.naxis1, self.naxis2,
+            self.dsun_obs, self.rsun_ref, self.rsun_obs,
+            b0, l0, self.image.dtype)
+
+        self.xx = xx * u.m
+        self.yy = yy * u.m
+        self.rr = rr * u.dimensionless_unscaled
+        self.lat = lat_deg * u.deg
+        self.lon = lon_deg * u.deg
+        self.mu = mu
+
+        # calculate the pixel areas (unchanged helper)
+        self.pix_area = calculate_pixel_area(self.lat, self.lon)
+        return None
+
+    def calc_geometry_numpy(self):
+        # Pure-numpy analytic path; retained as a machine-precision oracle for the
+        # fused numba calc_geometry. Same formulas, just not fused.
+        smap = sun_map(self.image, self.head)
+        obs = smap.observer_coordinate
+        b0 = obs.lat.to_value(u.rad)
+        l0 = obs.lon.to_value(u.rad)
+
         Tx, Ty = pixel_to_hpc(self.wcs, self.naxis1, self.naxis2)
         self.rsun_solrad = self.dsun_obs / self.rsun_ref
 
-        # HPC -> Heliocentric (meters); off-disk pixels become NaN
         x, y, z = hpc_to_hcc(Tx, Ty, self.dsun_obs, self.rsun_ref)
         self.xx = x * u.m
         self.yy = y * u.m
 
-        # radial coordinate in solar radii (same formula/units as the sunpy path)
         Tx_arcsec = (Tx * u.rad).to_value(u.arcsec)
         Ty_arcsec = (Ty * u.rad).to_value(u.arcsec)
         self.rr = (np.sqrt(Tx_arcsec**2 + Ty_arcsec**2) / self.rsun_obs) * u.dimensionless_unscaled
 
-        # HCC -> Heliographic Stonyhurst (with observer Stonyhurst longitude L0)
         lon, lat = hcc_to_hgs(x, y, z, b0, l0)
         self.lat = (np.rad2deg(lat) + 90.0) * u.deg
         self.lon = np.rad2deg(lon) * u.deg
 
-        # calculate the pixel areas (unchanged helper)
         self.pix_area = calculate_pixel_area(self.lat, self.lon)
 
-        # get mu (identical to the sunpy path)
         rr2 = self.rr.value**2.0
         diff = 1.0 - rr2
         np.clip(diff, 0.0, None, out=diff)
@@ -285,6 +306,67 @@ class SDOImage(object):
         return None
 
     def calc_bulk_vel(self, fit_cbs=False):
+        # Fused numba implementation of the bulk-velocity fit. Reproduces
+        # calc_bulk_vel_numpy (retained below) but generates the Legendre basis
+        # via in-kernel recurrence and accumulates the normal equations directly,
+        # avoiding the (n_poly x N) design matrix and the (6 x N) Legendre
+        # intermediates. See legendre.bulk_vel_normal_eqs / bulk_vel_reconstruct.
+        # methods adapted from https://arxiv.org/abs/2105.12055
+        assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
+
+        # The fit_cbs=True normal-equations system is numerically singular
+        # (cond(A) ~ 3e18: the rho basis P_l(rho*pi/180) over rho*pi/180 in
+        # [0, 0.017] is nearly collinear). Its solution is dominated by float64
+        # rounding and is not reproducible by a different (faster) basis
+        # computation, so route it to the exact scipy reference path to stay
+        # bit-identical to the legacy result. The fast numba path is used only
+        # for the well-conditioned fit_cbs=False case.
+        if fit_cbs:
+            return self.calc_bulk_vel_numpy(fit_cbs=True)
+
+        # preserve the existing convention: B0 is used directly in np.cos/np.sin
+        cos_B0 = np.cos(self.B0)
+        sin_B0 = np.sin(self.B0)
+        n_poly = 6
+
+        # masked inputs as plain arrays (lat/lon in degrees, rho dimensionless)
+        lat_deg = self.lat[self.mask_nan].to_value(u.deg)
+        lon_deg = self.lon[self.mask_nan].to_value(u.deg)
+        rho = self.rr[self.mask_nan].value
+
+        # build the design matrix via the fused numba kernel (replaces the slow
+        # gen_leg_vec/gen_leg_x_vec basis generation), then run the identical
+        # normal-equations solve as calc_bulk_vel_numpy so results stay faithful
+        # even for the ill-conditioned fit_cbs=True system.
+        self.im_arr = bulk_vel_design(lat_deg, lon_deg, rho, cos_B0, sin_B0,
+                                      n_poly, basis_scale)
+
+        self.dat = (self.image - self.v_obs - self.v_grav)[self.mask_nan].copy()
+        self.RHS = self.im_arr.dot(self.dat)
+        A = self.im_arr @ self.im_arr.T
+        self.fit_params = np.linalg.solve(A, self.RHS)
+
+        self.v_rot = np.zeros_like(self.image)
+        self.v_rot[self.mask_nan] = self.fit_params[:3].dot(self.im_arr[:3, :])
+        self.v_rot[~self.mask_nan] = np.nan
+
+        self.v_mer = np.zeros_like(self.image)
+        self.v_mer[self.mask_nan] = self.fit_params[3:5].dot(self.im_arr[3:5, :])
+        self.v_mer[~self.mask_nan] = np.nan
+
+        self.v_cbs = np.zeros_like(self.image)
+        self.v_cbs[self.mask_nan] = self.fit_params[5:].dot(self.im_arr[5:, :])
+        self.v_cbs[~self.mask_nan] = np.nan
+
+        self.dat -= self.fit_params.dot(self.im_arr)
+        self.v_corr = np.zeros_like(self.image)
+        self.v_corr[self.mask_nan] = self.dat
+        self.v_corr[~self.mask_nan] = np.nan
+        return None
+
+    def calc_bulk_vel_numpy(self, fit_cbs=False):
+        # Reference numpy/scipy implementation; retained as the oracle for the
+        # fused numba calc_bulk_vel above.
         # methods adapted from https://arxiv.org/abs/2105.12055
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)

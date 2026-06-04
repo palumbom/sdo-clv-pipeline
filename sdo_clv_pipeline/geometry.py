@@ -19,8 +19,13 @@ Conventions (matched to sunpy):
 Reference: Thompson, W. T. 2006, A&A 449, 791.
 """
 
+import math
 import numpy as np
 import astropy.units as u
+from numba import njit
+
+_RAD2DEG = 180.0 / math.pi
+_RAD2ARCSEC = _RAD2DEG * 3600.0
 
 
 def pixel_to_hpc(wcs, naxis1, naxis2):
@@ -130,3 +135,86 @@ def hcc_to_hgs(x, y, z, b0, l0=0.0):
     lat = np.arcsin(hgs_z / r)
     lon = np.arctan2(hgs_y, hgs_x) + l0
     return lon, lat
+
+
+@njit(cache=True)
+def _geometry_kernel(Tx, Ty, dsun, rsun, rsun_obs, cos_b0, sin_b0, l0,
+                     xx, yy, rr, mu, lat_deg, lon_deg):
+    """Single fused pass computing all geometry arrays from Tx, Ty (radians).
+
+    Reproduces the numpy chain hpc_to_hcc -> hcc_to_hgs plus rr/mu in one loop,
+    avoiding ~10 intermediate full-frame temporaries. Single-threaded so it does
+    not oversubscribe the per-epoch worker pool. Off-disk pixels (negative
+    discriminant) get NaN for xx/yy/lat/lon, matching the numpy/sunpy paths; mu
+    is set to NaN wherever rr >= 1 (independent of the disc test, as before).
+    """
+    n = Tx.shape[0]
+    d2 = dsun * dsun - rsun * rsun
+    for i in range(n):
+        tx = Tx[i]
+        ty = Ty[i]
+        ctx = math.cos(tx)
+        stx = math.sin(tx)
+        cty = math.cos(ty)
+        sty = math.sin(ty)
+
+        # rr and mu (defined for all pixels; same formula as the sunpy path)
+        rho = math.sqrt(tx * tx + ty * ty) * _RAD2ARCSEC / rsun_obs
+        rr[i] = rho
+        rho2 = rho * rho
+        if rho2 >= 1.0:
+            mu[i] = np.nan
+        else:
+            mu[i] = math.sqrt(1.0 - rho2)
+
+        # HPC -> HCC (law of cosines, near root); off-disk -> NaN
+        cos_alpha = cty * ctx
+        b = dsun * cos_alpha
+        disc = b * b - d2
+        if disc < 0.0:
+            xx[i] = np.nan
+            yy[i] = np.nan
+            lat_deg[i] = np.nan
+            lon_deg[i] = np.nan
+        else:
+            d = b - math.sqrt(disc)
+            x = d * cty * stx
+            y = d * sty
+            z = dsun - d * cos_alpha
+            xx[i] = x
+            yy[i] = y
+            # HCC -> Heliographic Stonyhurst
+            r = math.sqrt(x * x + y * y + z * z)
+            hgs_z = cos_b0 * y + sin_b0 * z
+            hgs_x = cos_b0 * z - sin_b0 * y
+            lat_deg[i] = math.asin(hgs_z / r) * _RAD2DEG + 90.0
+            lon_deg[i] = (math.atan2(x, hgs_x) + l0) * _RAD2DEG
+
+
+def compute_geometry(wcs, naxis1, naxis2, dsun, rsun, rsun_obs, b0, l0, image_dtype):
+    """Compute (xx, yy, rr, mu, lat_deg, lon_deg) arrays for an image grid.
+
+    Thin wrapper that gets Tx, Ty from the WCS (astropy C path) and runs the
+    fused numba kernel. Returns plain ndarrays in the same units/dtypes the
+    numpy path produced: xx, yy in meters; rr dimensionless; mu in ``image_dtype``
+    (NaN at the limb); lat_deg, lon_deg in degrees (lat already +90).
+    """
+    Tx, Ty = pixel_to_hpc(wcs, naxis1, naxis2)
+    shape = Tx.shape
+    n = Tx.size
+    txf = np.ascontiguousarray(Tx.ravel())
+    tyf = np.ascontiguousarray(Ty.ravel())
+
+    xx = np.empty(n, dtype=np.float64)
+    yy = np.empty(n, dtype=np.float64)
+    rr = np.empty(n, dtype=np.float64)
+    lat_deg = np.empty(n, dtype=np.float64)
+    lon_deg = np.empty(n, dtype=np.float64)
+    mu = np.empty(n, dtype=image_dtype)
+
+    _geometry_kernel(txf, tyf, float(dsun), float(rsun), float(rsun_obs),
+                     math.cos(b0), math.sin(b0), float(l0),
+                     xx, yy, rr, mu, lat_deg, lon_deg)
+
+    return (xx.reshape(shape), yy.reshape(shape), rr.reshape(shape),
+            mu.reshape(shape), lat_deg.reshape(shape), lon_deg.reshape(shape))

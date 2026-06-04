@@ -4,6 +4,23 @@ import numpy as np
 import pdb
 from .sdo_image import *
 
+
+def _region_index(flat_reg, region_codes):
+    """Map a flat region-code array to dense indices [0, len(region_codes)).
+
+    Vectorized replacement for the per-pixel ``dict.get`` loop: builds a small
+    lookup table indexed by region code and gathers in one pass. Codes not in
+    ``region_codes`` (including NaN, mapped to 0) become -1, matching the old
+    ``reg_map.get(r, -1)`` semantics.
+    """
+    maxc = max(region_codes)
+    lut = np.full(maxc + 1, -1, dtype=np.int64)
+    for i, r in enumerate(region_codes):
+        lut[r] = i
+    codes = np.nan_to_num(flat_reg, nan=0.0).astype(np.int64)
+    np.clip(codes, 0, maxc, out=codes)
+    return lut[codes]
+
 def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                          flat_ld, flat_iflat, flat_w_quiet, flat_w_active,
                          flat_abs_mag, mu_thresh, k_hat_con):
@@ -56,8 +73,7 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 
     # aggregate sums by region
     regions = np.array(region_codes)
-    reg_map = {r:i for i,r in enumerate(region_codes)}
-    reg_idx = np.array([reg_map.get(r,-1) for r in flat_reg])
+    reg_idx = _region_index(flat_reg, region_codes)
     valid = np.logical_and(valid_mask, reg_idx >= 0)
     grp = reg_idx[valid]
     M = len(regions)
@@ -112,8 +128,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 
     # aggregate sums by (bin, region)
     regions = np.array(region_codes)
-    reg_map = {r:i for i,r in enumerate(region_codes)}
-    reg_idx = np.array([reg_map.get(r,-1) for r in flat_reg])
+    reg_idx = _region_index(flat_reg, region_codes)
     valid = valid_mask & (reg_idx>=0)
     grp = bin_idx[valid] * len(regions) + reg_idx[valid]
     M = (n_rings-1) * len(regions)

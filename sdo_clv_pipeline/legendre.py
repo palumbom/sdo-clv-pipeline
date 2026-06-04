@@ -65,10 +65,14 @@ def gen_leg_x_vec(lmax, x):
     lmax : int
         Maximum degree of the Legendre series.
     x : astropy.units.Quantity
-        Coordinate in degrees (converted to radians internally).
+        Dimensionless disk-plane radial coordinate (rho in [0, 1]). Used directly
+        as the Legendre argument, matching the upstream hmi-clean-ls gen_leg_x.
+        (A previous version erroneously scaled this by pi/180 as if it were an
+        angle in degrees, which collapsed the argument to ~[0, 0.017] and made
+        the fit_cbs=True normal-equations system singular; cond ~3e18.)
     """
-    # switch to radians
-    x = x.value * np.pi / 180.0
+    # rho is already the (dimensionless) Legendre argument; no angle conversion
+    x = x.value
 
     # degree index l=0…lmax
     ell = np.arange(lmax+1)
@@ -177,7 +181,8 @@ def _bulk_vel_basis(lat_deg, lon_deg, rho, cos_B0, sin_B0, n_poly, scale, b):
     b[4] = dt4 * lt
 
     if n_poly > 5:
-        x = rho * deg2rad
+        # rho is the dimensionless Legendre argument directly (see gen_leg_x_vec)
+        x = rho
         px0 = 1.0
         b[5] = px0 * scale[0]
         if n_poly > 6:

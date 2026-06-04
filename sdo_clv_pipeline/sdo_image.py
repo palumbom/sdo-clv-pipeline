@@ -307,27 +307,20 @@ class SDOImage(object):
 
     def calc_bulk_vel(self, fit_cbs=False):
         # Fused numba implementation of the bulk-velocity fit. Reproduces
-        # calc_bulk_vel_numpy (retained below) but generates the Legendre basis
-        # via in-kernel recurrence and accumulates the normal equations directly,
-        # avoiding the (n_poly x N) design matrix and the (6 x N) Legendre
-        # intermediates. See legendre.bulk_vel_normal_eqs / bulk_vel_reconstruct.
+        # calc_bulk_vel_numpy (retained below) but generates the Legendre design
+        # matrix via an in-kernel recurrence instead of gen_leg_vec/gen_leg_x_vec,
+        # then runs the identical normal-equations solve. With the rho basis bug
+        # fixed (gen_leg_x_vec no longer mis-scales rho), the fit_cbs=True system
+        # is well-conditioned (cond ~4e7), so the fast path handles both cases.
         # methods adapted from https://arxiv.org/abs/2105.12055
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
-        # The fit_cbs=True normal-equations system is numerically singular
-        # (cond(A) ~ 3e18: the rho basis P_l(rho*pi/180) over rho*pi/180 in
-        # [0, 0.017] is nearly collinear). Its solution is dominated by float64
-        # rounding and is not reproducible by a different (faster) basis
-        # computation, so route it to the exact scipy reference path to stay
-        # bit-identical to the legacy result. The fast numba path is used only
-        # for the well-conditioned fit_cbs=False case.
-        if fit_cbs:
-            return self.calc_bulk_vel_numpy(fit_cbs=True)
-
-        # preserve the existing convention: B0 is used directly in np.cos/np.sin
-        cos_B0 = np.cos(self.B0)
-        sin_B0 = np.sin(self.B0)
-        n_poly = 6
+        # B0 (CRLT_OBS) is in degrees; convert to radians. The upstream Kashyap
+        # code used a sunpy Quantity here and let np.cos auto-convert; this port
+        # read the raw header float, so the conversion must be explicit.
+        cos_B0 = np.cos(np.deg2rad(self.B0))
+        sin_B0 = np.sin(np.deg2rad(self.B0))
+        n_poly = 11 if fit_cbs else 6
 
         # masked inputs as plain arrays (lat/lon in degrees, rho dimensionless)
         lat_deg = self.lat[self.mask_nan].to_value(u.deg)
@@ -336,8 +329,7 @@ class SDOImage(object):
 
         # build the design matrix via the fused numba kernel (replaces the slow
         # gen_leg_vec/gen_leg_x_vec basis generation), then run the identical
-        # normal-equations solve as calc_bulk_vel_numpy so results stay faithful
-        # even for the ill-conditioned fit_cbs=True system.
+        # normal-equations solve as calc_bulk_vel_numpy.
         self.im_arr = bulk_vel_design(lat_deg, lon_deg, rho, cos_B0, sin_B0,
                                       n_poly, basis_scale)
 
@@ -371,9 +363,10 @@ class SDOImage(object):
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
-        # pre-compute trigonometric quantities
-        cos_B0 = np.cos(self.B0)
-        sin_B0 = np.sin(self.B0)
+        # pre-compute trigonometric quantities (B0 in degrees -> radians;
+        # see calc_bulk_vel for why the conversion must be explicit here)
+        cos_B0 = np.cos(np.deg2rad(self.B0))
+        sin_B0 = np.sin(np.deg2rad(self.B0))
 
         self.lat_mask = self.lat[self.mask_nan]#.copy()
         self.lon_mask = self.lon[self.mask_nan]#.copy()

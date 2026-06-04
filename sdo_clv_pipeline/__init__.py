@@ -1,0 +1,6 @@
+# Default the parallel numba kernels to a single thread. This is the safe
+# setting under the across-epoch multiprocessing pool (one epoch per process);
+# single-epoch / interactive entry points opt into more threads via
+# parallel.set_compute_threads() or the SDO_THREADS env var.
+from .parallel import set_compute_threads
+set_compute_threads(1)

@@ -286,9 +286,12 @@ class SDOImage(object):
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
-        # pre-compute trigonometric quantities
-        sig = np.arctan(self.rr / self.rsun_solrad)
-        chi = np.arctan2(self.xx, self.yy)
+        # pre-compute trigonometric quantities on the valid (mask_nan) pixels
+        # only -- the result is discarded off-mask anyway, so computing the full
+        # 16.8M-pixel trig wastes ~30% of the work
+        m = self.mask_nan
+        sig = np.arctan(self.rr[m] / self.rsun_solrad)
+        chi = np.arctan2(self.xx[m], self.yy[m])
         sin_sig = np.sin(sig)
         cos_sig = np.cos(sig)
         sin_chi = np.sin(chi)
@@ -299,10 +302,10 @@ class SDOImage(object):
         vr2 = -self.obs_vw * sin_sig * sin_chi
         vr3 = -self.obs_vn * sin_sig * cos_chi
 
-        # reshape into 4096 x 4096 array
+        # scatter back into the full frame
         self.v_obs = np.zeros_like(self.image)
-        self.v_obs[self.mask_nan] = -(vr1 + vr2 + vr3)[self.mask_nan]
-        self.v_obs[~self.mask_nan] = np.nan
+        self.v_obs[m] = -(vr1 + vr2 + vr3)
+        self.v_obs[~m] = np.nan
         return None
 
     def calc_bulk_vel(self, fit_cbs=False):

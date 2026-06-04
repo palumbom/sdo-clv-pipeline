@@ -2,7 +2,9 @@
 #SBATCH --partition=cca
 #SBATCH --nodes=1
 #SBATCH --ntasks=64
-##SBATCH --mem-per-cpu=8192
+# ~3.6 GiB/epoch (one epoch per worker); cap per-cpu memory so a runaway worker
+# is killed by SLURM instead of OOM-ing the whole node
+#SBATCH --mem-per-cpu=8192
 ##SBATCH --time=2:00:00
 #SBATCH --time=72:00:00
 #SBATCH --job-name=sdo_all

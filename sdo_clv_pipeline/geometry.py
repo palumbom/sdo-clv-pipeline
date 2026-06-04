@@ -22,7 +22,7 @@ Reference: Thompson, W. T. 2006, A&A 449, 791.
 import math
 import numpy as np
 import astropy.units as u
-from numba import njit
+from numba import njit, prange
 
 _RAD2DEG = 180.0 / math.pi
 _RAD2ARCSEC = _RAD2DEG * 3600.0
@@ -137,20 +137,22 @@ def hcc_to_hgs(x, y, z, b0, l0=0.0):
     return lon, lat
 
 
-@njit(cache=True)
+@njit(cache=True, parallel=True)
 def _geometry_kernel(Tx, Ty, dsun, rsun, rsun_obs, cos_b0, sin_b0, l0,
                      xx, yy, rr, mu, lat_deg, lon_deg):
     """Single fused pass computing all geometry arrays from Tx, Ty (radians).
 
     Reproduces the numpy chain hpc_to_hcc -> hcc_to_hgs plus rr/mu in one loop,
-    avoiding ~10 intermediate full-frame temporaries. Single-threaded so it does
-    not oversubscribe the per-epoch worker pool. Off-disk pixels (negative
-    discriminant) get NaN for xx/yy/lat/lon, matching the numpy/sunpy paths; mu
-    is set to NaN wherever rr >= 1 (independent of the disc test, as before).
+    avoiding ~10 intermediate full-frame temporaries. Each pixel is independent
+    (a pure map, no cross-pixel reduction), so the prange loop is thread-count
+    invariant: results are identical whether run on 1 thread (batch) or many
+    (single-epoch). Thread count is controlled at runtime via
+    parallel.set_compute_threads (default 1). Off-disk pixels (negative
+    discriminant) get NaN for xx/yy/lat/lon; mu is NaN wherever rr >= 1.
     """
     n = Tx.shape[0]
     d2 = dsun * dsun - rsun * rsun
-    for i in range(n):
+    for i in prange(n):
         tx = Tx[i]
         ty = Ty[i]
         ctx = math.cos(tx)

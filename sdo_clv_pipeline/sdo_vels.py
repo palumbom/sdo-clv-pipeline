@@ -21,9 +21,26 @@ def _region_index(flat_reg, region_codes):
     np.clip(codes, 0, maxc, out=codes)
     return lut[codes]
 
+
+def shared_products(flat_int, flat_v_corr, flat_v_rot, flat_ld,
+                    flat_w_active, flat_abs_mag, k_hat_con):
+    """Per-pixel weighted products reused by all three aggregation functions.
+
+    Computing these once (in process_data_set) instead of inside each of
+    compute_disk/region_only/region_results avoids recomputing the same
+    16.8M-element products three times. Returns (p_vhat, p_vphot, p_mag) where
+    p_vhat = int*v_corr (also used for the quiet-sun numerator), p_vphot is the
+    photometric term, p_mag = |B|*int.
+    """
+    p_vhat = flat_int * flat_v_corr
+    p_vphot = flat_v_rot * (flat_int - k_hat_con * flat_ld) * flat_w_active
+    p_mag = flat_abs_mag * flat_int
+    return p_vhat, p_vphot, p_mag
+
 def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                          flat_ld, flat_iflat, flat_w_quiet, flat_w_active,
-                         flat_abs_mag, mu_thresh, k_hat_con):
+                         flat_abs_mag, mu_thresh, k_hat_con,
+                         p_vhat=None, p_vphot=None, p_mag=None):
     """Compute disk-integrated velocity and intensity metrics.
 
     Parameters
@@ -43,17 +60,21 @@ def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     k_hat_con : float
         Continuum scaling factor for the photometric term.
     """
+    if p_vhat is None:
+        p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
+                                                 flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
+
     valid = flat_mu >= mu_thresh
     all_pixels = np.nansum(valid)
     all_light = np.nansum(flat_int[valid])
 
     denom = np.nansum(flat_int[valid])
-    v_hat_di = np.nansum(flat_int[valid] * flat_v_corr[valid]) / denom
-    v_phot_di = np.nansum(flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * flat_w_active[valid]) / denom
-    v_quiet_di = np.nansum(flat_v_corr[valid] * flat_int[valid] * flat_w_quiet[valid]) / np.nansum(flat_int[valid] * flat_w_quiet[valid])
+    v_hat_di = np.nansum(p_vhat[valid]) / denom
+    v_phot_di = np.nansum(p_vphot[valid]) / denom
+    v_quiet_di = np.nansum(p_vhat[valid] * flat_w_quiet[valid]) / np.nansum(flat_int[valid] * flat_w_quiet[valid])
     v_cbs_di = v_hat_di - v_quiet_di
 
-    mag_unsigned = np.nansum(flat_abs_mag[valid] * flat_int[valid]) / denom
+    mag_unsigned = np.nansum(p_mag[valid]) / denom
 
     count = np.nansum(valid)
     avg_int = np.nansum(flat_int[valid]) / count
@@ -65,10 +86,15 @@ def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
             mag_unsigned, avg_int, avg_int_flat]
 
 def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
-                                flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, 
-                                flat_w_active, flat_reg, region_codes, 
-                                mu_thresh, k_hat_con):
+                                flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet,
+                                flat_w_active, flat_reg, region_codes,
+                                mu_thresh, k_hat_con,
+                                p_vhat=None, p_vphot=None, p_mag=None):
     """Compute region-aggregated metrics across the full disk."""
+    if p_vhat is None:
+        p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
+                                                 flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
+
     valid_mask = flat_mu >= mu_thresh
 
     # aggregate sums by region
@@ -78,17 +104,17 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     grp = reg_idx[valid]
     M = len(regions)
 
-    sum_vhat = np.bincount(grp, weights=flat_int[valid] * flat_v_corr[valid], minlength=M)
-    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int - k_hat_con * flat_ld)[valid] * flat_w_active[valid], minlength=M)
+    sum_vhat = np.bincount(grp, weights=p_vhat[valid], minlength=M)
+    sum_vphot = np.bincount(grp, weights=p_vphot[valid], minlength=M)
     sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
     sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
-    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid] * flat_int[valid], minlength=M)
+    sum_mag = np.bincount(grp, weights=p_mag[valid], minlength=M)
     sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
 
     quiet_idx = np.where(regions == quiet_sun_code)[0][0]
     q_valid = valid & flat_w_quiet
     grp_q = reg_idx[q_valid]
-    sum_vquiet = np.bincount(grp_q, weights=flat_v_corr[q_valid] * flat_int[q_valid], minlength=M)
+    sum_vquiet = np.bincount(grp_q, weights=p_vhat[q_valid], minlength=M)
     sum_int_q = np.bincount(grp_q, weights=flat_int[q_valid], minlength=M)
 
     total_pixels = np.nansum(valid_mask)
@@ -120,8 +146,13 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 
 def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                            flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, flat_w_active,
-                           flat_reg, region_codes, mu_thresh, n_rings, k_hat_con):
+                           flat_reg, region_codes, mu_thresh, n_rings, k_hat_con,
+                           p_vhat=None, p_vphot=None, p_mag=None):
     """Compute region-aggregated metrics in mu rings."""
+    if p_vhat is None:
+        p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
+                                                 flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
+
     bins = np.linspace(mu_thresh, 1.0, n_rings)
     bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings-2)
     valid_mask = (flat_mu >= mu_thresh)
@@ -133,18 +164,18 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     grp = bin_idx[valid] * len(regions) + reg_idx[valid]
     M = (n_rings-1) * len(regions)
 
-    sum_vhat = np.bincount(grp, weights=flat_int[valid]*flat_v_corr[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_vphot = np.bincount(grp, weights=flat_v_rot[valid] * (flat_int-k_hat_con*flat_ld)[valid] * flat_w_active[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_vhat = np.bincount(grp, weights=p_vhat[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_vphot = np.bincount(grp, weights=p_vphot[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_mag = np.bincount(grp, weights=flat_abs_mag[valid]*flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_mag = np.bincount(grp, weights=p_mag[valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M).reshape(n_rings-1,len(regions))
 
     # quiet-sun sums
     quiet_idx = np.where(regions == quiet_sun_code)[0][0]
     q_valid = valid & flat_w_quiet
     grp_q = bin_idx[q_valid] * len(regions) + reg_idx[q_valid]
-    sum_vquiet_flat = np.bincount(grp_q, weights=flat_v_corr[q_valid]*flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
+    sum_vquiet_flat = np.bincount(grp_q, weights=p_vhat[q_valid], minlength=M).reshape(n_rings-1,len(regions))
     sum_int_q_flat = np.bincount(grp_q, weights=flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
 
     # compute metrics

@@ -102,9 +102,13 @@ def compute_pixel_mapping_highlevel(src_wcs, dst_wcs, shape):
     src_x, src_y = src_wcs.world_to_pixel(sky)
     return src_x.astype(np.float32), src_y.astype(np.float32)
 
-@njit(parallel=False)
+@njit(parallel=True)
 def bilinear_reproject(src, src_x, src_y, dst):
-    """Bilinearly sample src into dst using precomputed pixel mappings."""
+    """Bilinearly sample src into dst using precomputed pixel mappings.
+
+    Each output pixel is independent, so the prange loop is thread-count
+    invariant; thread count is set at runtime via parallel.set_compute_threads
+    (default 1, safe under the across-epoch pool)."""
     H, W = dst.shape
     Hs, Ws = src.shape
     for idx in prange(H*W):

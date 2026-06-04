@@ -9,7 +9,20 @@ from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_io import *
 from sdo_clv_pipeline.sdo_process import *
 from sdo_clv_pipeline.reproject import *
+from sdo_clv_pipeline.parallel import set_compute_threads
 from sdo_clv_pipeline.logging_setup import configure_logging
+
+
+def _worker_init(log_level):
+    """Pool-worker initializer: set up logging and pin numba to one thread.
+
+    One epoch per worker process, so each worker must stay single-threaded to
+    avoid oversubscribing the box (N processes x M numba threads). The package
+    __init__ already defaults to 1 thread on import; this is the explicit guard.
+    """
+    configure_logging(log_level)
+    set_compute_threads(1)
+    return None
 
 # multiprocessing imports
 from multiprocessing import get_context
@@ -94,6 +107,13 @@ def main():
         if not isdir(tmpdir):
             os.mkdir(tmpdir)
 
+        # remove any stale per-worker temp files from a previous (possibly
+        # crashed) run; otherwise they would be glob'd into this run's stitch
+        # and silently corrupt the output
+        for stale in glob.glob(os.path.join(tmpdir, "thresholds_*")) + \
+                     glob.glob(os.path.join(tmpdir, "region_output_*")):
+            os.remove(stale)
+
         # prepare arguments for starmap
         items = []
         for i in range(len(con_files)):
@@ -104,7 +124,7 @@ def main():
         t0 = time.time()
         pids = []
         with get_context("spawn").Pool(ncpus, maxtasksperchild=4,
-                                       initializer=configure_logging,
+                                       initializer=_worker_init,
                                        initargs=(log_level,)) as pool:
             # get PIDs of workers
             for child in mp.active_children():
@@ -124,8 +144,9 @@ def main():
         outfiles1 = glob.glob(os.path.join(tmpdir,"thresholds_*"))
         outfiles2 = glob.glob(os.path.join(tmpdir,"region_output_*"))
 
-        # stitch them together on the main process
-        delete = False
+        # stitch them together on the main process, then remove the temp files
+        # so a later non-clobber rerun cannot pick up stale per-worker output
+        delete = True
         stitch_output_files(os.path.join(datadir, "thresholds.csv"), outfiles1, delete=delete)
         stitch_output_files(os.path.join(datadir, "region_output.csv"), outfiles2, delete=delete)
 

@@ -221,6 +221,11 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         w_quiet = mask.is_quiet_sun()
         k_hat_con = np.nansum(con.image * con.ldark * w_quiet) / np.nansum(con.ldark**2 * w_quiet)
 
+        # shared per-pixel weighted products (computed once, reused by all three
+        # aggregations below instead of being recomputed in each)
+        p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
+                                                 flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
+
         # create arrays to hold velocity, magnetic field, and pixel fraction results
         results = []
 
@@ -228,7 +233,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         results.append(compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
                                             flat_v_rot, flat_ld, flat_iflat,
                                             flat_w_quiet, flat_w_active, flat_abs_mag,
-                                            mu_thresh, k_hat_con))
+                                            mu_thresh, k_hat_con,
+                                            p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag))
 
         # calculate velocities for regions, not binning by mu
         results.extend(compute_region_only_results(mjd, flat_mu, flat_int,
@@ -237,7 +243,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                                    flat_abs_mag, flat_w_quiet,
                                                    flat_w_active,
                                                    flat_reg, region_codes,
-                                                   mu_thresh, k_hat_con))
+                                                   mu_thresh, k_hat_con,
+                                                   p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag))
 
         # calculate disk-resovled quantities
         results.extend(compute_region_results(mjd, flat_mu, flat_int, flat_v_corr,
@@ -245,7 +252,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                               flat_abs_mag, flat_w_quiet,
                                               flat_w_active, flat_reg,
                                               region_codes, mu_thresh,
-                                              n_rings, k_hat_con))
+                                              n_rings, k_hat_con,
+                                              p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag))
 
         # tag every region row with the per-epoch quality flag, then write to disk
         for row in results:

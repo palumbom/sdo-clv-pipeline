@@ -8,7 +8,7 @@ import math
 import numpy as np
 from math import pi
 from scipy.special import eval_legendre
-from numba import njit
+from numba import njit, prange
 
 
 def gen_leg_vec(lmax, theta):
@@ -209,12 +209,16 @@ def bulk_vel_design(lat_deg, lon_deg, rho, cos_B0, sin_B0, n_poly, scale):
     identical normal-equations solve (im_arr @ im_arr.T), which keeps results
     faithful even for the ill-conditioned fit_cbs=True system.
 
-    Returns im_arr with shape (n_poly, N), matching the original layout.
+    Returns im_arr with shape (n_poly, N), matching the original layout. Each
+    pixel writes a disjoint column, so the prange loop is thread-count invariant
+    (identical results on 1 vs many threads); thread count is set at runtime via
+    parallel.set_compute_threads (default 1). The per-pixel basis buffer is
+    allocated inside the loop so it is private to each thread.
     """
     n = lat_deg.shape[0]
     im_arr = np.empty((n_poly, n))
-    b = np.empty(n_poly)
-    for i in range(n):
+    for i in prange(n):
+        b = np.empty(n_poly)
         _bulk_vel_basis(lat_deg[i], lon_deg[i], rho[i], cos_B0, sin_B0, n_poly, scale, b)
         for j in range(n_poly):
             im_arr[j, i] = b[j]

@@ -7,6 +7,7 @@ from .sdo_image import *
 import pdb, warnings
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib.patches import Circle
 
 from astropy.io import fits
 from astropy.wcs import WCS
@@ -16,7 +17,108 @@ from astropy.wcs import FITSFixedWarning
 from astropy.io.fits.verify import VerifyWarning
 
 
-def plot_image(sdo_image, outdir=None, fname=None, vmin=None, vmax=None):
+# shared cosmetics (identical across every image type)
+_xlabel = r"${\rm Helioprojective\ Longitude}$"
+_ylabel = r"${\rm Helioprojective\ Latitude}$"
+_figsize = (6.4, 4.8)
+_timestamp_fontsize = 8   # DATE-OBS corner annotation; tuned to _figsize
+
+
+def _annotate_timestamp(ax, date_obs):
+    """Stamp the observation timestamp in the upper-left corner.
+
+    Anchored in axes-fraction coords (transAxes) so it stays in the corner
+    regardless of the data-axis inversions applied later in _finalize, and
+    clears the inscribed solar disk (the frame corners are empty pixels).
+    """
+    # DATE-OBS is ISO 8601 (e.g. "2014-01-07T00:00:00.00"); drop the 'T'
+    # separator and any fractional seconds for a clean YYYY-MM-DD HH:MM:SS label
+    stamp = date_obs.replace("T", " ").split(".")[0]
+    ax.text(0.02, 0.98, stamp, transform=ax.transAxes,
+            ha="left", va="top", fontsize=_timestamp_fontsize, color="black")
+    return None
+
+
+def _continuum_intensity(im):
+    """Limb-flattened intensity normalized by the disk-center darkening coeff."""
+    return im.iflat / im.ld_coeffs[0]
+
+
+# Per-type plotting recipe. Everything that differs between the four image types
+# is data here, not control flow: which array to display, the colormap, how to
+# set the color scale, and the colorbar label / output filename prefix. `scale`
+# returns the imshow color-scale kwargs (either a norm or vmin/vmax), resolving
+# None to each type's fixed fallback limits so colorbars can be held constant
+# across an animated sequence.
+_PLOT_SPECS = {
+    "mag": dict(
+        predicate="is_magnetogram",
+        get_data=lambda im: im.image,
+        cmap="RdYlBu",
+        scale=lambda vmin, vmax: dict(norm=colors.SymLogNorm(
+            1, vmin=-4200 if vmin is None else vmin,
+               vmax=4200 if vmax is None else vmax)),
+        label=r"${\rm Magnetic\ Field\ Strength\ (G)}$",
+    ),
+    "dop": dict(
+        predicate="is_dopplergram",
+        get_data=lambda im: im.v_corr,
+        cmap="seismic",
+        scale=lambda vmin, vmax: dict(vmin=-2000 if vmin is None else vmin,
+                                      vmax=2000 if vmax is None else vmax),
+        label=r"${\rm LOS\ Velocity\ } {\rm(m\ s}^{-1}{\rm )}$",
+    ),
+    "con": dict(
+        predicate="is_continuum",
+        get_data=_continuum_intensity,
+        cmap="afmhot",
+        scale=lambda vmin, vmax: dict(vmin=vmin, vmax=vmax),
+        label=r"${\rm Relative\ HMI\ Continuum\ Intensity}$",
+    ),
+    "aia": dict(
+        predicate="is_filtergram",
+        get_data=_continuum_intensity,
+        cmap="Purples_r",
+        scale=lambda vmin, vmax: dict(vmin=vmin, vmax=vmax),
+        label=r"${\rm Relative\ 1700\ \AA \ Continuum\ Intensity}$",
+    ),
+}
+
+
+def _draw_limb_and_grid(ax, wcs, mu):
+    """Overlay the heliographic lat/lon grid and the solar limb on a WCS axis."""
+    sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(
+        ax, grid_spacing=15 * u.deg, annotate=True,
+        color="k", alpha=0.5, ls="--", lw=0.5)
+    # The limb is rr == 1. The disk is a filled circle of area pi*r^2, so derive
+    # the radius from the finite-mu pixel count rather than marching-squares
+    # contouring the full 4k frame on every figure. Center is the WCS reference
+    # pixel (Sun center); CRPIX is 1-based, imshow data coords are 0-based.
+    cx, cy = wcs.wcs.crpix[0] - 1.0, wcs.wcs.crpix[1] - 1.0
+    r_pix = np.sqrt(np.count_nonzero(np.isfinite(mu)) / np.pi)
+    ax.add_patch(Circle((cx, cy), r_pix, fill=False,
+                        color="k", ls="--", lw=0.5, alpha=0.5))
+    return None
+
+
+def _finalize(fig, ax, outdir, fname, default_name, dpi):
+    """Apply shared axis cosmetics, then save (and close) or show the figure."""
+    ax.invert_xaxis()
+    ax.invert_yaxis()
+    ax.set_xlabel(_xlabel)
+    ax.set_ylabel(_ylabel)
+    ax.grid(False)
+    if outdir is not None:
+        if fname is None:
+            fname = default_name
+        fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=dpi)
+        plt.close(fig)   # close THIS figure so batch loops don't leak figures
+    else:
+        plt.show()
+    return None
+
+
+def plot_image(sdo_image, outdir=None, fname=None, vmin=None, vmax=None, dpi=500):
     """Plot an SDOImage with WCS axes and type-specific styling.
 
     Parameters
@@ -32,273 +134,106 @@ def plot_image(sdo_image, outdir=None, fname=None, vmin=None, vmax=None):
         to their built-in fixed limits and continuum/filtergram autoscale to the
         frame. Pass explicit values to keep the colorbar identical across frames
         (e.g. when animating a sequence).
+    dpi : int, optional
+        Raster resolution for the saved figure. The solar image is the only
+        rasterized element in the vector PDF; lower this to shrink files and
+        speed up batch runs.
     """
-    # get the WCS
-    wcs = sdo_image.wcs
+    # pick the per-type recipe; bail on anything that isn't a known image type
+    key = next((k for k, s in _PLOT_SPECS.items()
+                if getattr(sdo_image, s["predicate"])()), None)
+    if key is None:
+        return None
+    spec = _PLOT_SPECS[key]
 
     # initialize the figure
-    fig = plt.figure(figsize=(6.4, 4.8))
-    ax1 = fig.add_subplot(111, projection=wcs)
+    fig = plt.figure(figsize=_figsize)
+    ax1 = fig.add_subplot(111, projection=sdo_image.wcs)
     ax1.set_aspect("equal")
 
-    if sdo_image.is_magnetogram():
-        # get cmap
-        cmap = plt.get_cmap("RdYlBu").copy()
-        cmap.set_bad(color="white")
+    # get cmap (bad/masked pixels show white)
+    cmap = plt.get_cmap(spec["cmap"]).copy()
+    cmap.set_bad(color="white")
 
-        # get the norm (fall back to fixed limits when not overridden)
-        norm = colors.SymLogNorm(1,
-                                 vmin=-4200 if vmin is None else vmin,
-                                 vmax=4200 if vmax is None else vmax)
+    # plot the sun
+    img = ax1.imshow(spec["get_data"](sdo_image), cmap=cmap, origin="lower",
+                     interpolation=None, **spec["scale"](vmin, vmax))
+    _draw_limb_and_grid(ax1, sdo_image.wcs, sdo_image.mu)
+    fig.colorbar(img).set_label(spec["label"])
 
-        # plot the sun
-        img = ax1.imshow(sdo_image.image, cmap=cmap, origin="lower", norm=norm, interpolation=None)
-        sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
-                                                             color="k", alpha=0.5, ls="--", lw=0.5)
-        limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
-        clb = fig.colorbar(img)
-        clb.set_label(r"${\rm Magnetic\ Field\ Strength\ (G)}$")
-        ax1.invert_xaxis()
-        ax1.invert_yaxis()
-        ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")
-        ax1.set_ylabel(r"${\rm Helioprojective\ Latitude}$")
-        # ax1.text(1400, 4000, sdo_image.date_obs, fontsize=10, c="black")
-        ax1.grid(False)
+    _annotate_timestamp(ax1, sdo_image.date_obs)
+    _finalize(fig, ax1, outdir, fname,
+              key + "_" + sdo_image.date_obs + ".pdf", dpi)
+    return None
 
 
-        if outdir is not None:
-            if fname is None:
-                fname = "mag_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
-            plt.clf(); plt.close()
-
-        else:
-            plt.show()
-
-        return None
-
-    elif sdo_image.is_dopplergram():
-        # get cmap
-        cmap = plt.get_cmap("seismic").copy()
-        cmap.set_bad(color="white")
-
-        # plot the sun
-        img = ax1.imshow(sdo_image.v_corr, origin="lower", cmap=cmap,
-                         vmin=-2000 if vmin is None else vmin,
-                         vmax=2000 if vmax is None else vmax, interpolation=None)
-        sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
-                                                                     color="k", alpha=0.5, ls="--", lw=0.5)
-        limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
-        clb = fig.colorbar(img)
-        clb.set_label(r"${\rm LOS\ Velocity\ } {\rm(m\ s}^{-1}{\rm )}$")
-        ax1.invert_xaxis()
-        ax1.invert_yaxis()
-        ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")
-        ax1.set_ylabel(r"${\rm Helioprojective\ Latitude}$")
-        # ax1.text(1400, 4000, sdo_image.date_obs, fontsize=10, c="black")
-        ax1.grid(False)
-
-        # figure out the filename
-
-        if outdir is not None:
-
-            if fname is None:
-                fname = "dop_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
-            plt.clf(); plt.close()
-
-        else:
-            plt.show()
-
-        return None
-
-    elif sdo_image.is_continuum():
-        # get cmap
-        cmap = plt.get_cmap("afmhot").copy()
-        cmap.set_bad(color="white")
-
-        # plot the sun
-        img = ax1.imshow(sdo_image.iflat/sdo_image.ld_coeffs[0], cmap=cmap, origin="lower",
-                         vmin=vmin, vmax=vmax, interpolation=None)
-        sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
-                                                                     color="k", alpha=0.5, ls="--", lw=0.5)
-        limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
-
-        # plot the colorbar
-        clb = fig.colorbar(img)
-        clb.set_label(r"${\rm Relative\ HMI\ Continuum\ Intensity}$")
-
-        # axes and stuff
-        ax1.invert_xaxis()
-        ax1.invert_yaxis()
-        ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")
-        ax1.set_ylabel(r"${\rm Helioprojective\ Latitude}$")
-        # ax1.text(1400, 4000, sdo_image.date_obs, fontsize=10, c="black")
-        ax1.grid(False)
-
-        # figure out the filename
-        if outdir is not None:
-            if fname is None:
-                fname = "con_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
-            plt.clf(); plt.close()
-        else:
-            plt.show()
-        return None
-
-    elif sdo_image.is_filtergram():
-        # get cmap
-        cmap = plt.get_cmap("Purples_r").copy()
-        cmap.set_bad(color="white")
-
-        # plot the sun
-        img = ax1.imshow(sdo_image.iflat/sdo_image.ld_coeffs[0], cmap=cmap, origin="lower",
-                         vmin=vmin, vmax=vmax, interpolation=None)
-        sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
-                                                                     color="k", alpha=0.5, ls="--", lw=0.5)
-        limb = ax1.contour(sdo_image.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
-        clb = fig.colorbar(img)
-        clb.set_label(r"${\rm Relative\ 1700\ \AA \ Continuum\ Intensity}$")
-        ax1.invert_xaxis()
-        ax1.invert_yaxis()
-        ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")
-        ax1.set_ylabel(r"${\rm Helioprojective\ Latitude}$")
-        # ax1.text(1400, 4000, sdo_image.date_obs, fontsize=10, c="black")
-        ax1.grid(False)
-
-        # figure out the filename
-        if outdir is not None:
-            if fname is None:
-                fname = "aia_" + sdo_image.date_obs + ".pdf"
-            fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
-            plt.clf(); plt.close()
-        else:
-            plt.show()
-        return None
-    
-    else:
-        return None
-
-def plot_mask(mask, outdir=None, fname=None):
+def plot_mask(mask, outdir=None, fname=None, dpi=500):
     """Plot a SunMask classification map with labeled region colors."""
-    # merge the penumbra
-    mask_copy = np.copy(mask.regions)
-    # mask_copy[mask_copy >= 3] -= 1
-
     # get cmap
     cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white", "blue"])
     cmap.set_bad(color="white")
     norm = colors.BoundaryNorm([0, 1, 2, 3, 4, 5, 6], ncolors=cmap.N, clip=True)
 
-    # get the WCS
-    wcs = mask.wcs
-
-    # plot the sun
-    fig = plt.figure(figsize=(6.4, 4.8))
-    ax1 = fig.add_subplot(111, projection=wcs)
-    img = ax1.imshow(mask_copy - 0.5, cmap=cmap, norm=norm, origin="lower", interpolation=None)
-    sp.visualization.wcsaxes_compat.wcsaxes_heliographic_overlay(ax1, grid_spacing=15*u.deg, annotate=True,
-                                                                 color="k", alpha=0.5, ls="--", lw=0.5)
-    limb = ax1.contour(mask.mu >= 0.0, colors="k", linestyles="--", linewidths=0.5, alpha=0.5)
+    # plot the sun (regions - 0.5 centers each integer code in its color band)
+    fig = plt.figure(figsize=_figsize)
+    ax1 = fig.add_subplot(111, projection=mask.wcs)
+    img = ax1.imshow(mask.regions - 0.5, cmap=cmap, norm=norm,
+                     origin="lower", interpolation=None)
+    _draw_limb_and_grid(ax1, mask.wcs, mask.mu)
     clb = fig.colorbar(img, ticks=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5])
-    clb.ax.set_yticklabels([r"${\rm Umbra}$", r"${\rm Penumbra}$", r"${\rm Quiet\ Sun}$", r"${\rm Network}$", r"${\rm Plage}$", r"${\rm Moat}$"])
-    ax1.invert_xaxis()
-    ax1.invert_yaxis()
-    ax1.set_xlabel(r"${\rm Helioprojective\ Longitude}$")
-    ax1.set_ylabel(r"${\rm Helioprojective\ Latitude}$")
-    # ax1.text(1400, 4000, mask.date_obs, fontsize=10, c="black")
-    ax1.grid(False)
+    clb.ax.set_yticklabels([r"${\rm Umbra}$", r"${\rm Penumbra}$", r"${\rm Quiet\ Sun}$",
+                            r"${\rm Network}$", r"${\rm Plage}$", r"${\rm Moat}$"])
 
-    # figure out the filename
-    if outdir is not None:
-        if fname is None:
-            fname = "mask_" + mask.date_obs + ".pdf"
-        fig.savefig(os.path.join(outdir, fname), bbox_inches="tight", dpi=500)
-        plt.clf(); plt.close()
-    else:
-        plt.show()
+    _annotate_timestamp(ax1, mask.date_obs)
+    _finalize(fig, ax1, outdir, fname, "mask_" + mask.date_obs + ".pdf", dpi)
     return None
+
+
+def _plot_spot_overlay(mask_copy, spots, letters, base_cmap, overlay_cmap,
+                       title, label_spots):
+    """Render the merged-penumbra mask in greyscale with a per-spot color overlay."""
+    h, w = mask_copy.shape
+    overlay = np.full((h, w), np.nan)               # overlay array, one number per spot
+    for i, spot_mask in enumerate(spots):           # boolean-mask assignment; no np.where
+        overlay[spot_mask] = i
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(mask_copy, cmap=base_cmap, origin="lower")
+    ax.imshow(overlay, cmap=plt.get_cmap(overlay_cmap, len(spots)),
+              origin="lower", alpha=0.7)
+
+    if label_spots:                                 # letter at the centroid of each spot
+        for i, spot_mask in enumerate(spots):
+            y, x = np.where(spot_mask)
+            ax.text(x.mean(), y.mean(), letters[i], ha="center", va="center",
+                    color="black", fontsize=10, weight="bold")
+
+    ax.set_title(title)
+    ax.set_xlim(0, w)
+    ax.set_ylim(0, h)
+    ax.invert_yaxis()
+    ax.invert_xaxis()
+    plt.show()
+    return None
+
 
 def label_moats_on_sun(mask, outdir=None, fname=None):
     """Overlay moat region labels using precomputed moat data."""
-    # get spot mask and letters for labels from separate file
+    # get spot masks and label letters from the separate moats data file
     moat_file = os.path.join(root, "data", "moats_data.npz")
     data = np.load(moat_file, allow_pickle=True)  # allow_pickle for arrays of arrays
-    area_idx_arr = data['area_idx_arr']
-    letters = data['letters']
+    letters = data["letters"]
 
-    # get the mask array and shape
+    # merged-penumbra copy of the classification map (shared by both panels)
     mask_copy = np.copy(mask.regions)
-    mask_copy[mask_copy >= 3] -= 1      # merge penumbra
-    h, w = mask_copy.shape             # height and width
+    mask_copy[mask_copy >= 3] -= 1
 
-    overlay = np.full((h, w), np.nan)               # create overlay array with same shape
-    for i, spot_mask in enumerate(area_idx_arr):  # for each spot mask, find pixels in the spot and give them a number
-        y, x = np.where(spot_mask)
-        overlay[y, x] = i
-    # plot original mask in greyscale
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(mask_copy, cmap='gray', origin='lower')
-    # color spots
-    cmap_overlay = plt.cm.get_cmap('tab20', len(area_idx_arr))
-    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.7)
-
-    # check they are the same
-    # print("Number of spots:", len(area_idx_array))
-    # print("Number of letters:", len(letters))
-
-    for i, spot_mask in enumerate(area_idx_arr):
-        y, x = np.where(spot_mask)
-        # get center
-        x_center = np.mean(x)
-        y_center = np.mean(y)
-        label = letters[i]
-        ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
-                color='black', fontsize=10, weight='bold')
-
-    ax.set_title("Colored Spots with Labels")
-    ax.set_xlim(0, w)
-    ax.set_ylim(0, h)
-    plt.gca().invert_yaxis()
-    plt.gca().invert_xaxis()
-    plt.show()
-
-    dilated_spots = data['dilated_spots']
-
-    # get the mask array and shape
-    mask_copy = np.copy(mask.regions)
-    mask_copy[mask_copy >= 3] -= 1      # merge penumbra
-    h, w = mask_copy.shape             # height and width
-
-    overlay = np.full((h, w), np.nan)               # create overlay array with same shape
-    for i, spot_mask in enumerate(dilated_spots):  # for each spot mask, find pixels in the spot and give them a number
-        y, x = np.where(spot_mask)
-        overlay[y, x] = i
-    # plot original mask in greyscale
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(mask_copy, cmap='Greys_r', origin='lower')
-    # color spots
-    cmap_overlay = plt.cm.get_cmap('rainbow', len(area_idx_arr))
-    ax.imshow(overlay, cmap=cmap_overlay, origin='lower', alpha=0.6)
-
-    # check they are the same
-    # print("Number of spots:", len(area_idx_arr))
-    # print("Number of letters:", len(letters))
-
-    for i, spot_mask in enumerate(dilated_spots):
-        y, x = np.where(spot_mask)
-        # get center
-        x_center = np.mean(x)
-        y_center = np.mean(y)
-        label = letters[i]
-        # ax.text(x_center, y_center, label, ha='center', va='center',    # label with letter at the center of the spot
-        #         color='black', fontsize=9)
-
-    ax.set_title("Moats to Solanki Radius")
-    ax.set_xlim(0, w)
-    ax.set_ylim(0, h)
-    plt.gca().invert_yaxis()
-    plt.gca().invert_xaxis()
-    # moat_file = os.path.join(root, "data", "moats_data.npz")
-    # os.remove(moat_file)
-    plt.show()
+    # panel 1: detected spots, labeled with letters
+    _plot_spot_overlay(mask_copy, data["area_idx_arr"], letters,
+                       "gray", "tab20", "Colored Spots with Labels",
+                       label_spots=True)
+    # panel 2: moats dilated to the Solanki radius (labels suppressed, as before)
+    _plot_spot_overlay(mask_copy, data["dilated_spots"], letters,
+                       "Greys_r", "rainbow", "Moats to Solanki Radius",
+                       label_spots=False)
+    return None

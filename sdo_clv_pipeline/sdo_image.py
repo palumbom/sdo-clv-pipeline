@@ -647,9 +647,15 @@ class SunMask(object):
         self.left_moat = np.zeros_like(self.regions).astype(bool)
         self.right_moat = np.zeros_like(self.regions).astype(bool)
 
-        # calculate intensity thresholds for HMI
-        self.con_thresh1 = 0.89 * np.nansum(con.iflat * self.w_quiet) / np.nansum(self.w_quiet)
-        self.con_thresh2 = 0.45 * np.nansum(con.iflat * self.w_quiet) / np.nansum(self.w_quiet)
+        # calculate intensity thresholds for HMI. thresh1 and thresh2 are the
+        # same quiet-sun mean intensity scaled by two different constants, so the
+        # full-frame product and its two reductions are computed once here. The
+        # operand order (const * sum / sum) is preserved exactly, so the results
+        # are bit-identical to evaluating each line independently.
+        qs_int_sum = np.nansum(con.iflat * self.w_quiet)
+        qs_weight_sum = np.nansum(self.w_quiet)
+        self.con_thresh1 = 0.89 * qs_int_sum / qs_weight_sum
+        self.con_thresh2 = 0.45 * qs_int_sum / qs_weight_sum
 
         # get indices for umbrae
         ind1 = con.iflat <= self.con_thresh2      # if intensity less than thresh2, umbra (ind1)

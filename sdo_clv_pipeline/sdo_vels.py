@@ -65,20 +65,29 @@ def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                                                  flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
 
     valid = flat_mu >= mu_thresh
-    all_pixels = np.nansum(valid)
-    all_light = np.nansum(flat_int[valid])
 
-    denom = np.nansum(flat_int[valid])
+    # boolean indexing materializes a new array each time, and the masked
+    # intensity sum / valid-pixel count are each reused several times below.
+    # Compute them once; the operands and operation order are unchanged, so
+    # every result is bit-identical to recomputing them inline.
+    fi = flat_int[valid]
+    fwq = flat_w_quiet[valid]
+    light_sum = np.nansum(fi)
+    n_valid = np.nansum(valid)
+
+    all_pixels = n_valid
+    all_light = light_sum
+
+    denom = light_sum
     v_hat_di = np.nansum(p_vhat[valid]) / denom
     v_phot_di = np.nansum(p_vphot[valid]) / denom
-    v_quiet_di = np.nansum(p_vhat[valid] * flat_w_quiet[valid]) / np.nansum(flat_int[valid] * flat_w_quiet[valid])
+    v_quiet_di = np.nansum(p_vhat[valid] * fwq) / np.nansum(fi * fwq)
     v_cbs_di = v_hat_di - v_quiet_di
 
     mag_unsigned = np.nansum(p_mag[valid]) / denom
 
-    count = np.nansum(valid)
-    avg_int = np.nansum(flat_int[valid]) / count
-    avg_int_flat = np.nansum(flat_iflat[valid]) / count
+    avg_int = light_sum / n_valid
+    avg_int_flat = np.nansum(flat_iflat[valid]) / n_valid
 
     return [mjd, np.nan, np.nan, np.nan,
             all_pixels, all_light,
@@ -89,7 +98,8 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                                 flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet,
                                 flat_w_active, flat_reg, region_codes,
                                 mu_thresh, k_hat_con,
-                                p_vhat=None, p_vphot=None, p_mag=None):
+                                p_vhat=None, p_vphot=None, p_mag=None,
+                                reg_idx=None):
     """Compute region-aggregated metrics across the full disk."""
     if p_vhat is None:
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
@@ -99,7 +109,8 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 
     # aggregate sums by region
     regions = np.array(region_codes)
-    reg_idx = _region_index(flat_reg, region_codes)
+    if reg_idx is None:
+        reg_idx = _region_index(flat_reg, region_codes)
     valid = np.logical_and(valid_mask, reg_idx >= 0)
     grp = reg_idx[valid]
     M = len(regions)
@@ -147,7 +158,8 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                            flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, flat_w_active,
                            flat_reg, region_codes, mu_thresh, n_rings, k_hat_con,
-                           p_vhat=None, p_vphot=None, p_mag=None):
+                           p_vhat=None, p_vphot=None, p_mag=None,
+                           reg_idx=None):
     """Compute region-aggregated metrics in mu rings."""
     if p_vhat is None:
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
@@ -159,7 +171,8 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 
     # aggregate sums by (bin, region)
     regions = np.array(region_codes)
-    reg_idx = _region_index(flat_reg, region_codes)
+    if reg_idx is None:
+        reg_idx = _region_index(flat_reg, region_codes)
     valid = valid_mask & (reg_idx>=0)
     grp = bin_idx[valid] * len(regions) + reg_idx[valid]
     M = (n_rings-1) * len(regions)

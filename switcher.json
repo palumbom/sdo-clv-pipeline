@@ -11,6 +11,11 @@
     "preferred": true
   },
   {
+    "name": "v0.6.0",
+    "version": "v0.6.0",
+    "url": "https://michaelpalumbo.me/sdo-clv-pipeline/v0.6.0/"
+  },
+  {
     "name": "v0.5.3",
     "version": "v0.5.3",
     "url": "https://michaelpalumbo.me/sdo-clv-pipeline/v0.5.3/"

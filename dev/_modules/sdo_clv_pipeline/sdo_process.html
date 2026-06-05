@@ -296,6 +296,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.paths</span><span class="w"> </span><span class="kn">import</span> <span class="n">root</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_io</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_vels</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_vels</span><span class="w"> </span><span class="kn">import</span> <span class="n">_region_index</span>  <span class="c1"># private: not re-exported by `import *`</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_image</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.quality</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -509,17 +510,23 @@
         <span class="n">flat_abs_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mag</span><span class="o">.</span><span class="n">B_obs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flat_iflat</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">iflat</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flat_ld</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">ldark</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="n">flat_w_quiet</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">is_quiet_sun</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="c1"># compute the quiet-sun mask once (a full-frame comparison); reuse the 2D</span>
+        <span class="c1"># form for k_hat and the raveled view for the aggregations</span>
+        <span class="n">w_quiet</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">is_quiet_sun</span><span class="p">()</span>
+        <span class="n">flat_w_quiet</span> <span class="o">=</span> <span class="n">w_quiet</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flat_w_active</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">flat_w_quiet</span><span class="p">)</span>
 
         <span class="c1"># calculate k_hat</span>
-        <span class="n">w_quiet</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">is_quiet_sun</span><span class="p">()</span>
         <span class="n">k_hat_con</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">image</span> <span class="o">*</span> <span class="n">con</span><span class="o">.</span><span class="n">ldark</span> <span class="o">*</span> <span class="n">w_quiet</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">ldark</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">w_quiet</span><span class="p">)</span>
 
         <span class="c1"># shared per-pixel weighted products (computed once, reused by all three</span>
         <span class="c1"># aggregations below instead of being recomputed in each)</span>
         <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span> <span class="o">=</span> <span class="n">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
                                                  <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">)</span>
+
+        <span class="c1"># dense region indices (computed once and shared; both region aggregations</span>
+        <span class="c1"># below would otherwise rebuild this 16.8M-element int64 gather independently)</span>
+        <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">)</span>
 
         <span class="c1"># create arrays to hold velocity, magnetic field, and pixel fraction results</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
@@ -539,7 +546,8 @@
                                                    <span class="n">flat_w_active</span><span class="p">,</span>
                                                    <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span>
                                                    <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
-                                                   <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">))</span>
+                                                   <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">,</span>
+                                                   <span class="n">reg_idx</span><span class="o">=</span><span class="n">reg_idx</span><span class="p">))</span>
 
         <span class="c1"># calculate disk-resovled quantities</span>
         <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span>
@@ -548,7 +556,8 @@
                                               <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span>
                                               <span class="n">region_codes</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span>
                                               <span class="n">n_rings</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
-                                              <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">))</span>
+                                              <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">,</span>
+                                              <span class="n">reg_idx</span><span class="o">=</span><span class="n">reg_idx</span><span class="p">))</span>
 
         <span class="c1"># tag every region row with the per-epoch quality flag, then write to disk</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>

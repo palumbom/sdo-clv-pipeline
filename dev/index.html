@@ -329,7 +329,11 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#as-a-dependency-use-the-library-api">As a dependency (use the library API)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#for-development-or-to-run-the-full-pipeline">For development (or to run the full pipeline)</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#author-contact">Author &amp; Contact</a><ul class="visible nav section-nav flex-column">
 </ul>
@@ -351,20 +355,54 @@
 <a class="reference external" href="https://palumbom.github.io/sdo-clv-pipeline/dev/"><img alt="Dev" src="https://img.shields.io/badge/docs-dev-blue.svg" /></a>
 <a class="reference external" href="https://github.com/palumbom/sdo-clv-pipeline/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/palumbom/sdo-clv-pipeline/actions/workflows/ci.yml/badge.svg" /></a>
 <a class="reference external" href="https://arxiv.org/abs/2404.16747"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2404.16747-b31b1b.svg" /></a></p>
-<p>This package processes SDO data to recover trends in the center-to-limbv ariability of the solar radial velocity. v0.x.y is described in <a class="reference external" href="https://arxiv.org/abs/2404.16747">Palumbo et al.
+<p>This package processes SDO data to recover trends in the center-to-limb variability of the solar radial velocity. v0.x.y is described in <a class="reference external" href="https://arxiv.org/abs/2404.16747">Palumbo et al.
 (2024b)</a>. The results of this paper can be reproduced using the <a class="reference external" href="https://github.com/showyourwork/showyourwork">showyourwork workflow</a> from <a class="reference external" href="https://github.com/palumbom/sdo-clv">this repo</a>.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">sdo-clv-pipeline</span></code> package can be trivially installed using the <a class="reference external" href="https://docs.astral.sh/uv/"><code class="docutils literal notranslate"><span class="pre">uv</span></code> tool</a>:</p>
+<p>The package is not published to PyPI; install it from this Git repository. The
+<a class="reference external" href="https://docs.astral.sh/uv/"><code class="docutils literal notranslate"><span class="pre">uv</span></code> tool</a> is recommended but not required.</p>
+<section id="as-a-dependency-use-the-library-api">
+<h3>As a dependency (use the library API)<a class="headerlink" href="#as-a-dependency-use-the-library-api" title="Link to this heading">#</a></h3>
+<p>To import <code class="docutils literal notranslate"><span class="pre">sdo_clv_pipeline</span></code> and call its API from your own code, install it
+straight from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/palumbom/sdo-clv-pipeline.git&quot;</span>
+<span class="c1"># or, with plain pip:</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/palumbom/sdo-clv-pipeline.git&quot;</span>
+</pre></div>
+</div>
+<p>Then in Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sdo_clv_pipeline</span>
+</pre></div>
+</div>
+<p>The interactive Qt matplotlib backend is optional; add the <code class="docutils literal notranslate"><span class="pre">gui</span></code> extra if you
+want it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;sdo_clv_pipeline[gui] @ git+https://github.com/palumbom/sdo-clv-pipeline.git&quot;</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note:</strong> this installs the importable <code class="docutils literal notranslate"><span class="pre">sdo_clv_pipeline</span></code> package only. The
+command-line entry points (<code class="docutils literal notranslate"><span class="pre">scripts/</span></code>, <code class="docutils literal notranslate"><span class="pre">batch/</span></code>) are not packaged — to run the
+full pipeline end-to-end, clone the repo as in the next section.</p>
+</div></blockquote>
+</section>
+<section id="for-development-or-to-run-the-full-pipeline">
+<h3>For development (or to run the full pipeline)<a class="headerlink" href="#for-development-or-to-run-the-full-pipeline" title="Link to this heading">#</a></h3>
+<p>Clone the repo and let <code class="docutils literal notranslate"><span class="pre">uv</span></code> build the locked environment (this installs the
+project in editable mode plus the <code class="docutils literal notranslate"><span class="pre">dev</span></code> dependency group from <code class="docutils literal notranslate"><span class="pre">uv.lock</span></code>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/palumbom/sdo-clv-pipeline.git
 <span class="nb">cd</span><span class="w"> </span>sdo-clv-pipeline
 uv<span class="w"> </span>sync
 </pre></div>
 </div>
-<p>Then in Python, simply:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sdo_clv_pipeline</span>
+<p>Optional extras are not installed by <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> unless requested:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># pytest, to run the test suite</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>docs<span class="w">    </span><span class="c1"># sphinx + theme, to build the docs</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>gui<span class="w">     </span><span class="c1"># PyQt backends for interactive plotting</span>
+uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w">    </span><span class="c1"># all of the above</span>
 </pre></div>
 </div>
+<p>Requires Python 3.12.</p>
+</section>
 </section>
 <section id="citation">
 <h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">#</a></h2>
@@ -375,7 +413,7 @@ uv<span class="w"> </span>sync
 <section id="author-contact">
 <h2>Author &amp; Contact<a class="headerlink" href="#author-contact" title="Link to this heading">#</a></h2>
 <p><a class="reference external" href="https://github.com/palumbom"><img alt="GitHub followers" src="https://img.shields.io/github/followers/palumbom?label=Follow&amp;style=social" /></a></p>
-<p>This repo is maintained by <a class="reference external" href="https://michaelpalumbo.me">Michael Palumbo</a>. You may may contact him via his email - <a class="reference external" href="mailto:mpalumbo&#37;&#52;&#48;flatironinstitute&#46;org">mpalumbo<span>&#64;</span>flatironinstitute<span>&#46;</span>org</a></p>
+<p>This repo is maintained by <a class="reference external" href="https://michaelpalumbo.me">Michael Palumbo</a>. You may contact him via his email - <a class="reference external" href="mailto:mpalumbo&#37;&#52;&#48;flatironinstitute&#46;org">mpalumbo<span>&#64;</span>flatironinstitute<span>&#46;</span>org</a></p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
@@ -421,7 +459,11 @@ uv<span class="w"> </span>sync
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#as-a-dependency-use-the-library-api">As a dependency (use the library API)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#for-development-or-to-run-the-full-pipeline">For development (or to run the full pipeline)</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#author-contact">Author &amp; Contact</a><ul class="visible nav section-nav flex-column">
 </ul>

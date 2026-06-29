@@ -7,7 +7,8 @@ this concatenates them (sorted by timestamp for deterministic order) into
 
 import argparse, os, glob
 from sdo_clv_pipeline.sdo_io import (stitch_output_files, create_file,
-                                     header_thresholds, header_region)
+                                     header_thresholds, header_region,
+                                     header_feature)
 
 
 def main():
@@ -20,17 +21,22 @@ def main():
     tmpdir = os.path.join(args.datadir, "tmp")
     thr_files = sorted(glob.glob(os.path.join(tmpdir, "thresholds_*.csv")))
     reg_files = sorted(glob.glob(os.path.join(tmpdir, "region_output_*.csv")))
+    feat_files = sorted(glob.glob(os.path.join(tmpdir, "feature_output_*.csv")))
 
     out_thr = os.path.join(args.datadir, "thresholds.csv")
     out_reg = os.path.join(args.datadir, "region_output.csv")
+    out_feat = os.path.join(args.datadir, "feature_output.csv")
     create_file(out_thr, header_thresholds)
     create_file(out_reg, header_region)
+    create_file(out_feat, header_feature)
 
     delete = not args.keep_tmp
     stitch_output_files(out_thr, thr_files, delete=delete)
     stitch_output_files(out_reg, reg_files, delete=delete)
-    print(f"stitched {len(thr_files)} threshold rows and "
-          f"{len(reg_files)} region files into {args.datadir}")
+    stitch_output_files(out_feat, feat_files, delete=delete)
+    print(f"stitched {len(thr_files)} threshold rows, "
+          f"{len(reg_files)} region files, and "
+          f"{len(feat_files)} feature files into {args.datadir}")
     return None
 
 

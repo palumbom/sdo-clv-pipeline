@@ -12,8 +12,8 @@ runs, or invoked directly for interactive single-epoch work. Internal numba
 parallelism is controlled by the SDO_THREADS env var (default 1); for a single
 interactive epoch set e.g. SDO_THREADS=16 for lower latency.
 
-Outputs go to ``<datadir>/tmp/{thresholds,region_output}_<stamp>.csv`` (stamp =
-YYYYmmddTHHMMSS); combine them afterwards with scripts/stitch_tmp.py.
+Outputs go to ``<datadir>/tmp/{thresholds,region_output,feature_output}_<stamp>.csv``
+(stamp = YYYYmmddTHHMMSS); combine them afterwards with scripts/stitch_tmp.py.
 
 Usage (explicit files):
   uv run scripts/run_one.py --con C.fits --mag M.fits --dop D.fits --aia A.fits --datadir DIR
@@ -72,14 +72,15 @@ def main():
     os.makedirs(tmpdir, exist_ok=True)  # process_data_set writes here but does not create it
     thr = os.path.join(tmpdir, f"thresholds_{stamp}.csv")
     reg = os.path.join(tmpdir, f"region_output_{stamp}.csv")
+    feat = os.path.join(tmpdir, f"feature_output_{stamp}.csv")
 
-    if not args.clobber and os.path.exists(thr) and os.path.exists(reg):
+    if not args.clobber and all(os.path.exists(f) for f in (thr, reg, feat)):
         logger.info("Epoch %s already done, skipping (resume)", stamp)
         print(f"skip {stamp}")
         return None
 
     # remove any partial/stale output for this epoch before (re)writing
-    for f in (thr, reg):
+    for f in (thr, reg, feat):
         if os.path.exists(f):
             os.remove(f)
 

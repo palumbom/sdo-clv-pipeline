@@ -1,6 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import os, pdb, glob, time, argparse, logging
+# force a non-interactive backend before pyplot is imported, so this batch entry
+# point works headless (no DISPLAY) regardless of the configured GUI backend
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from os.path import exists, split, isdir, getsize
 from collections import Counter
 
@@ -52,16 +56,17 @@ def get_parser_args():
     parser.add_argument("--fitsdir", type=str, default="/mnt/ceph/users/mpalumbo/sdo_data/")
     parser.add_argument("--clobber", action="store_true", default=False)
     parser.add_argument("--globexp", type=str, default="")
+    parser.add_argument("--mu-thresh", type=float, default=0.1, dest="mu_thresh",
+                        help="mask pixels with mu below this (default: %(default)s)")
+    parser.add_argument("--n-rings", type=int, default=10, dest="n_rings",
+                        help="number of mu rings for disk-resolved aggregation (default: %(default)s)")
+    parser.add_argument("--max-epochs", type=int, default=None, dest="max_epochs",
+                        help="process at most this many epochs (for testing)")
     parser.add_argument("--log-level", type=str, default="INFO",
                         help="logging level (DEBUG, INFO, WARNING, ERROR)")
 
     # parse the command line arguments
-    args = parser.parse_args()
-    fitsdir = args.fitsdir
-    clobber = args.clobber
-    globexp = args.globexp
-    log_level = args.log_level
-    return fitsdir, clobber, globexp, log_level
+    return parser.parse_args()
 
 def main():
     # make raw data dir if it does not exist
@@ -69,21 +74,29 @@ def main():
         os.mkdir(os.path.join(root, "data"))
 
     # sort out input/output data files
-    fitsdir, clobber, globexp, log_level = get_parser_args()
+    args = get_parser_args()
+    log_level = args.log_level
     configure_logging(log_level)
-    globdir = globexp.replace("*","")
+    globdir = args.globexp.replace("*","")
     # fitsdir = os.path.join(root, "data", "fits")
-    files = organize_IO(fitsdir, clobber=clobber, globexp=globexp)
+    files = organize_IO(args.fitsdir, clobber=args.clobber, globexp=args.globexp)
     con_files, mag_files, dop_files, aia_files = files
+
+    # optionally cap the number of epochs (smoke testing)
+    if args.max_epochs is not None:
+        con_files = con_files[:args.max_epochs]
+        mag_files = mag_files[:args.max_epochs]
+        dop_files = dop_files[:args.max_epochs]
+        aia_files = aia_files[:args.max_epochs]
 
     # get output datadir
     datadir = os.path.join(root, "data", globdir)
     if not isdir(datadir):
         os.mkdir(datadir)
 
-    # set mu threshold, number of mu rings
-    n_rings = 10
-    mu_thresh = 0.1
+    # mu threshold / number of mu rings (from CLI)
+    n_rings = args.n_rings
+    mu_thresh = args.mu_thresh
     plot = False
 
     # get number of cpus
@@ -111,7 +124,8 @@ def main():
         # crashed) run; otherwise they would be glob'd into this run's stitch
         # and silently corrupt the output
         for stale in glob.glob(os.path.join(tmpdir, "thresholds_*")) + \
-                     glob.glob(os.path.join(tmpdir, "region_output_*")):
+                     glob.glob(os.path.join(tmpdir, "region_output_*")) + \
+                     glob.glob(os.path.join(tmpdir, "feature_output_*")):
             os.remove(stale)
 
         # prepare arguments for starmap
@@ -137,18 +151,23 @@ def main():
                                np.zeros((1,1),np.float32),
                                dummy_dst)
 
-            # run the analysis; keep the per-epoch statuses for the summary
-            statuses = pool.starmap(process_data_set_parallel, items, chunksize=4)
+            # run the analysis; keep the per-epoch statuses for the summary.
+            # chunksize=1: epochs are heavy and uneven, so dynamic dispatch
+            # load-balances better than static chunking (which would also collide
+            # with maxtasksperchild=4, respawning a worker every chunk boundary).
+            statuses = pool.starmap(process_data_set_parallel, items, chunksize=1)
 
         # find the output data sets
         outfiles1 = glob.glob(os.path.join(tmpdir,"thresholds_*"))
         outfiles2 = glob.glob(os.path.join(tmpdir,"region_output_*"))
+        outfiles3 = glob.glob(os.path.join(tmpdir,"feature_output_*"))
 
         # stitch them together on the main process, then remove the temp files
         # so a later non-clobber rerun cannot pick up stale per-worker output
         delete = True
         stitch_output_files(os.path.join(datadir, "thresholds.csv"), outfiles1, delete=delete)
         stitch_output_files(os.path.join(datadir, "region_output.csv"), outfiles2, delete=delete)
+        stitch_output_files(os.path.join(datadir, "feature_output.csv"), outfiles3, delete=delete)
 
         # log run time
         logger.info("Parallel run complete in %.1f seconds", time.time() - t0)

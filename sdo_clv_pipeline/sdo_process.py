@@ -170,6 +170,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
     if suffix is None:
         fname1 = os.path.join(datadir, "thresholds.csv")
         fname2 = os.path.join(datadir, "region_output.csv")
+        fname3 = os.path.join(datadir, "feature_output.csv")
     else:
         # make tmp directory
         tmpdir = os.path.join(datadir, "tmp")
@@ -177,6 +178,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         # filenames
         fname1 = os.path.join(tmpdir, "thresholds_" + suffix + ".csv")
         fname2 = os.path.join(tmpdir, "region_output_" + suffix + ".csv")
+        fname3 = os.path.join(tmpdir, "feature_output_" + suffix + ".csv")
 
     try:
         # reduce the data set; skip cleanly (no disk touched) on a known issue
@@ -190,7 +192,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         quality_flag = combine_quality(con.quality, mag.quality, dop.quality, aia.quality)
 
         # now that we have results, create the output files if needed
-        for file in (fname1, fname2):
+        for file in (fname1, fname2, fname3):
             if not exists(file):
                 create_file(file)
 
@@ -264,10 +266,25 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                               p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag,
                                               reg_idx=reg_idx))
 
+        # per-feature umbra/penumbra catalog (one row per connected blob); field
+        # strength binning is deferred to downstream analysis. Reuses the same
+        # flattened arrays and weighted products as the region aggregations.
+        feature_rows = compute_feature_catalog(mjd, mask.regions, flat_int,
+                                               flat_iflat, flat_mu, flat_abs_mag,
+                                               dop.pix_area.ravel(),
+                                               dop.lon.value.ravel(),
+                                               dop.lat.value.ravel(),
+                                               p_vhat, p_vphot)
+
         # tag every region row with the per-epoch quality flag, then write to disk
         for row in results:
             row.append(quality_flag)
         write_results_to_file(fname2, results)
+
+        # tag and write the per-feature catalog
+        for row in feature_rows:
+            row.append(quality_flag)
+        write_results_to_file(fname3, feature_rows)
 
         # do some memory cleanup (success path: all names are bound)
         del con

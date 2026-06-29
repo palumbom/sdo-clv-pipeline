@@ -24,6 +24,11 @@ header_region = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac",
                  "light_frac", "v_hat", "v_phot", "v_quiet",
                  "v_conv", "mag_unsigned", "avg_int", "avg_int_flat",
                  "quality_flag"]
+header_feature = ["mjd", "region", "feature_id", "n_pix", "area_uhem",
+                  "mean_mu_iw", "min_mu", "max_mu", "centroid_lon",
+                  "centroid_lat", "mean_abs_b_iw", "mean_abs_b_aw", "max_abs_b",
+                  "total_unsigned_flux", "v_hat", "v_phot", "avg_int",
+                  "avg_int_flat", "quality_flag"]
 
 # read headers and data
 def read_header(file):
@@ -125,20 +130,23 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
     # name output files
     fname1 = os.path.join(datadir, "thresholds.csv")
     fname2 = os.path.join(datadir, "region_output.csv")
+    fname3 = os.path.join(datadir, "feature_output.csv")
 
     # headers for output files (defined once at module scope)
     header1 = header_thresholds
     header2 = header_region
+    header3 = header_feature
 
     # replace/create/modify output files
-    fileset = (fname1, fname2)
+    fileset = (fname1, fname2, fname3)
+    headers = (header1, header2, header3)
     if clobber and any(map(exists, fileset)):
         # delete the files
         clean_output_directory(*fileset)
 
         # create the files with headers
-        create_file(fname1, header1)
-        create_file(fname2, header2)
+        for fn, hd in zip(fileset, headers):
+            create_file(fn, hd)
     elif all(map(exists, fileset)) and all(map(lambda x: getsize(x) > 0, fileset)):
         # get list of dates from file
         mjd_list = find_all_dates(fname1)
@@ -156,8 +164,8 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
         dop_files = [dop_files[idx] for idx, date in enumerate(get_dates(dop_files)) if date not in common_dates]
         aia_files = [aia_files[idx] for idx, date in enumerate(get_dates(aia_files)) if date not in common_dates]
     else:
-        create_file(fname1, header1)
-        create_file(fname2, header2)
+        for fn, hd in zip(fileset, headers):
+            create_file(fn, hd)
 
     return con_files, mag_files, dop_files, aia_files
 

@@ -30,18 +30,21 @@ def main():
     # names for output files
     fname1 = os.path.join(datadir, "thresholds.csv")
     fname2 = os.path.join(datadir, "region_output.csv")
+    fname3 = os.path.join(datadir, "feature_output.csv")
 
     # headers for output files (shared schema; defined once in sdo_io)
     header1 = header_thresholds
     header2 = header_region
+    header3 = header_feature
 
     # delete old files if they exists
-    fileset = (fname1, fname2)
+    fileset = (fname1, fname2, fname3)
+    headers = (header1, header2, header3)
     clean_output_directory(*fileset)
 
     # create the files with headers
-    create_file(fname1, header1)
-    create_file(fname2, header2)
+    for fn, hd in zip(fileset, headers):
+        create_file(fn, hd)
 
     # now loop over files to combine
     for file in fileset:

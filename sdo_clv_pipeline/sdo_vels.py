@@ -2,6 +2,7 @@
 
 import numpy as np
 import pdb
+from scipy import ndimage
 from .sdo_image import *
 
 
@@ -219,8 +220,92 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     bin_idxs = np.repeat(lo_mu, len(regions)), np.repeat(hi_mu, len(regions))
     region_list = np.tile(regions, len(lo_mu))
 
-    data = np.vstack([np.full_like(v_phot.ravel(), mjd), region_list, bin_idxs[0], 
-                      bin_idxs[1], pix_frac.ravel(), light_frac.ravel(), 
-                      v_hat.ravel(), v_phot.ravel(), v_q.ravel(), v_conv.ravel(), 
+    data = np.vstack([np.full_like(v_phot.ravel(), mjd), region_list, bin_idxs[0],
+                      bin_idxs[1], pix_frac.ravel(), light_frac.ravel(),
+                      v_hat.ravel(), v_phot.ravel(), v_q.ravel(), v_conv.ravel(),
                       mag_u.ravel(), avg_i.ravel(), avg_if.ravel()]).T.tolist()
     return data
+
+def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
+                            flat_abs_mag, flat_pix_area, flat_lon, flat_lat,
+                            p_vhat, p_vphot,
+                            region_codes_to_label=(umbrae_code, penumbrae_code)):
+    """Per-feature catalog of connected umbra/penumbra blobs.
+
+    Each connected component (8-connectivity) of a region-type mask is one
+    feature; field strength can then be split downstream without re-running the
+    pipeline. Velocities and field means use the same intensity-weighted
+    estimator as the region curves; area and unsigned flux use the per-pixel
+    solar area (microhemispheres). ``regions`` is the 2D region-code map (NaN
+    off-disk / sub-threshold); all other per-pixel inputs are flattened in the
+    same C-order. ``flat_lon``/``flat_lat`` are plain degree arrays (caller
+    extracts ``.value`` from the astropy Quantities); ``flat_lat`` follows the
+    pipeline heliographic colatitude convention (0=N pole, 90=equator).
+
+    Returns one row per feature (quality_flag appended by the caller):
+      [mjd, region, feature_id, n_pix, area_uhem, mean_mu_iw, min_mu, max_mu,
+       centroid_lon, centroid_lat, mean_abs_b_iw, mean_abs_b_aw, max_abs_b,
+       total_unsigned_flux, v_hat, v_phot, avg_int, avg_int_flat]
+    """
+    corners = ndimage.generate_binary_structure(2, 2)
+    rows = []
+    for code in region_codes_to_label:
+        labels2d, n = ndimage.label(regions == code, structure=corners)
+        if n == 0:
+            continue
+        # restrict to labeled pixels first: features cover <<1% of the disk, so
+        # doing the arithmetic on this small subset instead of the full
+        # ~16.8M-pixel frame is the difference between ~8s and well under 1s.
+        # np.flatnonzero is a single full pass; the gathers below touch only the
+        # feature pixels.
+        lab = labels2d.ravel()
+        idx = np.flatnonzero(lab)
+        labs = lab[idx]
+        index = np.arange(1, n + 1)
+        nb = n + 1
+
+        # subset weights once, then reuse
+        i = flat_int[idx]
+        b = flat_abs_mag[idx]
+        a = flat_pix_area[idx]
+        mu_ = flat_mu[idx]
+
+        # per-label weighted sums; bin 0 is empty (labs >= 1) but kept for index
+        # alignment, then sliced off. Feature pixels carry no NaN (sub-threshold
+        # pixels were masked to regions=NaN before labeling), so bincount is safe.
+        s_pix = np.bincount(labs, minlength=nb)[1:]
+        s_int = np.bincount(labs, weights=i, minlength=nb)[1:]
+        s_iflat = np.bincount(labs, weights=flat_iflat[idx], minlength=nb)[1:]
+        s_area = np.bincount(labs, weights=a, minlength=nb)[1:]
+        s_mu_i = np.bincount(labs, weights=mu_ * i, minlength=nb)[1:]
+        s_b_i = np.bincount(labs, weights=b * i, minlength=nb)[1:]
+        s_b_area = np.bincount(labs, weights=b * a, minlength=nb)[1:]
+        s_lon_i = np.bincount(labs, weights=flat_lon[idx] * i, minlength=nb)[1:]
+        s_lat_i = np.bincount(labs, weights=flat_lat[idx] * i, minlength=nb)[1:]
+        s_vhat = np.bincount(labs, weights=p_vhat[idx], minlength=nb)[1:]
+        s_vphot = np.bincount(labs, weights=p_vphot[idx], minlength=nb)[1:]
+
+        # per-label extrema (bincount only sums), on the subset
+        min_mu = np.atleast_1d(ndimage.minimum(mu_, labels=labs, index=index))
+        max_mu = np.atleast_1d(ndimage.maximum(mu_, labels=labs, index=index))
+        max_b = np.atleast_1d(ndimage.maximum(b, labels=labs, index=index))
+
+        # intensity-weighted means
+        mean_mu_iw = s_mu_i / s_int
+        mean_abs_b_iw = s_b_i / s_int
+        mean_abs_b_aw = s_b_area / s_area
+        centroid_lon = s_lon_i / s_int
+        centroid_lat = s_lat_i / s_int
+        v_hat = s_vhat / s_int
+        v_phot = s_vphot / s_int
+        avg_int = s_int / s_pix
+        avg_int_flat = s_iflat / s_pix
+
+        for j in range(n):
+            rows.append([mjd, code, int(index[j]), int(s_pix[j]), s_area[j],
+                         mean_mu_iw[j], min_mu[j], max_mu[j],
+                         centroid_lon[j], centroid_lat[j],
+                         mean_abs_b_iw[j], mean_abs_b_aw[j], max_b[j],
+                         s_b_area[j], v_hat[j], v_phot[j],
+                         avg_int[j], avg_int_flat[j]])
+    return rows

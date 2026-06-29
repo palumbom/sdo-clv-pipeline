@@ -336,7 +336,11 @@ class SDOImage(object):
         self.im_arr = bulk_vel_design(lat_deg, lon_deg, rho, cos_B0, sin_B0,
                                       n_poly, basis_scale)
 
-        self.dat = (self.image - self.v_obs - self.v_grav)[self.mask_nan].copy()
+        # subtract on the masked subset directly, avoiding a full-frame temporary.
+        # Bitwise-identical to (image - v_obs - v_grav)[mask_nan] (v_grav is scalar;
+        # the result is already a fresh array, so no .copy() is needed).
+        m = self.mask_nan
+        self.dat = self.image[m] - self.v_obs[m] - self.v_grav
         self.RHS = self.im_arr.dot(self.dat)
         A = self.im_arr @ self.im_arr.T
         self.fit_params = np.linalg.solve(A, self.RHS)
@@ -502,7 +506,7 @@ class SDOImage(object):
         c = -p[0] / p[2]
 
         # flatten
-        self.ld_coeffs = np.array([a, b, c]) 
+        self.ld_coeffs = np.array([a, b, c])
         self.ldark = quad_darkening_two(self.mu, b, c)
         self.iflat = self.image / self.ldark
         return None

@@ -102,7 +102,7 @@ def compute_pixel_mapping_highlevel(src_wcs, dst_wcs, shape):
     src_x, src_y = src_wcs.world_to_pixel(sky)
     return src_x.astype(np.float32), src_y.astype(np.float32)
 
-@njit(parallel=True)
+@njit(cache=True, parallel=True)
 def bilinear_reproject(src, src_x, src_y, dst):
     """Bilinearly sample src into dst using precomputed pixel mappings.
 

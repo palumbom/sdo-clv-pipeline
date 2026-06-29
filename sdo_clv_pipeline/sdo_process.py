@@ -214,7 +214,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         flat_int = con.image.ravel()
         flat_v_corr = dop.v_corr.ravel()
         flat_v_rot = dop.v_rot.ravel()
-        flat_abs_mag = np.abs(mag.B_obs).ravel()
+        flat_abs_mag = np.abs(mag.B_obs).ravel()       # line-of-sight |B_obs|
+        flat_abs_mag_rad = np.abs(mag.image).ravel()   # radial |B_obs|/mu (foreshortening-corrected)
         flat_iflat = con.iflat.ravel()
         flat_ld = con.ldark.ravel()
         # compute the quiet-sun mask once (a full-frame comparison); reuse the 2D
@@ -271,6 +272,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         # flattened arrays and weighted products as the region aggregations.
         feature_rows = compute_feature_catalog(mjd, mask.regions, flat_int,
                                                flat_iflat, flat_mu, flat_abs_mag,
+                                               flat_abs_mag_rad,
                                                dop.pix_area.ravel(),
                                                dop.lon.value.ravel(),
                                                dop.lat.value.ravel(),
@@ -299,6 +301,7 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         del flat_iflat
         del flat_v_corr
         del flat_abs_mag
+        del flat_abs_mag_rad
         del flat_w_quiet
 
         # end the timer

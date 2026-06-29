@@ -26,8 +26,10 @@ header_region = ["mjd", "region", "lo_mu", "hi_mu", "pixel_frac",
                  "quality_flag"]
 header_feature = ["mjd", "region", "feature_id", "n_pix", "area_uhem",
                   "mean_mu_iw", "min_mu", "max_mu", "centroid_lon",
-                  "centroid_lat", "mean_abs_b_iw", "mean_abs_b_aw", "max_abs_b",
-                  "total_unsigned_flux", "v_hat", "v_phot", "avg_int",
+                  "centroid_lat",
+                  "mean_abs_b_iw_los", "mean_abs_b_aw_los", "max_abs_b_los",
+                  "mean_abs_b_iw_rad", "mean_abs_b_aw_rad", "max_abs_b_rad",
+                  "unsigned_flux_rad_g_uhem", "v_hat", "v_phot", "avg_int",
                   "avg_int_flat", "quality_flag"]
 
 # read headers and data

@@ -12,6 +12,8 @@ Computing radial velocity results from processed SDO data.
 
    .. autofunction:: sdo_clv_pipeline.sdo_vels.compute_region_results
 
+   .. autofunction:: sdo_clv_pipeline.sdo_vels.compute_feature_catalog
+
 .. dropdown:: sdo_clv_pipeline.legendre
 
    .. autofunction:: sdo_clv_pipeline.legendre.gen_leg_vec

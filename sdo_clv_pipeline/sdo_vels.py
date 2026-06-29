@@ -227,8 +227,8 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     return data
 
 def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
-                            flat_abs_mag, flat_pix_area, flat_lon, flat_lat,
-                            p_vhat, p_vphot,
+                            flat_abs_mag, flat_abs_mag_rad, flat_pix_area,
+                            flat_lon, flat_lat, p_vhat, p_vphot,
                             region_codes_to_label=(umbrae_code, penumbrae_code)):
     """Per-feature catalog of connected umbra/penumbra blobs.
 
@@ -238,14 +238,32 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
     estimator as the region curves; area and unsigned flux use the per-pixel
     solar area (microhemispheres). ``regions`` is the 2D region-code map (NaN
     off-disk / sub-threshold); all other per-pixel inputs are flattened in the
-    same C-order. ``flat_lon``/``flat_lat`` are plain degree arrays (caller
-    extracts ``.value`` from the astropy Quantities); ``flat_lat`` follows the
-    pipeline heliographic colatitude convention (0=N pole, 90=equator).
+    same C-order.
+
+    Two magnetic-field conventions are recorded, matching how the literature uses
+    each (see Haywood et al. 2016 vs Yeo et al. 2013 / Milbourne et al. 2019):
+    ``flat_abs_mag`` is the line-of-sight field ``|B_obs|`` (the Haywood unsigned-
+    flux proxy, matching the pipeline's ``mag_unsigned``), reported in the ``_los``
+    columns; ``flat_abs_mag_rad`` is the foreshortening-corrected radial field
+    ``|B_obs|/mu`` (the canonical field for magnetic-strength classification),
+    reported in the ``_rad`` columns and used for the unsigned flux. NOTE the
+    radial field amplifies noise at low mu (x10 at mu=0.1), so ``max_abs_b_rad``
+    is spike-prone near the limb.
+
+    ``flat_lon``/``flat_lat`` are plain degree arrays (caller extracts ``.value``
+    from the astropy Quantities). ``flat_lat`` is the pipeline's internal
+    heliographic colatitude (0=N pole, 90=equator); ``centroid_lat`` is converted
+    to standard Stonyhurst latitude in [-90, 90] (lat - 90).
+
+    ``unsigned_flux_rad_g_uhem`` = sum(|B_rad| * pix_area) in Gauss*microhemisphere
+    -- proportional to the true vertical flux (multiply by ~3.0e16 cm^2/uHem, i.e.
+    1e-6 * 2*pi*R_sun^2, for Maxwells).
 
     Returns one row per feature (quality_flag appended by the caller):
       [mjd, region, feature_id, n_pix, area_uhem, mean_mu_iw, min_mu, max_mu,
-       centroid_lon, centroid_lat, mean_abs_b_iw, mean_abs_b_aw, max_abs_b,
-       total_unsigned_flux, v_hat, v_phot, avg_int, avg_int_flat]
+       centroid_lon, centroid_lat, mean_abs_b_iw_los, mean_abs_b_aw_los,
+       max_abs_b_los, mean_abs_b_iw_rad, mean_abs_b_aw_rad, max_abs_b_rad,
+       unsigned_flux_rad_g_uhem, v_hat, v_phot, avg_int, avg_int_flat]
     """
     corners = ndimage.generate_binary_structure(2, 2)
     rows = []
@@ -266,7 +284,8 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
 
         # subset weights once, then reuse
         i = flat_int[idx]
-        b = flat_abs_mag[idx]
+        b = flat_abs_mag[idx]        # line-of-sight |B_obs|
+        b_rad = flat_abs_mag_rad[idx]  # radial |B_obs|/mu
         a = flat_pix_area[idx]
         mu_ = flat_mu[idx]
 
@@ -280,6 +299,8 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
         s_mu_i = np.bincount(labs, weights=mu_ * i, minlength=nb)[1:]
         s_b_i = np.bincount(labs, weights=b * i, minlength=nb)[1:]
         s_b_area = np.bincount(labs, weights=b * a, minlength=nb)[1:]
+        s_brad_i = np.bincount(labs, weights=b_rad * i, minlength=nb)[1:]
+        s_brad_area = np.bincount(labs, weights=b_rad * a, minlength=nb)[1:]
         s_lon_i = np.bincount(labs, weights=flat_lon[idx] * i, minlength=nb)[1:]
         s_lat_i = np.bincount(labs, weights=flat_lat[idx] * i, minlength=nb)[1:]
         s_vhat = np.bincount(labs, weights=p_vhat[idx], minlength=nb)[1:]
@@ -288,14 +309,17 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
         # per-label extrema (bincount only sums), on the subset
         min_mu = np.atleast_1d(ndimage.minimum(mu_, labels=labs, index=index))
         max_mu = np.atleast_1d(ndimage.maximum(mu_, labels=labs, index=index))
-        max_b = np.atleast_1d(ndimage.maximum(b, labels=labs, index=index))
+        max_b_los = np.atleast_1d(ndimage.maximum(b, labels=labs, index=index))
+        max_b_rad = np.atleast_1d(ndimage.maximum(b_rad, labels=labs, index=index))
 
-        # intensity-weighted means
+        # intensity-weighted (iw) and area-weighted (aw) means
         mean_mu_iw = s_mu_i / s_int
-        mean_abs_b_iw = s_b_i / s_int
-        mean_abs_b_aw = s_b_area / s_area
+        mean_abs_b_iw_los = s_b_i / s_int
+        mean_abs_b_aw_los = s_b_area / s_area
+        mean_abs_b_iw_rad = s_brad_i / s_int
+        mean_abs_b_aw_rad = s_brad_area / s_area
         centroid_lon = s_lon_i / s_int
-        centroid_lat = s_lat_i / s_int
+        centroid_lat = s_lat_i / s_int - 90.0  # colatitude -> Stonyhurst latitude
         v_hat = s_vhat / s_int
         v_phot = s_vphot / s_int
         avg_int = s_int / s_pix
@@ -305,7 +329,8 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
             rows.append([mjd, code, int(index[j]), int(s_pix[j]), s_area[j],
                          mean_mu_iw[j], min_mu[j], max_mu[j],
                          centroid_lon[j], centroid_lat[j],
-                         mean_abs_b_iw[j], mean_abs_b_aw[j], max_b[j],
-                         s_b_area[j], v_hat[j], v_phot[j],
+                         mean_abs_b_iw_los[j], mean_abs_b_aw_los[j], max_b_los[j],
+                         mean_abs_b_iw_rad[j], mean_abs_b_aw_rad[j], max_b_rad[j],
+                         s_brad_area[j], v_hat[j], v_phot[j],
                          avg_int[j], avg_int_flat[j]])
     return rows

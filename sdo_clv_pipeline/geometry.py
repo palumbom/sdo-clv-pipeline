@@ -19,10 +19,14 @@ Conventions (matched to sunpy):
 Reference: Thompson, W. T. 2006, A&A 449, 791.
 """
 
+import logging
 import math
+import os
 import numpy as np
 import astropy.units as u
 from numba import njit, prange
+
+logger = logging.getLogger(__name__)
 
 _RAD2DEG = 180.0 / math.pi
 _RAD2ARCSEC = _RAD2DEG * 3600.0
@@ -200,20 +204,120 @@ def _geometry_kernel(Tx, Ty, dsun, rsun, rsun_obs, cos_b0, sin_b0, l0,
             lon_deg[i] = (math.atan2(x, hgs_x) + l0) * _RAD2DEG
 
 
+@njit(cache=True, parallel=True)
+def _geometry_kernel_analytic(naxis1, naxis2, cr1, cr2, cd1, cd2,
+                              pc00, pc01, pc10, pc11, av1_deg, fp_rad, sin_dp, cos_dp,
+                              dsun, rsun, rsun_obs, cos_b0, sin_b0, l0,
+                              xx, yy, rr, mu, lat_deg, lon_deg):
+    """Fully analytic geometry pass: pixel index -> all geometry arrays.
+
+    Replaces the astropy ``wcs_pix2world`` call in ``pixel_to_hpc`` with an inline
+    rotated-TAN inverse (FITS WCS Paper II), then runs the same HPC->HCC->HGS +
+    rr/mu math as ``_geometry_kernel``. Valid only for a clean HPLN/HPLT-TAN WCS
+    with no distortion (the caller guards this); WCS scalars are passed in
+    post-``wcs.wcs.set()`` (cunit normalized to deg). The longitude unwrap and all
+    formulas reproduce ``pixel_to_hpc`` to machine precision (~1e-10 arcsec).
+
+    Like ``_geometry_kernel`` this is a pure per-pixel map in ``prange``, so it is
+    thread-count invariant. Flat index ``idx`` decomposes as the original
+    ``meshgrid(arange(naxis1), arange(naxis2))`` raveling: col=idx%naxis1 (pixel x),
+    row=idx//naxis1 (pixel y).
+    """
+    n = naxis1 * naxis2
+    d2 = dsun * dsun - rsun * rsun
+    deg_per_rad = _RAD2DEG          # 180/pi (also the TAN constant)
+    deg2rad = 1.0 / _RAD2DEG
+    for idx in prange(n):
+        col = idx % naxis1          # pixel x (naxis1 axis)
+        row = idx // naxis1         # pixel y (naxis2 axis)
+        q1 = col - (cr1 - 1.0)
+        q2 = row - (cr2 - 1.0)
+
+        # pixel -> intermediate projection-plane coords (deg)
+        xdeg = cd1 * (pc00 * q1 + pc01 * q2)
+        ydeg = cd2 * (pc10 * q1 + pc11 * q2)
+
+        # TAN deprojection -> native spherical (rad)
+        Rdeg = math.sqrt(xdeg * xdeg + ydeg * ydeg)
+        phi = math.atan2(xdeg, -ydeg)
+        theta = math.atan2(deg_per_rad, Rdeg)
+
+        # native -> celestial (Paper II eq 2)
+        st = math.sin(theta)
+        ct = math.cos(theta)
+        dphi = phi - fp_rad
+        cdp_ = math.cos(dphi)
+        sdp_ = math.sin(dphi)
+        ty = math.asin(st * sin_dp + ct * cos_dp * cdp_)            # rad
+        alpha_deg = av1_deg + deg_per_rad * math.atan2(
+            -ct * sdp_, st * cos_dp - ct * sin_dp * cdp_)
+
+        # unwrap lon to [-180,180) then to radians (matches pixel_to_hpc)
+        t = alpha_deg + 180.0
+        t = t - 360.0 * math.floor(t / 360.0)
+        tx = (t - 180.0) * deg2rad
+
+        # ---- identical to _geometry_kernel from here ----
+        ctx = math.cos(tx)
+        stx = math.sin(tx)
+        cty = math.cos(ty)
+        sty = math.sin(ty)
+
+        rho = math.sqrt(tx * tx + ty * ty) * _RAD2ARCSEC / rsun_obs
+        rr[idx] = rho
+        rho2 = rho * rho
+        if rho2 >= 1.0:
+            mu[idx] = np.nan
+        else:
+            mu[idx] = math.sqrt(1.0 - rho2)
+
+        cos_alpha = cty * ctx
+        b = dsun * cos_alpha
+        disc = b * b - d2
+        if disc < 0.0:
+            xx[idx] = np.nan
+            yy[idx] = np.nan
+            lat_deg[idx] = np.nan
+            lon_deg[idx] = np.nan
+        else:
+            d = b - math.sqrt(disc)
+            x = d * cty * stx
+            y = d * sty
+            z = dsun - d * cos_alpha
+            xx[idx] = x
+            yy[idx] = y
+            r = math.sqrt(x * x + y * y + z * z)
+            hgs_z = cos_b0 * y + sin_b0 * z
+            hgs_x = cos_b0 * z - sin_b0 * y
+            lat_deg[idx] = math.asin(hgs_z / r) * _RAD2DEG + 90.0
+            lon_deg[idx] = (math.atan2(x, hgs_x) + l0) * _RAD2DEG
+
+
+def _wcs_is_clean_tan(wcs):
+    """True if ``wcs`` is a plain HPLN/HPLT-TAN with no distortion (analytic-safe)."""
+    try:
+        ctype = [str(c) for c in wcs.wcs.ctype]
+    except Exception:
+        return False
+    return (wcs.sip is None and not wcs.has_distortion
+            and len(ctype) == 2
+            and ctype[0].endswith("-TAN") and ctype[1].endswith("-TAN"))
+
+
 def compute_geometry(wcs, naxis1, naxis2, dsun, rsun, rsun_obs, b0, l0, image_dtype):
     """Compute (xx, yy, rr, mu, lat_deg, lon_deg) arrays for an image grid.
 
-    Thin wrapper that gets Tx, Ty from the WCS (astropy C path) and runs the
-    fused numba kernel. Returns plain ndarrays in the same units/dtypes the
-    numpy path produced: xx, yy in meters; rr dimensionless; mu in ``image_dtype``
-    (NaN at the limb); lat_deg, lon_deg in degrees (lat already +90).
+    For a clean HPLN/HPLT-TAN WCS (the SDO case), runs a fully analytic fused
+    numba pass (``_geometry_kernel_analytic``) that reproduces the astropy
+    ``wcs_pix2world`` deprojection inline -- no astropy in the hot path. For any
+    other WCS (distortion/SIP/non-TAN) it falls back to the astropy
+    ``pixel_to_hpc`` path + ``_geometry_kernel`` so correctness is never silently
+    compromised. Returns plain ndarrays in the same units/dtypes the numpy path
+    produced: xx, yy in meters; rr dimensionless; mu in ``image_dtype`` (NaN at the
+    limb); lat_deg, lon_deg in degrees (lat already +90).
     """
-    Tx, Ty = pixel_to_hpc(wcs, naxis1, naxis2)
-    shape = Tx.shape
-    n = Tx.size
-    txf = np.ascontiguousarray(Tx.ravel())
-    tyf = np.ascontiguousarray(Ty.ravel())
-
+    n = naxis1 * naxis2
+    shape = (naxis2, naxis1)
     xx = np.empty(n, dtype=np.float64)
     yy = np.empty(n, dtype=np.float64)
     rr = np.empty(n, dtype=np.float64)
@@ -221,9 +325,40 @@ def compute_geometry(wcs, naxis1, naxis2, dsun, rsun, rsun_obs, b0, l0, image_dt
     lon_deg = np.empty(n, dtype=np.float64)
     mu = np.empty(n, dtype=image_dtype)
 
-    _geometry_kernel(txf, tyf, float(dsun), float(rsun), float(rsun_obs),
-                     math.cos(b0), math.sin(b0), float(l0),
-                     xx, yy, rr, mu, lat_deg, lon_deg)
+    # SDO_GEOMETRY_LEGACY forces the astropy fallback path (for A/B verification
+    # against the analytic path on a single checkout, e.g. golden-CSV regression)
+    use_analytic = _wcs_is_clean_tan(wcs) and not os.environ.get("SDO_GEOMETRY_LEGACY")
+
+    if use_analytic:
+        wcs.wcs.set()  # canonicalize celestial units to deg, populate lonpole
+        w = wcs.wcs
+        cr1, cr2 = float(w.crpix[0]), float(w.crpix[1])
+        cd1, cd2 = float(w.cdelt[0]), float(w.cdelt[1])
+        pc = w.get_pc()
+        av1, av2 = float(w.crval[0]), float(w.crval[1])
+        lonpole = float(w.lonpole)
+        if math.isnan(lonpole):
+            lonpole = 180.0 if av2 < 90.0 else 0.0
+        fp_rad = math.radians(lonpole)
+        dp_rad = math.radians(av2)
+        _geometry_kernel_analytic(
+            int(naxis1), int(naxis2), cr1, cr2, cd1, cd2,
+            float(pc[0, 0]), float(pc[0, 1]), float(pc[1, 0]), float(pc[1, 1]),
+            av1, fp_rad, math.sin(dp_rad), math.cos(dp_rad),
+            float(dsun), float(rsun), float(rsun_obs),
+            math.cos(b0), math.sin(b0), float(l0),
+            xx, yy, rr, mu, lat_deg, lon_deg)
+    else:
+        if not _wcs_is_clean_tan(wcs):
+            logger.warning("WCS is not a clean HPLN/HPLT-TAN (ctype=%s, distortion=%s); "
+                           "using astropy pixel_to_hpc fallback",
+                           list(wcs.wcs.ctype), wcs.has_distortion)
+        Tx, Ty = pixel_to_hpc(wcs, naxis1, naxis2)
+        txf = np.ascontiguousarray(Tx.ravel())
+        tyf = np.ascontiguousarray(Ty.ravel())
+        _geometry_kernel(txf, tyf, float(dsun), float(rsun), float(rsun_obs),
+                         math.cos(b0), math.sin(b0), float(l0),
+                         xx, yy, rr, mu, lat_deg, lon_deg)
 
     return (xx.reshape(shape), yy.reshape(shape), rr.reshape(shape),
             mu.reshape(shape), lat_deg.reshape(shape), lon_deg.reshape(shape))

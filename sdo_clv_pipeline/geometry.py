@@ -44,24 +44,31 @@ def pixel_to_hpc(wcs, naxis1, naxis2):
     paxis1 = np.arange(naxis1)
     paxis2 = np.arange(naxis2)
     xx, yy = np.meshgrid(paxis1, paxis2)
+    shape = xx.shape
 
-    # low-level transform: returns world coords in the WCS's native CUNIT
+    # low-level transform: returns freshly-allocated float64 world coords in the
+    # WCS's native CUNIT, which we are free to mutate in place below
     lon, lat = wcs.wcs_pix2world(xx.ravel(), yy.ravel(), 0)
 
-    # convert to degrees using the live CUNIT (do not assume deg vs arcsec)
+    # convert to degrees using the live CUNIT (do not assume deg vs arcsec).
+    # The unit factor is a scalar, so scale in place rather than building
+    # full-frame Quantity temporaries (this is astropy's own internal multiply).
     cunit = wcs.wcs.cunit
-    lon = (lon * u.Unit(cunit[0])).to_value(u.deg)
-    lat = (lat * u.Unit(cunit[1])).to_value(u.deg)
+    lon *= (1.0 * u.Unit(cunit[0])).to_value(u.deg)
+    lat *= (1.0 * u.Unit(cunit[1])).to_value(u.deg)
 
     # wcs_pix2world reports longitude in [0, 360); helioprojective Tx near the
     # disk is small, so unwrap to a symmetric branch [-180, 180). Without this,
     # disk-center pixels come back as ~360 deg and inflate rr (sin/cos-based
     # quantities are immune, but rr = sqrt(Tx^2+Ty^2) is not).
-    lon = (lon + 180.0) % 360.0 - 180.0
+    lon += 180.0
+    np.mod(lon, 360.0, out=lon)
+    lon -= 180.0
 
-    Tx = np.deg2rad(lon).reshape(xx.shape)
-    Ty = np.deg2rad(lat).reshape(xx.shape)
-    return Tx, Ty
+    # to radians, in place (same values as np.deg2rad of the above)
+    np.deg2rad(lon, out=lon)
+    np.deg2rad(lat, out=lat)
+    return lon.reshape(shape), lat.reshape(shape)
 
 
 def hpc_to_hcc(Tx, Ty, dsun, rsun):

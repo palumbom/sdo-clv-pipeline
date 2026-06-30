@@ -564,9 +564,17 @@ def calculate_pixel_area(lat, lon):
     # pad the edge
     d_lat2 = np.pad(d_lat, ((0, 1), (0, 0)), mode="constant")
     d_lon2 = np.pad(d_lon, ((0, 0), (0, 1)), mode="constant")
-    
-    # compute the areas of pixels
-    pix_area = np.sin(lat_rad) * np.abs(d_lon2) * np.abs(d_lat2) / (2 * np.pi) * 1e6
+
+    # compute the areas of pixels. Same operation order as
+    #   sin(lat) * |d_lon2| * |d_lat2| / (2*pi) * 1e6
+    # but accumulated in place to avoid ~6 full-frame (134 MB) temporaries.
+    np.abs(d_lon2, out=d_lon2)
+    np.abs(d_lat2, out=d_lat2)
+    pix_area = np.sin(lat_rad)
+    pix_area *= d_lon2
+    pix_area *= d_lat2
+    pix_area /= (2 * np.pi)
+    pix_area *= 1e6
     return pix_area
 
 def pad_max_len(data, max_length):

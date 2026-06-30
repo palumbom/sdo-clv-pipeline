@@ -224,11 +224,15 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                       bin_idxs[1], pix_frac.ravel(), light_frac.ravel(),
                       v_hat.ravel(), v_phot.ravel(), v_q.ravel(), v_conv.ravel(),
                       mag_u.ravel(), avg_i.ravel(), avg_if.ravel()]).T.tolist()
-    return data
+    # also surface the per-ring quiet-Sun reference (the scalar subtracted to form
+    # v_conv) and the ring edges, so the feature catalog can subtract the identical
+    # reference per pixel without recomputing it.
+    return data, v_q[:, quiet_idx], bins
 
 def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
                             flat_abs_mag, flat_abs_mag_rad, flat_pix_area,
                             flat_lon, flat_lat, p_vhat, p_vphot,
+                            flat_v_quiet_ref=None,
                             region_codes_to_label=(umbrae_code, penumbrae_code)):
     """Per-feature catalog of connected umbra/penumbra blobs.
 
@@ -259,11 +263,19 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
     -- proportional to the true vertical flux (multiply by ~3.0e16 cm^2/uHem, i.e.
     1e-6 * 2*pi*R_sun^2, for Maxwells).
 
+    ``flat_v_quiet_ref`` is the per-pixel quiet-Sun velocity reference of each
+    pixel's mu-ring (``v_q[ring, quiet_idx]`` from compute_region_results, mapped
+    to pixels). When supplied, ``v_quiet`` is its intensity-weighted mean over the
+    feature and ``v_conv = v_hat - v_quiet`` -- the exact per-pixel-ring analogue
+    of the region-level convective term, correct even when a feature straddles
+    rings. When omitted (e.g. unit tests), both columns are NaN.
+
     Returns one row per feature (quality_flag appended by the caller):
       [mjd, region, feature_id, n_pix, area_uhem, mean_mu_iw, min_mu, max_mu,
        centroid_lon, centroid_lat, mean_abs_b_iw_los, mean_abs_b_aw_los,
        max_abs_b_los, mean_abs_b_iw_rad, mean_abs_b_aw_rad, max_abs_b_rad,
-       unsigned_flux_rad_g_uhem, v_hat, v_phot, avg_int, avg_int_flat]
+       unsigned_flux_rad_g_uhem, v_hat, v_phot, avg_int, avg_int_flat,
+       v_conv, v_quiet]
     """
     corners = ndimage.generate_binary_structure(2, 2)
     rows = []
@@ -325,6 +337,16 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
         avg_int = s_int / s_pix
         avg_int_flat = s_iflat / s_pix
 
+        # convective term: subtract the intensity-weighted per-pixel quiet-Sun
+        # ring reference (matches the region v_conv definition exactly)
+        if flat_v_quiet_ref is not None:
+            s_vq_i = np.bincount(labs, weights=flat_v_quiet_ref[idx] * i, minlength=nb)[1:]
+            v_quiet = s_vq_i / s_int
+            v_conv = v_hat - v_quiet
+        else:
+            v_quiet = np.full(n, np.nan)
+            v_conv = np.full(n, np.nan)
+
         for j in range(n):
             rows.append([mjd, code, int(index[j]), int(s_pix[j]), s_area[j],
                          mean_mu_iw[j], min_mu[j], max_mu[j],
@@ -332,5 +354,5 @@ def compute_feature_catalog(mjd, regions, flat_int, flat_iflat, flat_mu,
                          mean_abs_b_iw_los[j], mean_abs_b_aw_los[j], max_b_los[j],
                          mean_abs_b_iw_rad[j], mean_abs_b_aw_rad[j], max_b_rad[j],
                          s_brad_area[j], v_hat[j], v_phot[j],
-                         avg_int[j], avg_int_flat[j]])
+                         avg_int[j], avg_int_flat[j], v_conv[j], v_quiet[j]])
     return rows

@@ -257,15 +257,21 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                                    p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag,
                                                    reg_idx=reg_idx))
 
-        # calculate disk-resovled quantities
-        results.extend(compute_region_results(mjd, flat_mu, flat_int, flat_v_corr,
-                                              flat_v_rot, flat_ld, flat_iflat,
-                                              flat_abs_mag, flat_w_quiet,
+        # calculate disk-resovled quantities (also returns the per-ring quiet-Sun
+        # reference and ring edges, reused by the feature catalog below)
+        region_rows, v_q_quiet, bins = compute_region_results(mjd, flat_mu, flat_int,
+                                              flat_v_corr, flat_v_rot, flat_ld,
+                                              flat_iflat, flat_abs_mag, flat_w_quiet,
                                               flat_w_active, flat_reg,
                                               region_codes, mu_thresh,
                                               n_rings, k_hat_con,
                                               p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag,
-                                              reg_idx=reg_idx))
+                                              reg_idx=reg_idx)
+        results.extend(region_rows)
+
+        # map each pixel to its mu-ring's quiet-Sun reference (the exact scalar the
+        # region v_conv subtracts); pixels below mu_thresh never enter a feature
+        flat_v_quiet_ref = v_q_quiet[np.clip(np.digitize(flat_mu, bins) - 1, 0, len(bins) - 2)]
 
         # per-feature umbra/penumbra catalog (one row per connected blob); field
         # strength binning is deferred to downstream analysis. Reuses the same
@@ -276,7 +282,8 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                                dop.pix_area.ravel(),
                                                dop.lon.value.ravel(),
                                                dop.lat.value.ravel(),
-                                               p_vhat, p_vphot)
+                                               p_vhat, p_vphot,
+                                               flat_v_quiet_ref=flat_v_quiet_ref)
 
         # tag every region row with the per-epoch quality flag, then write to disk
         for row in results:

@@ -30,7 +30,7 @@ header_feature = ["mjd", "region", "feature_id", "n_pix", "area_uhem",
                   "mean_abs_b_iw_los", "mean_abs_b_aw_los", "max_abs_b_los",
                   "mean_abs_b_iw_rad", "mean_abs_b_aw_rad", "max_abs_b_rad",
                   "unsigned_flux_rad_g_uhem", "v_hat", "v_phot", "avg_int",
-                  "avg_int_flat", "quality_flag"]
+                  "avg_int_flat", "v_conv", "v_quiet", "quality_flag"]
 
 # read headers and data
 def read_header(file):

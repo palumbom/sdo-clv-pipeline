@@ -19,7 +19,7 @@ COL = {name: i for i, name in enumerate([
     "mean_abs_b_iw_los", "mean_abs_b_aw_los", "max_abs_b_los",
     "mean_abs_b_iw_rad", "mean_abs_b_aw_rad", "max_abs_b_rad",
     "unsigned_flux_rad_g_uhem", "v_hat", "v_phot",
-    "avg_int", "avg_int_flat"])}
+    "avg_int", "avg_int_flat", "v_conv", "v_quiet"])}
 
 
 def _toy_epoch():
@@ -69,6 +69,10 @@ def _toy_epoch():
                    (2, 0): 1.0, (2, 1): 1.0})
     p_vphot = grid({(0, 0): 1.0, (0, 1): 3.0, (0, 4): 0.5, (1, 4): 0.5,
                     (2, 0): 0.2, (2, 1): 0.2})
+    # per-pixel quiet-Sun ring reference; blob A pixels carry 1.0 and 3.0 so its
+    # intensity-weighted v_quiet = (1+3)/2 = 2.0 (tests straddling-ring averaging)
+    v_quiet_ref = grid({(0, 0): 1.0, (0, 1): 3.0, (0, 4): 5.0, (1, 4): 5.0,
+                        (2, 0): 0.5, (2, 1): 0.5})
 
     return dict(mjd=12345.0, regions=regions,
                 flat_int=intensity.ravel(), flat_iflat=iflat.ravel(),
@@ -76,7 +80,8 @@ def _toy_epoch():
                 flat_abs_mag_rad=abs_mag_rad.ravel(),
                 flat_pix_area=pix_area.ravel(), flat_lon=lon.ravel(),
                 flat_lat=lat.ravel(), p_vhat=p_vhat.ravel(),
-                p_vphot=p_vphot.ravel())
+                p_vphot=p_vphot.ravel(),
+                flat_v_quiet_ref=v_quiet_ref.ravel())
 
 
 def test_labels_independent_umbra_and_penumbra_features():
@@ -119,6 +124,12 @@ def test_per_feature_statistics_match_hand_computed_values():
     assert a[COL["v_phot"]] == pytest.approx(2.0)           # (1+3)/2
     assert a[COL["avg_int"]] == pytest.approx(1.0)
     assert a[COL["avg_int_flat"]] == pytest.approx(0.6)     # (0.5+0.7)/2
+
+    # convective term: v_quiet is the iw mean of the ring reference, v_conv the
+    # difference from v_hat
+    assert a[COL["v_quiet"]] == pytest.approx(2.0)          # (1+3)/2
+    assert a[COL["v_conv"]] == pytest.approx(3.0)           # 5.0 - 2.0
+    assert a[COL["v_conv"]] == pytest.approx(a[COL["v_hat"]] - a[COL["v_quiet"]])
 
 
 def test_empty_region_emits_no_rows():

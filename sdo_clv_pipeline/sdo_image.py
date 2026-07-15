@@ -27,8 +27,7 @@ from .legendre import bulk_vel_design, basis_scale
 from .reproject import *
 from .geometry import pixel_to_hpc, hpc_to_hcc, hcc_to_hgs, compute_geometry
 
-import sdo_clv_pipeline.plot_moats_data as plot_moats_data
-from sdo_clv_pipeline.plot_moats_data import load_and_plot
+from .moat import detect_moats
 
 warnings.simplefilter("ignore", category=VerifyWarning)
 warnings.simplefilter("ignore", category=FITSFixedWarning)
@@ -744,184 +743,22 @@ class SunMask(object):
         self.regions[ind_iso] = quiet_sun_code # quiet sun
 
         if classify_moat:
-            # label each penumbra island and include umbra so we only expand outwards
-            binary_img = np.logical_or.reduce([self.is_umbra(), self.is_penumbra()])
-            labels, nlabels = ndimage.label(binary_img, structure=corners) # label each island of umbra and penumbra
-            rprops = regionprops(labels, dop.pix_area)
-            areas_pix, areas_mic = get_areas(labels, dop.pix_area) # get areas
+            # grow moat rings outward from each large spot. The tunable logic
+            # lives in the pure kernel moat.detect_moats (see
+            # docs/superpowers/specs/2026-07-01-moat-tuning-design.md); this
+            # applies its masks to the region map. Behavior-preserving vs the
+            # former inline implementation.
+            moat_result = detect_moats(dop.v_corr, con.mu, dop.lon.value,
+                                       con.image, mag.image, invalid_mask,
+                                       self.is_umbra(), self.is_penumbra())
+            self.regions[moat_result.moat_mask] = moat_code
+            self.left_moat = moat_result.left_moat
+            self.right_moat = moat_result.right_moat
+            self.moat_profiles = moat_result.profiles
 
             if plot_moat:
-                plt.imshow(labels)
-                plt.colorbar()
+                plt.imshow(self.is_moat_flow())
                 plt.show()
-
-            # save original array first
-            # save_arr = areas_pix.copy()
-            # a_label = [36, 17, 19, 15, 37, 49]
-            # b_label = [71, 86, 81, 62, 52, 36, 39, 26]
-
-            # store left/right pixels
-            left_moat_pixels = np.zeros_like(self.regions, dtype=bool)
-            right_moat_pixels = np.zeros_like(self.regions, dtype=bool)
-
-            # collect areas and centroids
-            area_thresh = 600
-            rprops_tab = regionprops_table(labels, properties=("label","area","centroid"))  
-            areas = np.array(rprops_tab["area"])
-            x_centroids = np.array((rprops_tab["centroid-1"][areas > area_thresh])).astype(int)
-            y_centroids = np.array((rprops_tab["centroid-0"][areas > area_thresh])).astype(int)
-            labels = np.array(rprops_tab["label"][areas > area_thresh]).astype(int)
-            areas = areas[areas > area_thresh]
-
-            # allocate for moats
-            moat_idx = np.zeros_like(con.image).astype(bool)
-            moats = np.zeros((len(areas), *np.shape(con.image))).astype(bool)
-            area_idx_arr = np.zeros((len(areas), *np.shape(con.image))).astype(bool)
-
-            # allocate for hemisphere indicator 
-            left_hemisphere = np.zeros(len(areas)).astype(bool)
-            lon = dop.lon.value
-
-            # allocate for average quantities
-            avg_mu = np.zeros(len(areas))
-            max_dilations = np.zeros(len(areas))
-            max_rings = np.zeros(len(areas))
-            avg_vels = []
-            avg_mags = []
-            avg_ints = []
-
-            # allocate for mask
-            valid_mask = np.zeros_like(invalid_mask)
-
-            # define function to dilate moats
-            def dilate_moat(idx, pre_factor, compute_avgs=True):
-                # get area of that region              
-                max_area = areas[idx]
-                x_centroid = x_centroids[idx]
-                y_centroid = y_centroids[idx]
-
-                # get pixels in that region
-                max_area_idx = areas_pix == max_area
-                area_idx_arr[idx, :, :] = max_area_idx
-                valid_list = [~max_area_idx, ~invalid_mask, ~self.is_umbra(), ~self.is_penumbra()]
-                np.logical_and.reduce(valid_list, out=valid_mask)
-
-                # get the distance transform
-                dist = distance_transform_edt(~max_area_idx)
-                rings = dist.astype(int)
-                max_ring = np.nanmax(rings[valid_mask]) + 1
-                flat_rings = rings[valid_mask].ravel()
-
-                # func to compute inclusive averages (capturing variables above)
-                def cum_avg_val(val):
-                    sums = np.bincount(flat_rings, weights=val, minlength=max_ring)
-                    counts = np.bincount(flat_rings, minlength=max_ring)
-                    cumsum_sums = np.cumsum(sums)
-                    cumsum_counts = np.cumsum(counts)
-                    return cumsum_sums[1:] / cumsum_counts[1:]
-
-                # select and ravel averaging quantities
-                if compute_avgs:
-                    flat_vel = dop.v_corr[valid_mask].ravel()
-                    flat_mag = np.abs(mag.image[valid_mask].ravel())
-                    flat_int = con.image[valid_mask].ravel()
-                    
-                    # compute averages and append
-                    avg_vels.append(cum_avg_val(flat_vel))
-                    avg_mags.append(cum_avg_val(flat_mag))
-                    avg_ints.append(cum_avg_val(flat_int))
-
-                # select initially on the larger moat radius
-                rings_cond = rings < pre_factor * (1.2 * np.sqrt(max_area / pi))
-                cond = [rings_cond, valid_mask] 
-                np.logical_and.reduce(cond, out=moat_idx)
-                moats[idx, :, :] = moat_idx
-
-                # get average mu
-                avg_mu[idx] = np.average(con.mu[moat_idx])
-
-                # get max number of dilations
-                max_dilations[idx] = np.nanmax(rings[rings_cond])
-                max_rings[idx] = max_ring
-
-                # make hemisphere indicator
-                left_hemisphere[idx] = lon[y_centroid, x_centroid] >= 0.0
-                return None
-
-            # iterate over regions
-            for idx in range(len(areas)):
-                dilate_moat(idx, 0.97, compute_avgs=True)
-
-            # now re-do overlapping moats
-            collision_map = np.count_nonzero(moats, axis=0) > 1
-            overlapping = np.any(np.logical_and(moats, collision_map), axis=(1, 2))
-            redo_idxs = np.nonzero(overlapping)[0]
-
-            # iterate again over regions which overlap
-            for idx in redo_idxs:
-                dilate_moat(idx, 0.65, compute_avgs=False)
-
-            # get average theta
-            avg_theta = np.arccos(avg_mu)
-
-            # discriminate based on hemisphere
-            ind8 = moats[left_hemisphere, :, :].any(axis=0)
-            ind9 = moats[~left_hemisphere, :, :].any(axis=0)
-
-            # set values 
-            self.regions[ind8] = moat_code
-            self.regions[ind9] = moat_code
-
-            # set left and right moat
-            self.left_moat[ind8] = True
-            self.right_moat[ind9] = True
-
-            # pad data for write out
-            if plot_moat:
-                max_length = np.max([(len(arr) + 1) for arr in avg_vels])
-                vels = np.vstack([pad_max_len(arr, max_length) for arr in avg_vels])
-                mags = np.vstack([pad_max_len(arr, max_length) for arr in avg_mags])
-                ints = np.vstack([pad_max_len(arr, max_length) for arr in avg_ints])
-
-                # letters for labeling
-                letters = [ascii_letters[i%52] for i in range(len(areas))]
-                
-                # directory to write out moat data to
-                moat_path = os.path.join(root, "data", "moat_data")
-                if not os.path.exists(moat_path):
-                    os.mkdir(moat_path)
-
-                # write it out
-                iso = get_date(con.filename).isoformat()
-                fname = os.path.join(moat_path, f"moats_data_{iso}.npz")
-                np.savez_compressed(fname, x=max_rings, vels=vels, mags=mags, ints=ints, 
-                                    areas=areas, mus=avg_mu, area_idx_arr=area_idx_arr, 
-                                    letters=letters, dilated_spots=moats)
-            
-            # print("before plotting")
-            # TODO this needs to be checked
-            if plot_moat:
-                load_and_plot(fname)
-                # plot_loop()
-            
-            # TODO not sure what this does
-            # self.moat_vals = moat_vals
-            # self.moat_dilations = moat_dilations
-            # self.moat_thetas = moat_thetas
-            # self.moat_areas = moat_areas
-
-            # fig, ax = plt.subplots()
-            # colors = ['r', 'g', 'b']
-            # print(len(dilated_spots))
-            # for i in range(0, len(dilated_spots)+1):
-            #     ax.imshow(dilated_spots[i], alpha=0.4)
-            # ax.set_title("Regions and overlaps")
-            # plt.show()
-
-        # print("moat pixels")
-        if plot_moat:
-            plt.imshow(self.is_moat_flow())
-            plt.show()
 
         # make any remaining unclassified pixels quiet sun
         ind_rem = np.logical_and(~invalid_mask, self.is_unclassified())
@@ -933,7 +770,8 @@ class SunMask(object):
         return None
 
     def get_moat_properties(self):
-        return self.moat_vals, self.moat_dilations, self.moat_thetas, self.moat_areas
+        """Per-spot moat radial profiles (populated when classify_moat=True)."""
+        return self.moat_profiles
 
     def mask_low_mu(self, mu_thresh):
         self.mu_thresh = mu_thresh

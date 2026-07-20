@@ -6,6 +6,7 @@ import matplotlib.cm as cm
 import os, sys, pdb, csv, glob
 import pandas as pd
 from sdo_clv_pipeline.paths import root
+from sdo_clv_pipeline.clv_stats import weighted_stats
 
 # get paths
 plotdir = os.path.join(root, "figures")
@@ -58,8 +59,9 @@ lm_marker = "<"
 rm_marker = ">"
 
 mu_bins = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-def calc_region_stats(region_df, colname="v_hat"):
-    # get number elements
+def calc_region_stats(region_df, colname="v_hat", weight_col="pixel_frac"):
+    # weighted by pixel_frac (per-epoch pixel-count proxy) so epochs backed by
+    # only a handful of pixels don't count as much as ones backed by thousands
     lo_mus = mu_bins
     nn = len(lo_mus)
 
@@ -77,13 +79,15 @@ def calc_region_stats(region_df, colname="v_hat"):
     # loop over mu rings
     for i in range(nn):
         # get idx
-        # idx = region_df.lo_mu.values == lo_mus[i]
         idx = np.isclose(lo_mus[i], region_df.lo_mu.values, atol=1e-2)
 
-        # calculate the stats
-        reg_avg[i] = np.mean(region_df[colname][idx])
-        reg_std[i] = np.std(region_df[colname][idx])
-        reg_err[i] = reg_avg[i]/np.sqrt(len(region_df[colname][idx]))
+        # calculate the weighted stats (empty bins -> NaN, as np.mean used to give)
+        vals = region_df[colname].to_numpy()[idx]
+        if len(vals) == 0:
+            reg_avg[i] = reg_std[i] = reg_err[i] = np.nan
+            continue
+        w = np.ones(len(vals)) if weight_col is None else region_df[weight_col].to_numpy()[idx]
+        reg_avg[i], reg_std[i], reg_err[i] = weighted_stats(vals, w)
     return reg_avg, reg_std, np.abs(reg_err)
 
 # read in by region

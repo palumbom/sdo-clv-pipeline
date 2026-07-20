@@ -149,25 +149,37 @@ def organize_IO(indir, datadir=None, clobber=False, globexp=""):
         # create the files with headers
         for fn, hd in zip(fileset, headers):
             create_file(fn, hd)
-    elif all(map(exists, fileset)) and all(map(lambda x: getsize(x) > 0, fileset)):
-        # get list of dates from file
-        mjd_list = find_all_dates(fname1)
-
-        # convert to Time objects and round to nearest hour
-        mjd_list = list(map(lambda x: Time(x, format="mjd"), mjd_list))
-        mjd_list = list(map(lambda x: round_time(date=x.datetime), mjd_list))
-
-        # subset the input data to list to only include dates not seen here
-        common_dates = list(set.intersection(*map(set, [get_dates(con_files), mjd_list])))
-
-        # remove epochs that are missing in any data set from all data sets
-        con_files = [con_files[idx] for idx, date in enumerate(get_dates(con_files)) if date not in common_dates]
-        mag_files = [mag_files[idx] for idx, date in enumerate(get_dates(mag_files)) if date not in common_dates]
-        dop_files = [dop_files[idx] for idx, date in enumerate(get_dates(dop_files)) if date not in common_dates]
-        aia_files = [aia_files[idx] for idx, date in enumerate(get_dates(aia_files)) if date not in common_dates]
     else:
+        # non-clobber: thresholds.csv is the authoritative record of completed
+        # epochs, so we resume iff it already has data. Decide that BEFORE
+        # touching disk (creating a header would otherwise flip an empty file to
+        # non-empty).
+        resume = exists(fname1) and getsize(fname1) > 0
+
+        # ensure every output file exists, but create ONLY the missing/empty
+        # ones -- never truncate a populated file (that is reserved for the
+        # clobber path). This is what keeps a datadir predating feature_output.csv
+        # from losing its thresholds.csv / region_output.csv on a resume.
         for fn, hd in zip(fileset, headers):
-            create_file(fn, hd)
+            if not exists(fn) or getsize(fn) == 0:
+                create_file(fn, hd)
+
+        if resume:
+            # get list of dates already processed
+            mjd_list = find_all_dates(fname1)
+
+            # convert to Time objects and round to nearest hour
+            mjd_list = list(map(lambda x: Time(x, format="mjd"), mjd_list))
+            mjd_list = list(map(lambda x: round_time(date=x.datetime), mjd_list))
+
+            # subset the input data to list to only include dates not seen here
+            common_dates = list(set.intersection(*map(set, [get_dates(con_files), mjd_list])))
+
+            # remove epochs that are missing in any data set from all data sets
+            con_files = [con_files[idx] for idx, date in enumerate(get_dates(con_files)) if date not in common_dates]
+            mag_files = [mag_files[idx] for idx, date in enumerate(get_dates(mag_files)) if date not in common_dates]
+            dop_files = [dop_files[idx] for idx, date in enumerate(get_dates(dop_files)) if date not in common_dates]
+            aia_files = [aia_files[idx] for idx, date in enumerate(get_dates(aia_files)) if date not in common_dates]
 
     return con_files, mag_files, dop_files, aia_files
 

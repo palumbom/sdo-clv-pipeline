@@ -9,6 +9,9 @@ import pandas as pd
 from sdo_clv_pipeline.paths import root
 from sdo_clv_pipeline.sdo_image import region_codes
 from sdo_clv_pipeline.sdo_image import umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code, moat_code
+from sdo_clv_pipeline.sdo_image import (blue_penumbra_code, red_penumbra_code,
+                                        left_moat_code, right_moat_code,
+                                        plage_no_moat_code, network_no_moat_code)
 from sdo_clv_pipeline.logging_setup import configure_logging
 
 configure_logging()
@@ -97,15 +100,17 @@ idx = dist[dist > 2.0 * v_conv_rolling_std].index
 
 # make dfs by mu
 not_nan_mu_bin = np.logical_not(np.isnan(df_all.lo_mu))
-right_moat = df_all[np.logical_and(df_all.region == 9.0, not_nan_mu_bin)]
-left_moat = df_all[np.logical_and(df_all.region == 8.0, not_nan_mu_bin)]
+right_moat = df_all[np.logical_and(df_all.region == right_moat_code, not_nan_mu_bin)]
+left_moat = df_all[np.logical_and(df_all.region == left_moat_code, not_nan_mu_bin)]
 moat = df_all[np.logical_and(df_all.region == moat_code, not_nan_mu_bin)]
 plage = df_all[np.logical_and(df_all.region == plage_code, not_nan_mu_bin)]
+plage_no_moat = df_all[np.logical_and(df_all.region == plage_no_moat_code, not_nan_mu_bin)]
 network = df_all[np.logical_and(df_all.region == network_code, not_nan_mu_bin)]
+network_no_moat = df_all[np.logical_and(df_all.region == network_no_moat_code, not_nan_mu_bin)]
 quiet_sun = df_all[np.logical_and(df_all.region == quiet_sun_code, not_nan_mu_bin)]
-red_penumbrae = df_all[np.logical_and(df_all.region == 3.0, not_nan_mu_bin)]
+red_penumbrae = df_all[np.logical_and(df_all.region == red_penumbra_code, not_nan_mu_bin)]
 all_penumbrae = df_all[np.logical_and(df_all.region == penumbrae_code, not_nan_mu_bin)]
-blu_penumbrae = df_all[np.logical_and(df_all.region == 2.0, not_nan_mu_bin)]
+blu_penumbrae = df_all[np.logical_and(df_all.region == blue_penumbra_code, not_nan_mu_bin)]
 umbrae = df_all[np.logical_and(df_all.region == umbrae_code, not_nan_mu_bin)]
 
 # mask rows where all vels are 0.0 (i.e., region isn't present in that annulus)
@@ -133,11 +138,21 @@ plage.to_csv(os.path.join(outdir, "plage.csv"), index=False)
 # plage_daily = daily_bin(plage)
 # plage_daily.to_csv(outdir + "plage_daily.csv", index=False)
 
+# plage with moat-overlapping pixels removed (moat is a non-exclusive overlay)
+plage_no_moat = mask_all_zero_rows(plage_no_moat)
+plage_no_moat.reset_index(drop=True, inplace=True)
+plage_no_moat.to_csv(os.path.join(outdir, "plage_no_moat.csv"), index=False)
+
 network = mask_all_zero_rows(network)
 network.reset_index(drop=True, inplace=True)
 network.to_csv(os.path.join(outdir, "network.csv"), index=False)
 # network_daily = daily_bin(network)
 # network_daily.to_csv(outdir + "network_daily.csv", index=False)
+
+# network with moat-overlapping pixels removed
+network_no_moat = mask_all_zero_rows(network_no_moat)
+network_no_moat.reset_index(drop=True, inplace=True)
+network_no_moat.to_csv(os.path.join(outdir, "network_no_moat.csv"), index=False)
 
 quiet_sun = mask_all_zero_rows(quiet_sun)
 quiet_sun.reset_index(drop=True, inplace=True)

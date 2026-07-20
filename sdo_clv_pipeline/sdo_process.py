@@ -240,11 +240,15 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         results = []
 
         # calculate disk-integrataed quantities
-        results.append(compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
-                                            flat_v_rot, flat_ld, flat_iflat,
-                                            flat_w_quiet, flat_w_active, flat_abs_mag,
-                                            mu_thresh, k_hat_con,
-                                            p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag))
+        disk_row = compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr,
+                                        flat_v_rot, flat_ld, flat_iflat,
+                                        flat_w_quiet, flat_w_active, flat_abs_mag,
+                                        mu_thresh, k_hat_con,
+                                        p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag)
+        results.append(disk_row)
+        # the disk-integrated quiet-Sun velocity (v_quiet column) is the reference
+        # the disk-level flag rows subtract to form v_conv
+        quiet_ref_disk = disk_row[8]
 
         # calculate velocities for regions, not binning by mu
         results.extend(compute_region_only_results(mjd, flat_mu, flat_int,
@@ -268,6 +272,20 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
                                               p_vhat=p_vhat, p_vphot=p_vphot, p_mag=p_mag,
                                               reg_idx=reg_idx)
         results.extend(region_rows)
+
+        # non-exclusive feature-flag rows (moat, penumbra velocity split, and the
+        # plage/network minus-moat variants). These overlap the base region rows
+        # by design: a moat pixel that is also plage contributes to both.
+        flat_flags = mask.flags.ravel()
+        selections = flag_selections(flat_reg, flat_flags)
+        results.extend(compute_region_only_flag_results(mjd, flat_mu, flat_int,
+                                                        flat_iflat, selections,
+                                                        mu_thresh, quiet_ref_disk,
+                                                        p_vhat, p_vphot, p_mag))
+        results.extend(compute_region_flag_results(mjd, flat_mu, flat_int,
+                                                   flat_iflat, selections,
+                                                   mu_thresh, n_rings, v_q_quiet,
+                                                   p_vhat, p_vphot, p_mag))
 
         # map each pixel to its mu-ring's quiet-Sun reference (the exact scalar the
         # region v_conv subtracts); pixels below mu_thresh never enter a feature

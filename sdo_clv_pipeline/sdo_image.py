@@ -32,16 +32,57 @@ from .moat import detect_moats
 warnings.simplefilter("ignore", category=VerifyWarning)
 warnings.simplefilter("ignore", category=FITSFixedWarning)
 
-# set globals for region IDS
-umbrae_code = 1 
+# set globals for region IDS. These are the mutually-exclusive morphological
+# classes: every on-disk pixel gets exactly one, so they form a partition and
+# are stored as a single integer code per pixel in SunMask.regions.
+umbrae_code = 1
 penumbrae_code = 2
-quiet_sun_code = 3 
-network_code = 4 
-plage_code = 5 
-moat_code = 6 
+quiet_sun_code = 3
+network_code = 4
+plage_code = 5
 
-# set all region codes
-region_codes = [umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code, moat_code]
+# the base partition membership list (moat is NOT here -- it is a non-exclusive
+# overlay carried in the feature-flag plane, see below)
+region_codes = [umbrae_code, penumbrae_code, quiet_sun_code, network_code, plage_code]
+
+# non-exclusive feature flags (SunMask.flags, a bitmask plane like quality.py).
+# A pixel may carry several: a moat pixel can also be plage. Sub-types that
+# would otherwise need their own exclusive code live here instead.
+blue_pen_flag = 1 << 0    # penumbra pixel with v_corr <= 0 (blueshifted)
+red_pen_flag = 1 << 1     # penumbra pixel with v_corr > 0 (redshifted)
+moat_left_flag = 1 << 2   # moat pixel, left hemisphere (lon >= 0)
+moat_right_flag = 1 << 3  # moat pixel, right hemisphere (lon < 0)
+moat_any_flag = moat_left_flag | moat_right_flag
+
+# output codes for the flag-derived region_output.csv rows. moat_code is kept
+# (a derived left|right query) so existing moat.csv consumers are unaffected.
+moat_code = 6
+blue_penumbra_code = 7
+red_penumbra_code = 8
+left_moat_code = 9
+right_moat_code = 10
+plage_no_moat_code = 11     # plage pixels NOT also in a moat
+network_no_moat_code = 12   # network pixels NOT also in a moat
+
+
+def flag_selections(flat_reg, flat_flags):
+    """Map the feature-flag plane to (output_code, pixel_mask) selections.
+
+    Unlike region_codes these masks may overlap (a moat pixel can also be plage),
+    so each is aggregated independently downstream. The *_no_moat variants pair a
+    base class with the negation of the moat flag, letting callers separate moat
+    overlap from the rest of the bright region.
+    """
+    moat = (flat_flags & moat_any_flag) != 0
+    return [
+        (blue_penumbra_code,   (flat_flags & blue_pen_flag) != 0),
+        (red_penumbra_code,    (flat_flags & red_pen_flag) != 0),
+        (moat_code,            moat),
+        (left_moat_code,       (flat_flags & moat_left_flag) != 0),
+        (right_moat_code,      (flat_flags & moat_right_flag) != 0),
+        (plage_no_moat_code,   (flat_reg == plage_code) & ~moat),
+        (network_no_moat_code, (flat_reg == network_code) & ~moat),
+    ]
 
 class SDOImage(object):
     """Load an SDO image and provide geometry, corrections, and metadata.
@@ -653,10 +694,9 @@ class SunMask(object):
 
         # allocate memory for mask array
         self.regions = np.zeros_like(con.image)
-        self.blue_penumbrae = np.zeros_like(self.regions).astype(bool)
-        self.red_penumbrae = np.zeros_like(self.regions).astype(bool)
-        self.left_moat = np.zeros_like(self.regions).astype(bool)
-        self.right_moat = np.zeros_like(self.regions).astype(bool)
+        # non-exclusive feature flags (see sdo_image module globals); a pixel may
+        # carry several bits (e.g. moat AND plage) without losing its base label
+        self.flags = np.zeros(self.regions.shape, dtype=np.uint8)
 
         # calculate intensity thresholds for HMI. thresh1 and thresh2 are the
         # same quiet-sun mean intensity scaled by two different constants, so the
@@ -718,9 +758,10 @@ class SunMask(object):
         self.regions[ind4] = quiet_sun_code 
         self.regions[ind5] = network_code # bright areas (will separate into plage + network)
 
-        # set blue and red penumbrae
-        self.blue_penumbrae[ind2] = True
-        self.red_penumbrae[ind3] = True
+        # tag the penumbra velocity split as non-exclusive flags (both pixels
+        # remain penumbrae_code in the base partition)
+        self.flags[ind2] |= blue_pen_flag
+        self.flags[ind3] |= red_pen_flag
 
         # create structures for dilations
         corners = ndimage.generate_binary_structure(2,2) # array of bools, defines feature connections
@@ -751,9 +792,10 @@ class SunMask(object):
             moat_result = detect_moats(dop.v_corr, con.mu, dop.lon.value,
                                        con.image, mag.image, invalid_mask,
                                        self.is_umbra(), self.is_penumbra())
-            self.regions[moat_result.moat_mask] = moat_code
-            self.left_moat = moat_result.left_moat
-            self.right_moat = moat_result.right_moat
+            # non-destructive: set moat flags but leave the base label (a moat
+            # ring overlapping plage/network keeps its plage/network code)
+            self.flags[moat_result.left_moat] |= moat_left_flag
+            self.flags[moat_result.right_moat] |= moat_right_flag
             self.moat_profiles = moat_result.profiles
 
             if plot_moat:
@@ -766,6 +808,7 @@ class SunMask(object):
 
         # set values beyond mu_thresh to nan (if they weren't already)
         self.regions[invalid_mask] = np.nan
+        self.flags[invalid_mask] = 0
 
         return None
 
@@ -793,11 +836,11 @@ class SunMask(object):
 
     def is_blue_penumbra(self):
         """Return mask for blue-shifted penumbra regions."""
-        return self.blue_penumbrae
+        return (self.flags & blue_pen_flag) != 0
 
     def is_red_penumbra(self):
         """Return mask for red-shifted penumbra regions."""
-        return self.red_penumbrae
+        return (self.flags & red_pen_flag) != 0
 
     def is_quiet_sun(self):
         """Return mask for quiet sun regions."""
@@ -812,13 +855,13 @@ class SunMask(object):
         return self.regions == plage_code
     
     def is_moat_flow(self):
-        """Return mask for moat flow regions."""
-        return self.regions == moat_code
-    
+        """Return mask for moat flow regions (either hemisphere)."""
+        return (self.flags & moat_any_flag) != 0
+
     def is_left_moat(self):
         """Return mask for left-hand moat flow regions."""
-        return self.left_moat
-    
+        return (self.flags & moat_left_flag) != 0
+
     def is_right_moat(self):
         """Return mask for right-hand moat flow regions."""
-        return self.right_moat
+        return (self.flags & moat_right_flag) != 0

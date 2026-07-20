@@ -169,20 +169,26 @@ def plot_image(sdo_image, outdir=None, fname=None, vmin=None, vmax=None, dpi=500
 
 def plot_mask(mask, outdir=None, fname=None, dpi=500):
     """Plot a SunMask classification map with labeled region colors."""
-    # get cmap
-    cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white", "blue"])
+    # base partition is 5 mutually-exclusive classes (moat is a non-exclusive
+    # overlay drawn as a contour below, not a base color)
+    cmap = colors.ListedColormap(["black", "saddlebrown", "orange", "yellow", "white"])
     cmap.set_bad(color="white")
-    norm = colors.BoundaryNorm([0, 1, 2, 3, 4, 5, 6], ncolors=cmap.N, clip=True)
+    norm = colors.BoundaryNorm([0, 1, 2, 3, 4, 5], ncolors=cmap.N, clip=True)
 
     # plot the sun (regions - 0.5 centers each integer code in its color band)
     fig = plt.figure(figsize=_figsize)
     ax1 = fig.add_subplot(111, projection=mask.wcs)
     img = ax1.imshow(mask.regions - 0.5, cmap=cmap, norm=norm,
                      origin="lower", interpolation=None)
+    # overlay the moat flow as a contour so it is visible without hiding the
+    # underlying (plage/network/quiet) base class it overlaps
+    moat = mask.is_moat_flow()
+    if moat.any():
+        ax1.contour(moat.astype(float), levels=[0.5], colors="blue", linewidths=0.4)
     _draw_limb_and_grid(ax1, mask.wcs, mask.mu)
-    clb = fig.colorbar(img, ticks=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5])
+    clb = fig.colorbar(img, ticks=[0.5, 1.5, 2.5, 3.5, 4.5])
     clb.ax.set_yticklabels([r"${\rm Umbra}$", r"${\rm Penumbra}$", r"${\rm Quiet\ Sun}$",
-                            r"${\rm Network}$", r"${\rm Plage}$", r"${\rm Moat}$"])
+                            r"${\rm Network}$", r"${\rm Plage}$"])
 
     _annotate_timestamp(ax1, mask.date_obs)
     _finalize(fig, ax1, outdir, fname, "mask_" + mask.date_obs + ".pdf", dpi)

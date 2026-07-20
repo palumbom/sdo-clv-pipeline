@@ -84,8 +84,20 @@ def cache_epoch(con_file, mag_file, dop_file, aia_file, mu_thresh=0.1,
     iso = get_date(con_file).isoformat()
     path = _cache_path(iso, cache_dir)
     if path.exists() and not clobber:
-        logger.info("Cache hit, skipping reduction: %s", path)
-        return path
+        # the filename is keyed on ISO time only, but mu_thresh changes the
+        # reduction (it drives mask_low_mu and the cached invalid_mask/mu). Read
+        # the stored mu_thresh and only serve the hit if it matches; otherwise
+        # fall through and recompute so a sweep can't get stale arrays.
+        try:
+            with np.load(path, allow_pickle=False) as npz:
+                cached_mu = float(npz["mu_thresh"])
+        except (KeyError, OSError, ValueError):
+            cached_mu = None
+        if cached_mu is not None and np.isclose(cached_mu, float(mu_thresh)):
+            logger.info("Cache hit, skipping reduction: %s", path)
+            return path
+        logger.info("Cache mu_thresh mismatch (cached=%s, requested=%s); "
+                    "recomputing: %s", cached_mu, mu_thresh, path)
 
     data = reduce_epoch_for_moats(con_file, mag_file, dop_file, aia_file,
                                   mu_thresh=mu_thresh)

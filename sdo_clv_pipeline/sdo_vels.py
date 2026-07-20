@@ -151,10 +151,107 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
     mjd_arr = np.full_like(regs, mjd, dtype=float)
     nan_arr = np.full_like(regs, np.nan, dtype=float)
     data = np.vstack([mjd_arr, regs, nan_arr, nan_arr,
-                      pix_frac, light_frac, v_hat, 
-                      v_phot, v_q, v_conv, mag_u, 
+                      pix_frac, light_frac, v_hat,
+                      v_phot, v_q, v_conv, mag_u,
                       avg_i, avg_if]).T.tolist()
     return data
+
+def compute_region_only_flag_results(mjd, flat_mu, flat_int, flat_iflat,
+                                      selections, mu_thresh, quiet_ref,
+                                      p_vhat, p_vphot, p_mag):
+    """Disk-aggregated metrics for non-exclusive feature selections.
+
+    Unlike the mutually-exclusive region codes, ``selections`` may overlap (a
+    moat pixel can also be plage), so each ``(code, mask)`` is aggregated on its
+    own boolean mask rather than through a single partition bincount. A pixel in
+    two selections contributes to both rows. Flags are never the quiet-Sun
+    reference, so the v_quiet column is 0 and v_conv = v_hat - quiet_ref (the
+    per-disk quiet reference computed by the base region aggregation).
+    """
+    valid_mask = flat_mu >= mu_thresh
+    total_pixels = np.nansum(valid_mask)
+    total_light = np.nansum(flat_int[valid_mask])
+
+    rows = []
+    for code, sel in selections:
+        m = valid_mask & sel
+        sum_pix = np.nansum(m)
+        sum_int = np.nansum(flat_int[m])
+        sum_iflat = np.nansum(flat_iflat[m])
+        sum_vhat = np.nansum(p_vhat[m])
+        sum_vphot = np.nansum(p_vphot[m])
+        sum_mag = np.nansum(p_mag[m])
+
+        # avoid division by zero (empty selection emits a zeroed row, not NaN)
+        sum_int_safe = sum_int if sum_int > 0 else 1
+        sum_pix_safe = sum_pix if sum_pix > 0 else 1
+
+        pix_frac = sum_pix / total_pixels
+        light_frac = sum_int / total_light
+        v_hat = sum_vhat / sum_int_safe
+        v_phot = sum_vphot / sum_int_safe
+        mag_u = sum_mag / sum_int_safe
+        avg_i = sum_int / sum_pix_safe
+        avg_if = sum_iflat / sum_pix_safe
+        v_quiet = 0.0
+        v_conv = (v_hat - quiet_ref) if v_hat != 0 else 0.0
+
+        rows.append([mjd, code, np.nan, np.nan, pix_frac, light_frac,
+                     v_hat, v_phot, v_quiet, v_conv, mag_u, avg_i, avg_if])
+    return rows
+
+def compute_region_flag_results(mjd, flat_mu, flat_int, flat_iflat,
+                                selections, mu_thresh, n_rings, quiet_ref_by_bin,
+                                p_vhat, p_vphot, p_mag):
+    """Mu-binned metrics for non-exclusive feature selections.
+
+    Same overlapping-mask semantics as compute_region_only_flag_results, but
+    resolved into the n_rings-1 mu bins. ``quiet_ref_by_bin`` is the per-ring
+    quiet-Sun reference returned by compute_region_results, subtracted to form
+    v_conv (the v_quiet column stays 0 as flags are never the quiet reference).
+    """
+    bins = np.linspace(mu_thresh, 1.0, n_rings)
+    bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings - 2)
+    valid_mask = (flat_mu >= mu_thresh)
+    n_bins = n_rings - 1
+
+    total_pixels = np.nansum(valid_mask)
+    total_light = np.nansum(flat_int[valid_mask])
+    lo_mu = bins[:-1]
+    hi_mu = bins[1:]
+
+    rows = []
+    for code, sel in selections:
+        m = valid_mask & sel
+        grp = bin_idx[m]
+        sum_pix = np.bincount(grp, minlength=n_bins).astype(float)
+        sum_int = np.bincount(grp, weights=flat_int[m], minlength=n_bins)
+        sum_iflat = np.bincount(grp, weights=flat_iflat[m], minlength=n_bins)
+        sum_vhat = np.bincount(grp, weights=p_vhat[m], minlength=n_bins)
+        sum_vphot = np.bincount(grp, weights=p_vphot[m], minlength=n_bins)
+        sum_mag = np.bincount(grp, weights=p_mag[m], minlength=n_bins)
+
+        # avoid division by zero (empty ring emits a zeroed row, not NaN)
+        sum_int_safe = np.where(sum_int > 0, sum_int, 1)
+        sum_pix_safe = np.where(sum_pix > 0, sum_pix, 1)
+
+        pix_frac = sum_pix / total_pixels
+        light_frac = sum_int / total_light
+        v_hat = sum_vhat / sum_int_safe
+        v_phot = sum_vphot / sum_int_safe
+        mag_u = sum_mag / sum_int_safe
+        avg_i = sum_int / sum_pix_safe
+        avg_if = sum_iflat / sum_pix_safe
+        v_quiet = np.zeros(n_bins)
+        v_conv = np.where(v_hat != 0, v_hat - quiet_ref_by_bin, 0)
+
+        code_arr = np.full(n_bins, code, dtype=float)
+        mjd_arr = np.full(n_bins, mjd, dtype=float)
+        data = np.vstack([mjd_arr, code_arr, lo_mu, hi_mu, pix_frac, light_frac,
+                          v_hat, v_phot, v_quiet, v_conv, mag_u,
+                          avg_i, avg_if]).T.tolist()
+        rows.extend(data)
+    return rows
 
 def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                            flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, flat_w_active,

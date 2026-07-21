@@ -72,6 +72,8 @@ def run_benchmark(file, repeats, warmup, thread_sweep):
     set_compute_threads(1)
     rows.append(("sunpy", None, time_method(img.calc_geometry_sunpy, repeats, warmup)))
     rows.append(("numpy", None, time_method(img.calc_geometry_numpy, repeats, warmup)))
+    rows.append(("numpy-nq", None,
+                 time_method(img.calc_geometry_numpy_noquant, repeats, warmup)))
 
     # numba path across the thread sweep; dedupe on the value actually set
     # (set_compute_threads clamps to NUMBA_NUM_THREADS)

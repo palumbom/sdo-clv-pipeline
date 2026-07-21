@@ -26,6 +26,7 @@ from .legendre import *
 from .legendre import bulk_vel_design, basis_scale
 from .reproject import *
 from .geometry import pixel_to_hpc, hpc_to_hcc, hcc_to_hgs, compute_geometry
+from .geometry import _RAD2ARCSEC  # arcsec per radian; shared so rr matches exactly
 
 from .moat import detect_moats
 
@@ -209,6 +210,50 @@ class SDOImage(object):
             np.sqrt(diff, out=diff)
         self.mu = diff.astype(self.image.dtype)
         self.mu[rr2 >= 1.0] = np.nan
+        return None
+
+    def calc_geometry_numpy_noquant(self):
+        # Same analytic math as calc_geometry_numpy, but with astropy Quantity
+        # arithmetic removed from the hot path: rr is a single np.hypot pass times
+        # a scalar factor (no per-frame u.rad->u.arcsec Quantity conversions or
+        # their temporaries), and units are attached only once at the end, as the
+        # fused numba calc_geometry does. Produces the same arrays as
+        # calc_geometry_numpy to machine precision (see scripts/verify_geometry_noquant.py).
+        smap = sun_map(self.image, self.head)
+        obs = smap.observer_coordinate
+        b0 = obs.lat.to_value(u.rad)
+        l0 = obs.lon.to_value(u.rad)
+
+        Tx, Ty = pixel_to_hpc(self.wcs, self.naxis1, self.naxis2)
+        self.rsun_solrad = self.dsun_obs / self.rsun_ref
+
+        x, y, z = hpc_to_hcc(Tx, Ty, self.dsun_obs, self.rsun_ref)
+
+        # rr = |(Tx, Ty)| (arcsec) / rsun_obs, as one hypot pass + scalar multiply.
+        # No Quantity: the u.rad->u.arcsec conversion is just the scalar _RAD2ARCSEC.
+        rr = np.hypot(Tx, Ty)
+        rr *= (_RAD2ARCSEC / self.rsun_obs)
+
+        lon, lat = hcc_to_hgs(x, y, z, b0, l0)
+
+        # mu from the plain rr array (no .value round-trip through a Quantity)
+        rr2 = rr * rr
+        mu = 1.0 - rr2
+        np.clip(mu, 0.0, None, out=mu)
+        with np.errstate(invalid='ignore'):
+            np.sqrt(mu, out=mu)
+        mu = mu.astype(self.image.dtype)
+        mu[rr2 >= 1.0] = np.nan
+        self.mu = mu
+
+        # attach units once, at the end (matches the numba calc_geometry)
+        self.xx = x * u.m
+        self.yy = y * u.m
+        self.rr = rr * u.dimensionless_unscaled
+        self.lat = (np.rad2deg(lat) + 90.0) * u.deg
+        self.lon = np.rad2deg(lon) * u.deg
+
+        self.pix_area = calculate_pixel_area(self.lat, self.lon)
         return None
 
     def calc_geometry_sunpy(self):

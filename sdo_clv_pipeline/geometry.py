@@ -91,24 +91,39 @@ def hpc_to_hcc(Tx, Ty, dsun, rsun):
     rsun : float
         Solar radius in meters (RSUN_REF).
     """
-    cos_Tx = np.cos(Tx)
-    sin_Tx = np.sin(Tx)
-    cos_Ty = np.cos(Ty)
-    sin_Ty = np.sin(Ty)
+    # Buffer-reuse form: computes x, y, z with 4 full-frame allocations instead of
+    # ~11, by threading out= through every intermediate product. Tx, Ty are read
+    # only (the callers still need them for rr), so they are never written to.
+    # Reassociation vs the naive form perturbs results by <=1 ULP.
+    d2 = dsun * dsun - rsun * rsun
 
-    # cos of the angle between disk center and the point (sunpy: cos_alpha)
-    cos_alpha = cos_Ty * cos_Tx
+    cos_Ty = np.cos(Ty)                            # buf A (also reused later for y)
+    cos_alpha = np.cos(Tx)                         # buf B -> cos_alpha -> x
+    np.multiply(cos_alpha, cos_Ty, out=cos_alpha)  # cos_alpha = cos_Ty*cos_Tx
 
-    # distance observer->surface via law of cosines, "near" root
-    b = dsun * cos_alpha
-    disc = b * b - (dsun**2 - rsun**2)
+    # distance observer->surface via law of cosines, "near" root: d = b - sqrt(b^2 - d2)
+    d = np.multiply(cos_alpha, dsun)               # buf C = b (dsun*cos_alpha)
+    disc = np.multiply(d, d)                       # buf D = b^2
+    disc -= d2
     with np.errstate(invalid="ignore"):
-        d = b - np.sqrt(disc)  # NaN where disc < 0 (off-disk)
+        np.sqrt(disc, out=disc)                    # NaN where disc < 0 (off-disk)
+    np.subtract(d, disc, out=d)                    # d = b - sqrt(disc)
 
-    # HPC-equivalent Cartesian permuted to HCC, origin shifted observer->Sun
-    x = d * cos_Ty * sin_Tx
-    y = d * sin_Ty
-    z = dsun - d * cos_alpha
+    # z = dsun - d*cos_alpha (reuse buf D; this is cos_alpha's last use)
+    z = disc
+    np.multiply(d, cos_alpha, out=z)
+    np.subtract(dsun, z, out=z)
+
+    # x = d*cos_Ty*sin_Tx (reuse buf B for sin_Tx -> x; cos_Ty's last read)
+    x = cos_alpha
+    np.sin(Tx, out=x)
+    np.multiply(x, cos_Ty, out=x)
+    np.multiply(x, d, out=x)
+
+    # y = d*sin_Ty (reuse buf A for sin_Ty -> y)
+    y = cos_Ty
+    np.sin(Ty, out=y)
+    np.multiply(y, d, out=y)
     return x, y, z
 
 
@@ -138,13 +153,31 @@ def hcc_to_hgs(x, y, z, b0, l0=0.0):
     cos_b0 = np.cos(b0)
     sin_b0 = np.sin(b0)
 
-    r = np.sqrt(x * x + y * y + z * z)
-    hgs_x = cos_b0 * z - sin_b0 * y
-    hgs_y = x
-    hgs_z = cos_b0 * y + sin_b0 * z
+    # Buffer-reuse form: 3 full-frame allocations (r, and the two outputs) instead
+    # of ~8. x, y, z are read only (noquant still needs them after this call), so
+    # they are never written to. Reassociation perturbs results by <=1 ULP.
+    r = np.multiply(x, x)                # buf R
+    scratch = np.multiply(y, y)          # buf S
+    r += scratch
+    np.multiply(z, z, out=scratch)
+    r += scratch
+    np.sqrt(r, out=r)                    # r = |(x,y,z)|
 
-    lat = np.arcsin(hgs_z / r)
-    lon = np.arctan2(hgs_y, hgs_x) + l0
+    # lat = arcsin((cos_b0*y + sin_b0*z)/r); reuse buf S for hgs_z -> lat
+    tmp = np.multiply(z, sin_b0)         # buf T = sin_b0*z
+    lat = scratch
+    np.multiply(y, cos_b0, out=lat)      # lat = cos_b0*y
+    lat += tmp                           # lat = hgs_z
+    lat /= r
+    lat = np.arcsin(lat, out=lat)
+
+    # lon = arctan2(x, cos_b0*z - sin_b0*y) + l0; reuse buf R for hgs_x -> lon
+    lon = r
+    np.multiply(z, cos_b0, out=lon)      # lon = cos_b0*z
+    np.multiply(y, sin_b0, out=tmp)      # tmp = sin_b0*y
+    lon -= tmp                           # lon = hgs_x
+    lon = np.arctan2(x, lon, out=lon)
+    lon += l0
     return lon, lat
 
 

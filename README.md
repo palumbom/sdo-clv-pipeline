@@ -62,6 +62,20 @@ uv sync --all-extras    # all of the above
 
 Requires Python 3.12.
 
+## Testing
+
+```bash
+uv run --extra test pytest                      # everything
+uv run --extra test pytest -k "not real_epoch"  # fast, no SDO data needed
+```
+
+The suite has two tiers. Most tests run on small synthetic frames and need no
+input data. `tests/test_real_epoch.py` additionally compares each optimized code
+path against the reference implementation retained beside it on a full
+4096&times;4096 frame, and checks the per-epoch CSV output against committed
+goldens. Those tests **skip automatically** when SDO FITS input is not reachable;
+point them at your own data with `SDO_TEST_FITSDIR` and `SDO_TEST_GLOBEXP`.
+
 ## Citation
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8273623.svg)](https://doi.org/10.5281/zenodo.8273622)
 [![arXiv](https://img.shields.io/badge/arXiv-2404.16747-b31b1b.svg)](https://arxiv.org/abs/2404.16747)

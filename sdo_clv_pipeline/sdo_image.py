@@ -146,8 +146,8 @@ class SDOImage(object):
     def calc_geometry(self):
         # Analytic replacement for the sunpy/astropy coordinate-transform chain,
         # fused into a single numba pass (see geometry.compute_geometry). Matches
-        # calc_geometry_numpy to machine precision and calc_geometry_sunpy to the
-        # tolerances checked by scripts/verify_refactor.py, but avoids the per-pixel
+        # calc_geometry_numpy to the tolerances pinned in
+        # tests/test_real_epoch.py, but avoids the per-pixel
         # SkyCoord/frame machinery and the intermediate full-frame temporaries.
 
         # the authoritative observer (B0, L0) comes from the same sunpy machinery

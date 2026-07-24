@@ -280,6 +280,7 @@ Key non-standard dependencies: `sunpy[all]` (coordinate transforms, Fido downloa
   bindings: `sdo_process` holds its own `write_results_to_file`, `sdo_image` its own
   `compute_geometry`. Anything that patches, probes, or reasons about which function
   actually runs must target the **consuming** module, not the defining one.
-- Two `.gitignore` entries surprise people. `.claude/*` means this file is itself
-  untracked, so edits to it are local-only and invisible to collaborators. `*.csv`
-  means the golden fixtures need `git add -f`.
+- `.gitignore` ignores `.claude/*` but re-includes this file via `!.claude/CLAUDE.md`,
+  so **this file is tracked and shared** — keep it accurate for collaborators.
+  `.claude/settings.local.json` stays ignored (personal permissions). Separately,
+  `*.csv` is ignored, so the golden fixtures need `git add -f`.

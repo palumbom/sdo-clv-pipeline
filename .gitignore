@@ -12,6 +12,7 @@ uv.lock
 data/*
 figures/*
 .claude/*
+!.claude/CLAUDE.md
 build/*
 docs/_build/
 docs/superpowers/

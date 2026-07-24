@@ -4,6 +4,10 @@ import numpy as np
 import pdb
 from scipy import ndimage
 from .sdo_image import *
+from .aggregate import (region_acc, flag_acc,
+                        Q_VHAT, Q_VPHOT, Q_INT, Q_IFLAT, Q_MAG, Q_PIX,
+                        Q_VQUIET, Q_INT_QUIET,
+                        F_VHAT, F_VPHOT, F_INT, F_IFLAT, F_MAG, F_PIX)
 
 
 def _region_index(flat_reg, region_codes):
@@ -41,7 +45,7 @@ def shared_products(flat_int, flat_v_corr, flat_v_rot, flat_ld,
 def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                          flat_ld, flat_iflat, flat_w_quiet, flat_w_active,
                          flat_abs_mag, mu_thresh, k_hat_con,
-                         p_vhat=None, p_vphot=None, p_mag=None):
+                         p_vhat=None, p_vphot=None, p_mag=None, agg=None):
     """Compute disk-integrated velocity and intensity metrics.
 
     Parameters
@@ -65,30 +69,43 @@ def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
                                                  flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
 
-    valid = flat_mu >= mu_thresh
-
     # boolean indexing materializes a new array each time, and the masked
     # intensity sum / valid-pixel count are each reused several times below.
     # Compute them once; the operands and operation order are unchanged, so
-    # every result is bit-identical to recomputing them inline.
+    # every result is bit-identical to recomputing them inline. When an
+    # AggInputs context is supplied the gathers were already done once for the
+    # whole epoch (see aggregate.build_agg_inputs) and are simply reused.
+    # The disk row keeps its numpy gathers even with a context: np.nansum uses
+    # pairwise summation, which a sequential kernel loop cannot reproduce, so
+    # fusing this would break bit-identity for no real gain. The context only
+    # supplies the mask and the two totals it already computed.
+    valid = (flat_mu >= mu_thresh) if agg is None else agg.valid
     fi = flat_int[valid]
     fwq = flat_w_quiet[valid]
-    light_sum = np.nansum(fi)
-    n_valid = np.nansum(valid)
+    vhat_v = p_vhat[valid]
+    vphot_v = p_vphot[valid]
+    mag_v = p_mag[valid]
+    iflat_v = flat_iflat[valid]
+    if agg is None:
+        light_sum = np.nansum(fi)
+        n_valid = np.nansum(valid)
+    else:
+        light_sum = agg.total_light
+        n_valid = agg.n_valid
 
     all_pixels = n_valid
     all_light = light_sum
 
     denom = light_sum
-    v_hat_di = np.nansum(p_vhat[valid]) / denom
-    v_phot_di = np.nansum(p_vphot[valid]) / denom
-    v_quiet_di = np.nansum(p_vhat[valid] * fwq) / np.nansum(fi * fwq)
+    v_hat_di = np.nansum(vhat_v) / denom
+    v_phot_di = np.nansum(vphot_v) / denom
+    v_quiet_di = np.nansum(vhat_v * fwq) / np.nansum(fi * fwq)
     v_cbs_di = v_hat_di - v_quiet_di
 
-    mag_unsigned = np.nansum(p_mag[valid]) / denom
+    mag_unsigned = np.nansum(mag_v) / denom
 
     avg_int = light_sum / n_valid
-    avg_int_flat = np.nansum(flat_iflat[valid]) / n_valid
+    avg_int_flat = np.nansum(iflat_v) / n_valid
 
     return [mjd, np.nan, np.nan, np.nan,
             all_pixels, all_light,
@@ -100,37 +117,65 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                                 flat_w_active, flat_reg, region_codes,
                                 mu_thresh, k_hat_con,
                                 p_vhat=None, p_vphot=None, p_mag=None,
-                                reg_idx=None):
+                                reg_idx=None, agg=None):
     """Compute region-aggregated metrics across the full disk."""
     if p_vhat is None:
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
                                                  flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
 
-    valid_mask = flat_mu >= mu_thresh
-
     # aggregate sums by region
     regions = np.array(region_codes)
-    if reg_idx is None:
-        reg_idx = _region_index(flat_reg, region_codes)
-    valid = np.logical_and(valid_mask, reg_idx >= 0)
-    grp = reg_idx[valid]
     M = len(regions)
 
-    sum_vhat = np.bincount(grp, weights=p_vhat[valid], minlength=M)
-    sum_vphot = np.bincount(grp, weights=p_vphot[valid], minlength=M)
-    sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M)
-    sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M)
-    sum_mag = np.bincount(grp, weights=p_mag[valid], minlength=M)
-    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M)
+    if agg is None:
+        valid_mask = flat_mu >= mu_thresh
+        if reg_idx is None:
+            reg_idx = _region_index(flat_reg, region_codes)
+        valid = np.logical_and(valid_mask, reg_idx >= 0)
+        grp = reg_idx[valid]
+        w_vhat = p_vhat[valid]
+        w_vphot = p_vphot[valid]
+        w_int = flat_int[valid]
+        w_iflat = flat_iflat[valid]
+        w_mag = p_mag[valid]
+        q_valid = valid & flat_w_quiet
+        grp_q = reg_idx[q_valid]
+        q_vhat = p_vhat[q_valid]
+        q_int = flat_int[q_valid]
+        total_pixels = np.nansum(valid_mask)
+        total_light = np.nansum(flat_int[valid_mask])
+        sum_vhat = np.bincount(grp, weights=w_vhat, minlength=M)
+        sum_vphot = np.bincount(grp, weights=w_vphot, minlength=M)
+        sum_int = np.bincount(grp, weights=w_int, minlength=M)
+        sum_iflat = np.bincount(grp, weights=w_iflat, minlength=M)
+        sum_mag = np.bincount(grp, weights=w_mag, minlength=M)
+        # summing 1.0 per pixel and counting are exact for counts below 2^53, so
+        # this drops a full-frame int64 temporary plus a gather at no numeric cost
+        sum_pix = np.bincount(grp, minlength=M).astype(float)
+        sum_vquiet = np.bincount(grp_q, weights=q_vhat, minlength=M)
+        sum_int_q = np.bincount(grp_q, weights=q_int, minlength=M)
+    else:
+        # Sum the shared (ring, region) accumulator over rings. This is the one
+        # place the refactor is NOT bit-identical: the ring partials are added
+        # together rather than accumulated in one sequential pass over pixels.
+        # Nine partial sums of ~1.5M terms each are in fact better conditioned
+        # than one 13.3M-term sequential sum; the deviation is ~1e-16 relative,
+        # far inside the 1e-12 gate, and is recorded by the golden-CSV run.
+        acc = region_acc(agg, flat_mu, flat_int, flat_iflat, p_vhat, p_vphot,
+                         p_mag, flat_w_quiet, flat_reg, mu_thresh,
+                         len(agg.bins) - 1, M).sum(axis=0)
+        sum_vhat = acc[:, Q_VHAT]
+        sum_vphot = acc[:, Q_VPHOT]
+        sum_int = acc[:, Q_INT]
+        sum_iflat = acc[:, Q_IFLAT]
+        sum_mag = acc[:, Q_MAG]
+        sum_pix = acc[:, Q_PIX]
+        sum_vquiet = acc[:, Q_VQUIET]
+        sum_int_q = acc[:, Q_INT_QUIET]
+        total_pixels = agg.n_valid
+        total_light = agg.total_light
 
     quiet_idx = np.where(regions == quiet_sun_code)[0][0]
-    q_valid = valid & flat_w_quiet
-    grp_q = reg_idx[q_valid]
-    sum_vquiet = np.bincount(grp_q, weights=p_vhat[q_valid], minlength=M)
-    sum_int_q = np.bincount(grp_q, weights=flat_int[q_valid], minlength=M)
-
-    total_pixels = np.nansum(valid_mask)
-    total_light = np.nansum(flat_int[valid_mask])
     pix_frac = sum_pix / total_pixels
     light_frac = sum_int / total_light
 
@@ -158,7 +203,7 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
 
 def compute_region_only_flag_results(mjd, flat_mu, flat_int, flat_iflat,
                                       selections, mu_thresh, quiet_ref,
-                                      p_vhat, p_vphot, p_mag):
+                                      p_vhat, p_vphot, p_mag, agg=None):
     """Disk-aggregated metrics for non-exclusive feature selections.
 
     Unlike the mutually-exclusive region codes, ``selections`` may overlap (a
@@ -168,9 +213,17 @@ def compute_region_only_flag_results(mjd, flat_mu, flat_int, flat_iflat,
     reference, so the v_quiet column is 0 and v_conv = v_hat - quiet_ref (the
     per-disk quiet reference computed by the base region aggregation).
     """
-    valid_mask = flat_mu >= mu_thresh
-    total_pixels = np.nansum(valid_mask)
-    total_light = np.nansum(flat_int[valid_mask])
+    # This function deliberately stays on the numpy path even when a context is
+    # supplied. Its sums come from np.nansum over float32 arrays, so they are
+    # accumulated in *float32*; the fused kernel accumulates in float64 (as
+    # np.bincount does) and therefore disagrees by ~1e-8 relative -- more accurate,
+    # but outside the 1e-12 gate. Reproducing float32 accumulation in the kernel
+    # would be perverse, so the ~230 ms this costs buys exact agreement instead.
+    # The mu-binned flag rows (compute_region_flag_results) use np.bincount, which
+    # upcasts to float64, so those fuse bit-identically.
+    valid_mask = (flat_mu >= mu_thresh) if agg is None else agg.valid
+    total_pixels = np.nansum(valid_mask) if agg is None else agg.n_valid
+    total_light = np.nansum(flat_int[valid_mask]) if agg is None else agg.total_light
 
     rows = []
     for code, sel in selections:
@@ -202,7 +255,7 @@ def compute_region_only_flag_results(mjd, flat_mu, flat_int, flat_iflat,
 
 def compute_region_flag_results(mjd, flat_mu, flat_int, flat_iflat,
                                 selections, mu_thresh, n_rings, quiet_ref_by_bin,
-                                p_vhat, p_vphot, p_mag):
+                                p_vhat, p_vphot, p_mag, agg=None):
     """Mu-binned metrics for non-exclusive feature selections.
 
     Same overlapping-mask semantics as compute_region_only_flag_results, but
@@ -210,26 +263,45 @@ def compute_region_flag_results(mjd, flat_mu, flat_int, flat_iflat,
     quiet-Sun reference returned by compute_region_results, subtracted to form
     v_conv (the v_quiet column stays 0 as flags are never the quiet reference).
     """
-    bins = np.linspace(mu_thresh, 1.0, n_rings)
-    bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings - 2)
-    valid_mask = (flat_mu >= mu_thresh)
     n_bins = n_rings - 1
 
-    total_pixels = np.nansum(valid_mask)
-    total_light = np.nansum(flat_int[valid_mask])
+    if agg is None:
+        bins = np.linspace(mu_thresh, 1.0, n_rings)
+        bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings - 2)
+        valid_mask = (flat_mu >= mu_thresh)
+        total_pixels = np.nansum(valid_mask)
+        total_light = np.nansum(flat_int[valid_mask])
+        acc = None
+    else:
+        # shared traversal; per-ring flag rows are bit-identical to the bincounts
+        bins = agg.bins
+        valid_mask = None
+        total_pixels = agg.n_valid
+        total_light = agg.total_light
+        acc = flag_acc(agg, flat_mu, flat_int, flat_iflat, p_vhat, p_vphot,
+                       p_mag, selections, mu_thresh, n_bins)
+
     lo_mu = bins[:-1]
     hi_mu = bins[1:]
 
     rows = []
-    for code, sel in selections:
-        m = valid_mask & sel
-        grp = bin_idx[m]
-        sum_pix = np.bincount(grp, minlength=n_bins).astype(float)
-        sum_int = np.bincount(grp, weights=flat_int[m], minlength=n_bins)
-        sum_iflat = np.bincount(grp, weights=flat_iflat[m], minlength=n_bins)
-        sum_vhat = np.bincount(grp, weights=p_vhat[m], minlength=n_bins)
-        sum_vphot = np.bincount(grp, weights=p_vphot[m], minlength=n_bins)
-        sum_mag = np.bincount(grp, weights=p_mag[m], minlength=n_bins)
+    for k, (code, sel) in enumerate(selections):
+        if acc is None:
+            m = valid_mask & sel
+            grp = bin_idx[m]
+            sum_pix = np.bincount(grp, minlength=n_bins).astype(float)
+            sum_int = np.bincount(grp, weights=flat_int[m], minlength=n_bins)
+            sum_iflat = np.bincount(grp, weights=flat_iflat[m], minlength=n_bins)
+            sum_vhat = np.bincount(grp, weights=p_vhat[m], minlength=n_bins)
+            sum_vphot = np.bincount(grp, weights=p_vphot[m], minlength=n_bins)
+            sum_mag = np.bincount(grp, weights=p_mag[m], minlength=n_bins)
+        else:
+            sum_pix = acc[k, :, F_PIX]
+            sum_int = acc[k, :, F_INT]
+            sum_iflat = acc[k, :, F_IFLAT]
+            sum_vhat = acc[k, :, F_VHAT]
+            sum_vphot = acc[k, :, F_VPHOT]
+            sum_mag = acc[k, :, F_MAG]
 
         # avoid division by zero (empty ring emits a zeroed row, not NaN)
         sum_int_safe = np.where(sum_int > 0, sum_int, 1)
@@ -257,41 +329,65 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
                            flat_ld, flat_iflat, flat_abs_mag, flat_w_quiet, flat_w_active,
                            flat_reg, region_codes, mu_thresh, n_rings, k_hat_con,
                            p_vhat=None, p_vphot=None, p_mag=None,
-                           reg_idx=None):
+                           reg_idx=None, agg=None):
     """Compute region-aggregated metrics in mu rings."""
     if p_vhat is None:
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
                                                  flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
 
-    bins = np.linspace(mu_thresh, 1.0, n_rings)
-    bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings-2)
-    valid_mask = (flat_mu >= mu_thresh)
-
     # aggregate sums by (bin, region)
     regions = np.array(region_codes)
-    if reg_idx is None:
-        reg_idx = _region_index(flat_reg, region_codes)
-    valid = valid_mask & (reg_idx>=0)
-    grp = bin_idx[valid] * len(regions) + reg_idx[valid]
-    M = (n_rings-1) * len(regions)
+    n_reg = len(regions)
+    M = (n_rings-1) * n_reg
 
-    sum_vhat = np.bincount(grp, weights=p_vhat[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_vphot = np.bincount(grp, weights=p_vphot[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_int = np.bincount(grp, weights=flat_int[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_iflat = np.bincount(grp, weights=flat_iflat[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_mag = np.bincount(grp, weights=p_mag[valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_pix = np.bincount(grp, weights=valid.astype(int)[valid], minlength=M).reshape(n_rings-1,len(regions))
+    if agg is None:
+        bins = np.linspace(mu_thresh, 1.0, n_rings)
+        bin_idx = np.clip(np.digitize(flat_mu, bins) - 1, 0, n_rings-2)
+        valid_mask = (flat_mu >= mu_thresh)
+        if reg_idx is None:
+            reg_idx = _region_index(flat_reg, region_codes)
+        valid = valid_mask & (reg_idx>=0)
+        grp = bin_idx[valid] * n_reg + reg_idx[valid]
+        w_vhat = p_vhat[valid]
+        w_vphot = p_vphot[valid]
+        w_int = flat_int[valid]
+        w_iflat = flat_iflat[valid]
+        w_mag = p_mag[valid]
+        q_valid = valid & flat_w_quiet
+        grp_q = bin_idx[q_valid] * n_reg + reg_idx[q_valid]
+        q_vhat = p_vhat[q_valid]
+        q_int = flat_int[q_valid]
+        total_pixels = np.nansum(valid_mask)
+        total_light = np.nansum(flat_int[valid_mask])
+        sum_vhat = np.bincount(grp, weights=w_vhat, minlength=M).reshape(n_rings-1,n_reg)
+        sum_vphot = np.bincount(grp, weights=w_vphot, minlength=M).reshape(n_rings-1,n_reg)
+        sum_int = np.bincount(grp, weights=w_int, minlength=M).reshape(n_rings-1,n_reg)
+        sum_iflat = np.bincount(grp, weights=w_iflat, minlength=M).reshape(n_rings-1,n_reg)
+        sum_mag = np.bincount(grp, weights=w_mag, minlength=M).reshape(n_rings-1,n_reg)
+        sum_pix = np.bincount(grp, minlength=M).astype(float).reshape(n_rings-1,n_reg)
+        sum_vquiet_flat = np.bincount(grp_q, weights=q_vhat, minlength=M).reshape(n_rings-1,n_reg)
+        sum_int_q_flat = np.bincount(grp_q, weights=q_int, minlength=M).reshape(n_rings-1,n_reg)
+    else:
+        # one shared traversal; these per-ring rows ARE bit-identical to the
+        # bincounts they replace (same pixels, same C order, same sequential
+        # accumulation per (ring, region) slot)
+        bins = agg.bins
+        acc = region_acc(agg, flat_mu, flat_int, flat_iflat, p_vhat, p_vphot,
+                         p_mag, flat_w_quiet, flat_reg, mu_thresh,
+                         n_rings - 1, n_reg)
+        sum_vhat = acc[:, :, Q_VHAT]
+        sum_vphot = acc[:, :, Q_VPHOT]
+        sum_int = acc[:, :, Q_INT]
+        sum_iflat = acc[:, :, Q_IFLAT]
+        sum_mag = acc[:, :, Q_MAG]
+        sum_pix = acc[:, :, Q_PIX]
+        sum_vquiet_flat = acc[:, :, Q_VQUIET]
+        sum_int_q_flat = acc[:, :, Q_INT_QUIET]
+        total_pixels = agg.n_valid
+        total_light = agg.total_light
 
     # quiet-sun sums
     quiet_idx = np.where(regions == quiet_sun_code)[0][0]
-    q_valid = valid & flat_w_quiet
-    grp_q = bin_idx[q_valid] * len(regions) + reg_idx[q_valid]
-    sum_vquiet_flat = np.bincount(grp_q, weights=p_vhat[q_valid], minlength=M).reshape(n_rings-1,len(regions))
-    sum_int_q_flat = np.bincount(grp_q, weights=flat_int[q_valid], minlength=M).reshape(n_rings-1,len(regions))
-
-    # compute metrics
-    total_pixels = np.nansum(valid_mask)
-    total_light = np.nansum(flat_int[valid_mask])
     pix_frac = sum_pix/total_pixels
     light_frac = sum_int/total_light
 

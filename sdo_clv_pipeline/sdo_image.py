@@ -26,7 +26,10 @@ from .legendre import *
 from .legendre import bulk_vel_design, basis_scale
 from .reproject import *
 from .geometry import pixel_to_hpc, hpc_to_hcc, hcc_to_hgs, compute_geometry
+from .geometry import pixel_area_kernel
 from .geometry import _RAD2ARCSEC  # arcsec per radian; shared so rr matches exactly
+
+from .doppler_kernels import spacecraft_vel_kernel
 
 from .moat import detect_moats
 
@@ -367,6 +370,23 @@ class SDOImage(object):
         return None
 
     def calc_spacecraft_vel(self):
+        """Project the spacecraft velocity into the image frame (fused kernel).
+
+        ``calc_spacecraft_vel_numpy`` is the retained oracle.
+        """
+        assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
+
+        # .value on a Quantity is a view, so these cost nothing. The kernel
+        # writes every pixel (NaN off-mask), so empty_like needs no pre-fill.
+        self.v_obs = np.empty_like(self.image)
+        spacecraft_vel_kernel(self.rr.value, self.xx.value, self.yy.value,
+                              self.mask_nan, float(self.rsun_solrad),
+                              float(self.obs_vr), float(self.obs_vw),
+                              float(self.obs_vn), self.v_obs)
+        return None
+
+    def calc_spacecraft_vel_numpy(self):
+        """Reference numpy implementation; oracle for calc_spacecraft_vel."""
         # methods adapted from https://arxiv.org/abs/2105.12055
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
@@ -539,7 +559,9 @@ class SDOImage(object):
         return None
 
     def calc_limb_darkening(self, mu_lim=0.1, num_mu=25, n_sigma=2.0):
-        """Estimate limb darkening and flatten continuum/filtergram intensity.
+        """Estimate limb darkening and flatten intensity (fused kernels).
+
+        ``calc_limb_darkening_numpy`` is the retained oracle.
 
         Parameters
         ----------
@@ -550,6 +572,43 @@ class SDOImage(object):
         n_sigma : float, optional
             Sigma clipping threshold within each bin.
         """
+        assert (self.is_continuum() | self.is_filtergram()), "expected continuum or filtergram, got content=%s (%s)" % (self.content, self.filename)
+
+        mu_flat = self.mu.ravel()
+        I_flat = self.image.ravel()
+        mu_edges = np.linspace(mu_lim, 1.0, num=num_mu + 1)
+
+        # first pass: per-bin sums, counts, sum of squares (no mask, no gathers)
+        sums, counts, sum2 = ld_bin_stats(mu_flat, I_flat, mu_edges, mu_lim, num_mu)
+        means = sums / counts
+        stds = np.sqrt(np.clip(sum2 / counts - means**2.0, 0, None))
+
+        # second pass: sigma-clipped sums. The oracle only re-bins when at least
+        # one pixel is clipped, so gate on n_clipped to match it exactly.
+        sums_c, counts_c, n_clipped = ld_bin_stats_clipped(
+            mu_flat, I_flat, mu_edges, mu_lim, num_mu, means, stds, n_sigma)
+        if n_clipped > 0:
+            sums, counts = sums_c, counts_c
+        avg_int = sums / counts
+
+        # bin-center mu values, then the quadratic LD fit (25 points; negligible)
+        mu_avgs = 0.5 * (mu_edges[:-1] + mu_edges[1:])
+        p = np.polyfit(1.0 - mu_avgs, avg_int, 2)
+        a = p[2]
+        b = -p[1] / p[2]
+        c = -p[0] / p[2]
+
+        # ldark/iflat are float64: b and c are np.float64 scalars, which promote
+        # the float32 mu under NEP 50 (see ld_flatten). .ravel() on a fresh
+        # C-contiguous array is a view, so the kernel writes straight into them.
+        self.ld_coeffs = np.array([a, b, c])
+        self.ldark = np.empty(self.image.shape, dtype=np.float64)
+        self.iflat = np.empty(self.image.shape, dtype=np.float64)
+        ld_flatten(mu_flat, I_flat, b, c, self.ldark.ravel(), self.iflat.ravel())
+        return None
+
+    def calc_limb_darkening_numpy(self, mu_lim=0.1, num_mu=25, n_sigma=2.0):
+        """Reference numpy implementation; oracle for calc_limb_darkening."""
         assert (self.is_continuum() | self.is_filtergram()), "expected continuum or filtergram, got content=%s (%s)" % (self.content, self.filename)
 
         # flatten & mask
@@ -639,7 +698,19 @@ def calculate_weights(mag):
     return w_active, w_quiet
 
 def calculate_pixel_area(lat, lon):
-    """Compute per-pixel areas from heliographic latitude/longitude grids."""
+    """Compute per-pixel areas from heliographic latitude/longitude grids.
+
+    Fused numba path; ``calculate_pixel_area_numpy`` is the retained oracle.
+    """
+    lat_deg = np.ascontiguousarray(lat.value, dtype=np.float64)
+    lon_deg = np.ascontiguousarray(lon.value, dtype=np.float64)
+    out = np.empty(lat_deg.shape, dtype=np.float64)
+    pixel_area_kernel(lat_deg, lon_deg, out)
+    return out
+
+
+def calculate_pixel_area_numpy(lat, lon):
+    """Reference numpy implementation; oracle for calculate_pixel_area."""
     # convert to radians
     lat_rad = lat.value * np.pi / 180.0
     lon_rad = lon.value * np.pi / 180.0

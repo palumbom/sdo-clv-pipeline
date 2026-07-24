@@ -336,6 +336,43 @@ def _wcs_is_clean_tan(wcs):
             and ctype[0].endswith("-TAN") and ctype[1].endswith("-TAN"))
 
 
+@njit(cache=True, parallel=True)
+def pixel_area_kernel(lat_deg, lon_deg, out):
+    """Per-pixel solar area in microhemispheres, in one fused pass.
+
+    Replaces the numpy chain in ``sdo_image.calculate_pixel_area_numpy``, which
+    materializes ~7 full-frame float64 temporaries (896 MB high-water on a
+    4096x4096 frame) for what is a per-pixel map plus a forward difference.
+
+    The operation order is preserved exactly -- radians via ``deg * pi / 180``,
+    then ``sin(lat) * |d_lon| * |d_lat| / (2*pi) * 1e6`` -- so results are
+    bit-identical to the oracle. Forward differences use a zero edge, matching
+    the oracle's ``np.pad(..., mode="constant")``: the last row of d_lat and the
+    last column of d_lon are 0, so those pixels get zero area, exactly as before.
+
+    Each pixel reads only (i, j), (i+1, j), (i, j+1), so the prange loop is a
+    pure map and is thread-count invariant.
+    """
+    n_row, n_col = lat_deg.shape
+    two_pi = 2.0 * math.pi
+    for i in prange(n_row):
+        for j in range(n_col):
+            lr = lat_deg[i, j] * math.pi / 180.0
+            if i < n_row - 1:
+                d_lat = lat_deg[i + 1, j] * math.pi / 180.0 - lr
+            else:
+                d_lat = 0.0
+            if j < n_col - 1:
+                d_lon = lon_deg[i, j + 1] * math.pi / 180.0 - lon_deg[i, j] * math.pi / 180.0
+            else:
+                d_lon = 0.0
+            if d_lat < 0.0:
+                d_lat = -d_lat
+            if d_lon < 0.0:
+                d_lon = -d_lon
+            out[i, j] = math.sin(lr) * d_lon * d_lat / two_pi * 1e6
+
+
 def compute_geometry(wcs, naxis1, naxis2, dsun, rsun, rsun_obs, b0, l0, image_dtype):
     """Compute (xx, yy, rr, mu, lat_deg, lon_deg) arrays for an image grid.
 

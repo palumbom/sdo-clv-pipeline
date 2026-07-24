@@ -1,8 +1,10 @@
-"""The compaction context must not change any aggregation output.
+"""The shared aggregation context must not change any aggregation output.
 
-Phase 1 only reorders how pixels are selected and gathered -- it changes no
-arithmetic -- so every output must be *bit-identical*, not merely within the
-1e-12 project gate. A near-miss here is a bug, not floating-point noise.
+The fused kernels change how pixels are visited, not the arithmetic, so their
+rows must be *bit-identical* to the np.bincount path rather than merely within
+tolerance -- a near-miss is a bug, not floating-point noise. The one exception is
+the region-only rows, which sum ring partials and so reassociate; those are held
+to the 1e-12 tolerance.
 """
 
 import pytest
@@ -127,24 +129,23 @@ def test_flag_rows_bit_identical_with_context():
     to float64) and the disk-level ones stay on the numpy path on purpose."""
     d = _toy()
     agg = _agg(d)
-    sel_full = flag_selections(d["flat_reg"], d["flat_flags"])
-    sel_cmp = sel_full          # kernels read full-frame arrays; no compaction
+    sel = flag_selections(d["flat_reg"], d["flat_flags"])
     quiet_ref = -123.0
 
     old = compute_region_only_flag_results(
-        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel_full, MU_THRESH,
+        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel, MU_THRESH,
         quiet_ref, d["p_vhat"], d["p_vphot"], d["p_mag"])
     new = compute_region_only_flag_results(
-        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel_cmp, MU_THRESH,
+        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel, MU_THRESH,
         quiet_ref, d["p_vhat"], d["p_vphot"], d["p_mag"], agg=agg)
     _rows_equal(new, old, "flag rows (no mu bins)")
 
     ref_by_bin = np.linspace(-50.0, 50.0, N_RINGS - 1)
     old_r = compute_region_flag_results(
-        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel_full, MU_THRESH,
+        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel, MU_THRESH,
         N_RINGS, ref_by_bin, d["p_vhat"], d["p_vphot"], d["p_mag"])
     new_r = compute_region_flag_results(
-        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel_cmp, MU_THRESH,
+        1.0, d["flat_mu"], d["flat_int"], d["flat_iflat"], sel, MU_THRESH,
         N_RINGS, ref_by_bin, d["p_vhat"], d["p_vphot"], d["p_mag"], agg=agg)
     _rows_equal(new_r, old_r, "flag x ring rows")
     return None

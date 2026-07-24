@@ -4,7 +4,7 @@ import numpy as np
 import pdb
 from scipy import ndimage
 from .sdo_image import *
-from .aggregate import (region_acc, flag_acc,
+from .aggregate import (region_acc, flag_acc, region_lut,
                         Q_VHAT, Q_VPHOT, Q_INT, Q_IFLAT, Q_MAG, Q_PIX,
                         Q_VQUIET, Q_INT_QUIET,
                         F_VHAT, F_VPHOT, F_INT, F_IFLAT, F_MAG, F_PIX)
@@ -19,9 +19,7 @@ def _region_index(flat_reg, region_codes):
     ``reg_map.get(r, -1)`` semantics.
     """
     maxc = max(region_codes)
-    lut = np.full(maxc + 1, -1, dtype=np.int64)
-    for i, r in enumerate(region_codes):
-        lut[r] = i
+    lut = region_lut(region_codes)
     codes = np.nan_to_num(flat_reg, nan=0.0).astype(np.int64)
     np.clip(codes, 0, maxc, out=codes)
     return lut[codes]
@@ -69,16 +67,10 @@ def compute_disk_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
                                                  flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
 
-    # boolean indexing materializes a new array each time, and the masked
-    # intensity sum / valid-pixel count are each reused several times below.
-    # Compute them once; the operands and operation order are unchanged, so
-    # every result is bit-identical to recomputing them inline. When an
-    # AggInputs context is supplied the gathers were already done once for the
-    # whole epoch (see aggregate.build_agg_inputs) and are simply reused.
-    # The disk row keeps its numpy gathers even with a context: np.nansum uses
-    # pairwise summation, which a sequential kernel loop cannot reproduce, so
-    # fusing this would break bit-identity for no real gain. The context only
-    # supplies the mask and the two totals it already computed.
+    # Gather once and reuse: the masked intensity sum and valid-pixel count are
+    # each used several times below. This row stays on numpy even when a context
+    # is supplied, because np.nansum's pairwise summation cannot be reproduced by
+    # a sequential kernel loop; the context supplies only the mask and totals.
     valid = (flat_mu >= mu_thresh) if agg is None else agg.valid
     fi = flat_int[valid]
     fwq = flat_w_quiet[valid]
@@ -149,18 +141,15 @@ def compute_region_only_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
         sum_int = np.bincount(grp, weights=w_int, minlength=M)
         sum_iflat = np.bincount(grp, weights=w_iflat, minlength=M)
         sum_mag = np.bincount(grp, weights=w_mag, minlength=M)
-        # summing 1.0 per pixel and counting are exact for counts below 2^53, so
-        # this drops a full-frame int64 temporary plus a gather at no numeric cost
+        # counting is exact below 2^53, and drops an int64 temporary plus a gather
         sum_pix = np.bincount(grp, minlength=M).astype(float)
         sum_vquiet = np.bincount(grp_q, weights=q_vhat, minlength=M)
         sum_int_q = np.bincount(grp_q, weights=q_int, minlength=M)
     else:
-        # Sum the shared (ring, region) accumulator over rings. This is the one
-        # place the refactor is NOT bit-identical: the ring partials are added
-        # together rather than accumulated in one sequential pass over pixels.
-        # Nine partial sums of ~1.5M terms each are in fact better conditioned
-        # than one 13.3M-term sequential sum; the deviation is ~1e-16 relative,
-        # far inside the 1e-12 gate, and is recorded by the golden-CSV run.
+        # Sum the shared (ring, region) accumulator over rings. These rows are
+        # the only ones held to the 1e-12 tolerance rather than bit-identity:
+        # summing ring partials reassociates the total. It is also the better
+        # conditioned order, being many partial sums instead of one long one.
         acc = region_acc(agg, flat_mu, flat_int, flat_iflat, p_vhat, p_vphot,
                          p_mag, flat_w_quiet, flat_reg, mu_thresh,
                          len(agg.bins) - 1, M).sum(axis=0)
@@ -213,14 +202,11 @@ def compute_region_only_flag_results(mjd, flat_mu, flat_int, flat_iflat,
     reference, so the v_quiet column is 0 and v_conv = v_hat - quiet_ref (the
     per-disk quiet reference computed by the base region aggregation).
     """
-    # This function deliberately stays on the numpy path even when a context is
-    # supplied. Its sums come from np.nansum over float32 arrays, so they are
-    # accumulated in *float32*; the fused kernel accumulates in float64 (as
-    # np.bincount does) and therefore disagrees by ~1e-8 relative -- more accurate,
-    # but outside the 1e-12 gate. Reproducing float32 accumulation in the kernel
-    # would be perverse, so the ~230 ms this costs buys exact agreement instead.
-    # The mu-binned flag rows (compute_region_flag_results) use np.bincount, which
-    # upcasts to float64, so those fuse bit-identically.
+    # Stays on the numpy path even with a context: these sums come from np.nansum
+    # over float32 arrays and so accumulate in float32, whereas any kernel (like
+    # np.bincount) accumulates in float64. The two differ by ~1e-8, outside the
+    # tolerance, so this path is kept for exact agreement. The mu-binned flag rows
+    # below use np.bincount and therefore do fuse bit-identically.
     valid_mask = (flat_mu >= mu_thresh) if agg is None else agg.valid
     total_pixels = np.nansum(valid_mask) if agg is None else agg.n_valid
     total_light = np.nansum(flat_int[valid_mask]) if agg is None else agg.total_light
@@ -273,7 +259,7 @@ def compute_region_flag_results(mjd, flat_mu, flat_int, flat_iflat,
         total_light = np.nansum(flat_int[valid_mask])
         acc = None
     else:
-        # shared traversal; per-ring flag rows are bit-identical to the bincounts
+        # shared traversal; bit-identical to the bincounts it replaces
         bins = agg.bins
         valid_mask = None
         total_pixels = agg.n_valid
@@ -368,9 +354,7 @@ def compute_region_results(mjd, flat_mu, flat_int, flat_v_corr, flat_v_rot,
         sum_vquiet_flat = np.bincount(grp_q, weights=q_vhat, minlength=M).reshape(n_rings-1,n_reg)
         sum_int_q_flat = np.bincount(grp_q, weights=q_int, minlength=M).reshape(n_rings-1,n_reg)
     else:
-        # one shared traversal; these per-ring rows ARE bit-identical to the
-        # bincounts they replace (same pixels, same C order, same sequential
-        # accumulation per (ring, region) slot)
+        # one shared traversal; bit-identical to the bincounts it replaces
         bins = agg.bins
         acc = region_acc(agg, flat_mu, flat_int, flat_iflat, p_vhat, p_vphot,
                          p_mag, flat_w_quiet, flat_reg, mu_thresh,

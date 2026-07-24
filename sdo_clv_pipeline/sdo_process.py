@@ -12,7 +12,6 @@ import multiprocessing as mp
 from .paths import root
 from .sdo_io import *
 from .sdo_vels import *
-from .sdo_vels import _region_index  # private: not re-exported by `import *`
 from .aggregate import build_agg_inputs
 from .sdo_image import *
 from .quality import *
@@ -233,11 +232,9 @@ def process_data_set(con_file, mag_file, dop_file, aia_file,
         p_vhat, p_vphot, p_mag = shared_products(flat_int, flat_v_corr, flat_v_rot,
                                                  flat_ld, flat_w_active, flat_abs_mag, k_hat_con)
 
-        # compact the per-pixel arrays to the valid (on-disk) pixels once. The
-        # five aggregations below then share one selection, one set of gathers and
-        # one pair of disk totals, instead of rebuilding them 2-5 times each.
-        # Bit-identical: index gathering preserves element order, so every
-        # downstream bincount/nansum sees the same array it saw before.
+        # shared per-epoch selection and disk totals; the aggregations below build
+        # their fused accumulators from it instead of each rebuilding the valid
+        # mask, ring index and disk sums (see aggregate.py)
         flat_flags = mask.flags.ravel()
         agg = build_agg_inputs(flat_mu, flat_int, region_codes, mu_thresh, n_rings)
 

@@ -15,16 +15,17 @@ def compute_pixel_mapping(src_wcs, dst_wcs, shape, stride=4):
     2D WCS composition would drop). The destination->source pixel map is a very
     smooth, near-affine TAN->TAN warp, so the expensive SkyCoord transform is
     evaluated only on a coarse subgrid (every ``stride`` pixels) and bilinearly
-    upsampled to full resolution. With stride=8 this is ~64x fewer SkyCoord
-    transforms, reducing ~12 s to <1 s while matching the reference to well under
-    0.01 px on disk.
+    upsampled to full resolution, cutting the number of SkyCoord transforms by
+    ``stride**2``.
 
     Off-disk coarse nodes come back as NaN (the high-level transform projects
     through the solar surface); they are nearest-filled before upsampling so the
-    usable disk is not eroded. Any residual error stays in the ``mu < mu_thresh``
-    limb ring that is masked downstream. The original full-resolution
-    implementation is retained as ``compute_pixel_mapping_highlevel`` and used as
-    the verification oracle in ``scripts/verify_geometry.py``.
+    usable disk is not eroded. The original full-resolution implementation is
+    retained as ``compute_pixel_mapping_highlevel`` and is the oracle for the
+    stride sweep in ``scripts/benchmark_pipeline.py reproject``, which measures
+    max on-disk deviation of 0.001 px at the default stride=4, 0.07 px at
+    stride=8, and 4.9 px at stride=16 (where nearest-fill of off-disk nodes
+    starts to bleed inward).
 
     Parameters
     ----------

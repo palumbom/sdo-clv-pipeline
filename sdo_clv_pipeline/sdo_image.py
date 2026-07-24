@@ -153,7 +153,7 @@ class SDOImage(object):
         # Analytic replacement for the sunpy/astropy coordinate-transform chain,
         # fused into a single numba pass (see geometry.compute_geometry). Matches
         # calc_geometry_numpy to machine precision and calc_geometry_sunpy to the
-        # tolerances in scripts/verify_geometry.py, but avoids the per-pixel
+        # tolerances checked by scripts/verify_refactor.py, but avoids the per-pixel
         # SkyCoord/frame machinery and the intermediate full-frame temporaries.
 
         # the authoritative observer (B0, L0) comes from the same sunpy machinery
@@ -598,9 +598,9 @@ class SDOImage(object):
         b = -p[1] / p[2]
         c = -p[0] / p[2]
 
-        # ldark/iflat are float64: b and c are np.float64 scalars, which promote
-        # the float32 mu under NEP 50 (see ld_flatten). .ravel() on a fresh
-        # C-contiguous array is a view, so the kernel writes straight into them.
+        # float64 outputs: b and c are np.float64 scalars, which promote the
+        # float32 mu (see ld_flatten). .ravel() on a fresh C-contiguous array is a
+        # view, so the kernel writes straight into them.
         self.ld_coeffs = np.array([a, b, c])
         self.ldark = np.empty(self.image.shape, dtype=np.float64)
         self.iflat = np.empty(self.image.shape, dtype=np.float64)

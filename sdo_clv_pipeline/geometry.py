@@ -340,18 +340,15 @@ def _wcs_is_clean_tan(wcs):
 def pixel_area_kernel(lat_deg, lon_deg, out):
     """Per-pixel solar area in microhemispheres, in one fused pass.
 
-    Replaces the numpy chain in ``sdo_image.calculate_pixel_area_numpy``, which
-    materializes ~7 full-frame float64 temporaries (896 MB high-water on a
-    4096x4096 frame) for what is a per-pixel map plus a forward difference.
+    Oracle: ``sdo_image.calculate_pixel_area_numpy``. Operation order is preserved
+    (radians via ``deg * pi / 180``, then
+    ``sin(lat) * |d_lon| * |d_lat| / (2*pi) * 1e6``), so results are bit-identical.
+    Forward differences take a zero edge, matching the oracle's
+    ``np.pad(..., mode="constant")``: the last row of d_lat and last column of
+    d_lon are 0, giving those pixels zero area.
 
-    The operation order is preserved exactly -- radians via ``deg * pi / 180``,
-    then ``sin(lat) * |d_lon| * |d_lat| / (2*pi) * 1e6`` -- so results are
-    bit-identical to the oracle. Forward differences use a zero edge, matching
-    the oracle's ``np.pad(..., mode="constant")``: the last row of d_lat and the
-    last column of d_lon are 0, so those pixels get zero area, exactly as before.
-
-    Each pixel reads only (i, j), (i+1, j), (i, j+1), so the prange loop is a
-    pure map and is thread-count invariant.
+    Each pixel reads only (i, j), (i+1, j) and (i, j+1), so the prange loop is a
+    pure map and thread-count invariant.
     """
     n_row, n_col = lat_deg.shape
     two_pi = 2.0 * math.pi

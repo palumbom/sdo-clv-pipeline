@@ -13,6 +13,7 @@ pytest.importorskip("numba")
 
 import numpy as np
 
+from conftest import assert_within_gate, assert_bit_identical
 from sdo_clv_pipeline.aggregate import build_agg_inputs
 from sdo_clv_pipeline.sdo_image import (region_codes, quiet_sun_code,
                                         flag_selections)
@@ -58,27 +59,14 @@ def _agg(d):
                             MU_THRESH, N_RINGS)
 
 
-def _rows_within_gate(a, b, name, rtol=1e-12):
-    """Project gate: rtol 1e-12 with an atol scaled to each column's range."""
-    a = np.asarray(a, dtype=float)
-    b = np.asarray(b, dtype=float)
-    assert a.shape == b.shape, "%s: shape %s != %s" % (name, a.shape, b.shape)
-    assert np.array_equal(np.isnan(a), np.isnan(b)), "%s: NaN pattern moved" % name
-    f = ~np.isnan(b)
-    scale = float(np.max(np.abs(b[f]))) if f.any() else 0.0
-    np.testing.assert_allclose(a[f], b[f], rtol=rtol, atol=rtol * scale,
-                               err_msg="%s exceeded the 1e-12 gate" % name)
-    return None
+def _rows_within_gate(a, b, name):
+    return assert_within_gate(np.asarray(a, dtype=float),
+                              np.asarray(b, dtype=float), name)
 
 
 def _rows_equal(a, b, name):
-    a = np.asarray(a, dtype=float)
-    b = np.asarray(b, dtype=float)
-    assert a.shape == b.shape, "%s: shape %s != %s" % (name, a.shape, b.shape)
-    assert np.array_equal(a, b, equal_nan=True), \
-        "%s: must be bit-identical, max|d| = %g" % (
-            name, np.nanmax(np.abs(a - b)))
-    return None
+    return assert_bit_identical(np.asarray(a, dtype=float),
+                                np.asarray(b, dtype=float), name)
 
 
 def test_disk_row_bit_identical_with_context():

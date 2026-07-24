@@ -11,16 +11,7 @@ pytest.importorskip("numba")
 import numpy as np
 import astropy.units as u
 
-
-def assert_close(new, old, name, rtol=1e-12):
-    """Project numerical gate: rtol 1e-12, atol scaled to the oracle's range."""
-    assert new.dtype == old.dtype, "%s: dtype %s != %s" % (name, new.dtype, old.dtype)
-    assert np.array_equal(np.isnan(new), np.isnan(old)), "%s: NaN pattern moved" % name
-    f = ~np.isnan(old)
-    scale = float(np.max(np.abs(old[f]))) if f.any() else 0.0
-    np.testing.assert_allclose(new[f], old[f], rtol=rtol, atol=rtol * scale,
-                               err_msg="%s exceeded the 1e-12 gate" % name)
-    return None
+from conftest import assert_within_gate as assert_close
 
 
 def _synthetic_latlon(n=64):

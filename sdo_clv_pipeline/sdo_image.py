@@ -1,24 +1,18 @@
 """SDO image handling and region masking utilities."""
 
 import numpy as np
-import pdb, ipdb, time, warnings
+import pdb, ipdb, warnings
 import astropy.units as u
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors
 
 from sunpy.map import Map as sun_map
 from sunpy.coordinates import frames
 
-from numba import njit
 from scipy import ndimage
 from astropy.wcs import WCS
-from scipy.optimize import curve_fit
-from skimage.measure import regionprops, regionprops_table
+from skimage.measure import regionprops_table
 from astropy.wcs import FITSFixedWarning
 from astropy.io.fits.verify import VerifyWarning
-from astropy.wcs.utils import proj_plane_pixel_scales
-from string import ascii_letters
-from scipy.ndimage import distance_transform_edt
 
 from .sdo_io import *
 from .limbdark import *
@@ -221,7 +215,7 @@ class SDOImage(object):
         # a scalar factor (no per-frame u.rad->u.arcsec Quantity conversions or
         # their temporaries), and units are attached only once at the end, as the
         # fused numba calc_geometry does. Produces the same arrays as
-        # calc_geometry_numpy to machine precision (see scripts/verify_geometry_noquant.py).
+        # calc_geometry_numpy to machine precision.
         smap = sun_map(self.image, self.head)
         obs = smap.observer_coordinate
         b0 = obs.lat.to_value(u.rad)
@@ -776,25 +770,69 @@ class SunMask(object):
         # calculate weights
         self.w_active, self.w_quiet = calculate_weights(mag)
 
-        # calculate magnetic filling factor
-        npix = np.nansum(con.mu >= con.mu_thresh)
-        self.ff = np.nansum(self.w_active[con.mu >= con.mu_thresh]) / npix
+        # mu threshold of the images this mask was built from; needed by the
+        # area-fraction properties below
+        self.mu_thresh = con.mu_thresh
 
         # identify regions
         self.identify_regions(con, mag, dop, aia, **kwargs)
-
-        # get region fracs
-        self.umb_frac = np.nansum(self.is_umbra()) / npix
-        self.pen_frac = np.nansum(self.is_penumbra()) / npix
-        self.blu_pen_frac = np.nansum(self.is_blue_penumbra()) / npix
-        self.red_pen_frac = np.nansum(self.is_red_penumbra()) / npix
-        self.quiet_frac = np.nansum(self.is_quiet_sun()) / npix
-        self.network_frac = np.nansum(self.is_network()) / npix
-        self.plage_frac = np.nansum(self.is_plage()) / npix
-        self.moat_frac = np.nansum(self.is_moat_flow()) / npix
-        self.left_moat_frac = np.nansum(self.is_left_moat()) / npix
-        self.right_moat_frac = np.nansum(self.is_right_moat()) / npix
         return None
+
+    # The filling factor and per-region area fractions are lazy properties, not
+    # attributes computed in __init__. Nothing in this repo reads them, but they
+    # are public API (an external analysis repo imports this package), so they are
+    # kept rather than deleted. Computing all eleven eagerly cost ~12 full-frame
+    # boolean masks plus reductions per epoch for values usually thrown away.
+    @property
+    def npix(self):
+        """Number of on-disk pixels at or above mu_thresh."""
+        return np.nansum(self.mu >= self.mu_thresh)
+
+    @property
+    def ff(self):
+        """Magnetic filling factor over the on-disk pixels."""
+        on_disk = self.mu >= self.mu_thresh
+        return np.nansum(self.w_active[on_disk]) / np.nansum(on_disk)
+
+    @property
+    def umb_frac(self):
+        return np.nansum(self.is_umbra()) / self.npix
+
+    @property
+    def pen_frac(self):
+        return np.nansum(self.is_penumbra()) / self.npix
+
+    @property
+    def blu_pen_frac(self):
+        return np.nansum(self.is_blue_penumbra()) / self.npix
+
+    @property
+    def red_pen_frac(self):
+        return np.nansum(self.is_red_penumbra()) / self.npix
+
+    @property
+    def quiet_frac(self):
+        return np.nansum(self.is_quiet_sun()) / self.npix
+
+    @property
+    def network_frac(self):
+        return np.nansum(self.is_network()) / self.npix
+
+    @property
+    def plage_frac(self):
+        return np.nansum(self.is_plage()) / self.npix
+
+    @property
+    def moat_frac(self):
+        return np.nansum(self.is_moat_flow()) / self.npix
+
+    @property
+    def left_moat_frac(self):
+        return np.nansum(self.is_left_moat()) / self.npix
+
+    @property
+    def right_moat_frac(self):
+        return np.nansum(self.is_right_moat()) / self.npix
 
     def inherit_geometry(self, other_image):
         # self.xx = np.copy(other_image.xx)

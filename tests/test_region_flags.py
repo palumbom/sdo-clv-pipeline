@@ -135,3 +135,54 @@ def test_flag_selections_no_moat_variants_exclude_moat_overlap():
     assert list(sels[plage_no_moat_code]) == [True, False, False, False]
     # network-not-moat drops the network pixel that is also a moat
     assert list(sels[network_no_moat_code]) == [False, False, False, False]
+
+
+def _bare_mask(n=8):
+    """A SunMask with only the fields the area-fraction properties read.
+
+    Bypasses __init__ (which needs four real SDOImages). Layout: a 8x8 frame with
+    a 2-pixel umbra, a 2-pixel penumbra, one plage pixel, one network pixel, the
+    rest quiet sun, and a ring of off-disk pixels excluded by mu_thresh.
+    """
+    from sdo_clv_pipeline.sdo_image import (SunMask, umbrae_code, penumbrae_code,
+                                            plage_code, network_code,
+                                            quiet_sun_code, blue_pen_flag)
+    mask = SunMask.__new__(SunMask)
+    mask.mu = np.full((n, n), 0.5, dtype=np.float32)
+    mask.mu[0, :] = 0.0                       # one row below threshold
+    mask.mu_thresh = 0.1
+    mask.regions = np.full((n, n), quiet_sun_code, dtype=np.float32)
+    mask.regions[0, :] = np.nan               # off-disk
+    mask.regions[1, 0:2] = umbrae_code
+    mask.regions[2, 0:2] = penumbrae_code
+    mask.regions[3, 0] = plage_code
+    mask.regions[3, 1] = network_code
+    mask.flags = np.zeros((n, n), dtype=np.uint8)
+    mask.flags[2, 0:2] = blue_pen_flag
+    mask.w_active = np.zeros((n, n), dtype=bool)
+    mask.w_active[1, 0:2] = True
+    return mask
+
+
+def test_area_fraction_properties_partition_the_disk():
+    """The five base-region fractions must sum to exactly 1 over on-disk pixels."""
+    mask = _bare_mask()
+    total = (mask.umb_frac + mask.pen_frac + mask.quiet_frac
+             + mask.network_frac + mask.plage_frac)
+    assert total == 1.0, "base region fractions must partition the disk, got %r" % total
+    assert mask.npix == 56          # 8x8 minus the one off-disk row
+    assert mask.umb_frac == 2 / 56
+    assert mask.plage_frac == 1 / 56
+    return None
+
+
+def test_area_fraction_properties_are_lazy_not_attributes():
+    """They are computed on access, so a stale cached value cannot be served."""
+    from sdo_clv_pipeline.sdo_image import SunMask, umbrae_code
+    mask = _bare_mask()
+    before = mask.umb_frac
+    mask.regions[4, 0:2] = umbrae_code        # two more umbra pixels
+    assert mask.umb_frac > before, "property did not reflect the updated region map"
+    assert isinstance(SunMask.umb_frac, property)
+    assert mask.ff == 2 / 56                  # w_active covers the 2 umbra pixels
+    return None

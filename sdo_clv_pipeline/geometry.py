@@ -21,7 +21,6 @@ Reference: Thompson, W. T. 2006, A&A 449, 791.
 
 import logging
 import math
-import os
 import numpy as np
 import astropy.units as u
 from numba import njit, prange
@@ -358,11 +357,11 @@ def compute_geometry(wcs, naxis1, naxis2, dsun, rsun, rsun_obs, b0, l0, image_dt
     lon_deg = np.empty(n, dtype=np.float64)
     mu = np.empty(n, dtype=image_dtype)
 
-    # SDO_GEOMETRY_LEGACY forces the astropy fallback path (for A/B verification
-    # against the analytic path on a single checkout, e.g. golden-CSV regression)
-    use_analytic = _wcs_is_clean_tan(wcs) and not os.environ.get("SDO_GEOMETRY_LEGACY")
-
-    if use_analytic:
+    # A clean HPLN/HPLT-TAN WCS (the SDO case) takes the analytic path; anything
+    # else falls back to the astropy pixel_to_hpc path (with a warning) so a
+    # distortion/SIP/non-TAN WCS is never silently pushed through the analytic
+    # kernel, which does not model it.
+    if _wcs_is_clean_tan(wcs):
         wcs.wcs.set()  # canonicalize celestial units to deg, populate lonpole
         w = wcs.wcs
         cr1, cr2 = float(w.crpix[0]), float(w.crpix[1])
@@ -382,10 +381,9 @@ def compute_geometry(wcs, naxis1, naxis2, dsun, rsun, rsun_obs, b0, l0, image_dt
             math.cos(b0), math.sin(b0), float(l0),
             xx, yy, rr, mu, lat_deg, lon_deg)
     else:
-        if not _wcs_is_clean_tan(wcs):
-            logger.warning("WCS is not a clean HPLN/HPLT-TAN (ctype=%s, distortion=%s); "
-                           "using astropy pixel_to_hpc fallback",
-                           list(wcs.wcs.ctype), wcs.has_distortion)
+        logger.warning("WCS is not a clean HPLN/HPLT-TAN (ctype=%s, distortion=%s); "
+                       "using astropy pixel_to_hpc fallback",
+                       list(wcs.wcs.ctype), wcs.has_distortion)
         Tx, Ty = pixel_to_hpc(wcs, naxis1, naxis2)
         txf = np.ascontiguousarray(Tx.ravel())
         tyf = np.ascontiguousarray(Ty.ravel())

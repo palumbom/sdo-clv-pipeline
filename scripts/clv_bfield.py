@@ -137,10 +137,30 @@ def prepare_features(feature_df):
 def bin_by_bfield(feature_df, nbins):
     """Add an integer b_bin column via equal-count quantile bins on |B|.
 
-    Returns (df, edges) where edges has length nbins+1 (Gauss).
+    Returns (df, edges); edges has length (n_bins_used + 1) in Gauss. The number
+    of bins used can be fewer than requested when there are too few features or
+    when many share a |B| value (duplicate quantile edges are dropped) -- callers
+    derive the count from ``len(edges) - 1``, so a smaller result is safe.
     """
     out = feature_df.copy()
-    bins, edges = pd.qcut(out[bfield_col], nbins, labels=False, retbins=True)
+    # drop features without a usable |B|; real umbra/penumbra features have finite
+    # radial |B|, but guard so qcut/astype can't choke on a stray NaN
+    finite = np.isfinite(out[bfield_col].values)
+    if not finite.all():
+        print(f"  [bin_by_bfield] dropping {int((~finite).sum())} feature(s) with "
+              f"non-finite {bfield_col}", flush=True)
+        out = out[finite].copy()
+    assert len(out) > 0, f"no features with finite {bfield_col} to bin"
+    # cap requested bins at the number of distinct |B| values so qcut can form them
+    n_unique = out[bfield_col].nunique()
+    eff_nbins = int(min(nbins, max(n_unique, 1)))
+    if eff_nbins < nbins:
+        print(f"  [bin_by_bfield] only {n_unique} unique {bfield_col} value(s) across "
+              f"{len(out)} feature(s); using {eff_nbins} bin(s) instead of {nbins}",
+              flush=True)
+    # duplicates="drop" collapses any remaining tied quantile edges (clustered |B|)
+    bins, edges = pd.qcut(out[bfield_col], eff_nbins, labels=False,
+                          retbins=True, duplicates="drop")
     out["b_bin"] = bins.astype(int)
     return out, edges
 

@@ -15,6 +15,12 @@ interactive epoch set e.g. SDO_THREADS=16 for lower latency.
 Outputs go to ``<datadir>/tmp/{thresholds,region_output,feature_output}_<stamp>.csv``
 (stamp = YYYYmmddTHHMMSS); combine them afterwards with scripts/stitch_tmp.py.
 
+Resume is gated on a per-epoch sentinel ``<datadir>/tmp/.done_<stamp>``, written only
+after a successful, fully-written run -- not on the CSVs merely existing, since a
+worker killed mid-write leaves them present but partial. The sentinel is a durable
+done-log (the ``*.csv`` stitch globs ignore the dotfile); delete it to force an epoch
+to reprocess.
+
 Usage (explicit files):
   uv run scripts/run_one.py --con C.fits --mag M.fits --dop D.fits --aia A.fits --datadir DIR
 Usage (index into a matched glob; used by the disBatch generator):
@@ -73,20 +79,33 @@ def main():
     thr = os.path.join(tmpdir, f"thresholds_{stamp}.csv")
     reg = os.path.join(tmpdir, f"region_output_{stamp}.csv")
     feat = os.path.join(tmpdir, f"feature_output_{stamp}.csv")
+    # Completion sentinel, written only after a successful process_data_set return.
+    # The three CSVs existing is NOT proof of completion: process_data_set creates
+    # them empty up front and fills them sequentially, so a worker killed mid-write
+    # (OOM / SLURM preemption -- the failures this script exists to survive) leaves
+    # all three present but partial. Gating resume on the sentinel instead means a
+    # crashed epoch is reprocessed rather than silently skipped with truncated output.
+    done = os.path.join(tmpdir, f".done_{stamp}")
 
-    if not args.clobber and all(os.path.exists(f) for f in (thr, reg, feat)):
+    if not args.clobber and os.path.exists(done):
         logger.info("Epoch %s already done, skipping (resume)", stamp)
         print(f"skip {stamp}")
         return None
 
-    # remove any partial/stale output for this epoch before (re)writing
-    for f in (thr, reg, feat):
+    # remove any partial/stale output for this epoch (and an orphaned sentinel) before
+    # (re)writing -- covers a prior attempt killed before it wrote the sentinel
+    for f in (thr, reg, feat, done):
         if os.path.exists(f):
             os.remove(f)
 
     status = process_data_set(con, mag, dop, aia, mu_thresh=args.mu_thresh,
                               n_rings=args.n_rings, suffix=stamp, datadir=args.datadir,
                               fit_cbs=args.fit_cbs, plot_moat=False, classify_moat=False)
+    # mark done only on a fully-written success; a quality/error skip leaves no
+    # sentinel and is re-attempted next run, exactly as before (skips are cheap and
+    # may recover if a missing/corrupt input is later fixed)
+    if status == status_ok:
+        open(done, "w").close()
     print(f"{status} {stamp}")
     return None
 

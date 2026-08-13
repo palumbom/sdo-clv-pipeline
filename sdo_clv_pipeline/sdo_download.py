@@ -8,7 +8,9 @@ from sunpy.net import Fido, attrs as a
 
 email   = 'mlp95@psu.edu' # be kind
 
-def download_data(series="720", email=None, outdir=None, start=None, end=None, sample=None, overwrite=False, progress=False):
+def download_data(series="720", email=None, outdir=None, start=None, end=None, sample=None, overwrite=False, progress=False, fetch_hmi=True, fetch_aia=True):
+    assert series in ("45", "720"), "series must be '45' or '720', got %r" % series
+
     # setup arguments
     trange = a.Time(start, end)
     sample = a.Sample(sample * u.hour)
@@ -16,39 +18,35 @@ def download_data(series="720", email=None, outdir=None, start=None, end=None, s
     notify = a.jsoc.Notify(email)
     # quality = a.jsoc.Keyword("QUALLEV1") == 0
 
-    # set attributes for HMI query
-    instr1 = a.Instrument.hmi
-    if series == "45":
-        physobs = (a.Physobs.intensity | a.Physobs.los_magnetic_field | a.Physobs.los_velocity)
-    elif series == "720":
-        physobs = (a.jsoc.Series("hmi.M_720s") | a.jsoc.Series("hmi.V_720s") | a.jsoc.Series("hmi.Ic_720s"))
-    else:
-        return None
+    hmi_files = []
+    aia_files = []
 
-    # get query for HMI and download data, retry failed downloads
-    if series == "45":
-        result = Fido.search(trange, instr1, physobs, sample)
-    elif series == "720":
-        result = Fido.search(trange, physobs, sample, notify)#, quality)
-    else:
-        return None
+    # skipping the HMI half skips the staged JSOC export, which is the slow step;
+    # overwrite=False only ever skipped the re-download
+    if fetch_hmi:
+        # set attributes for HMI query
+        instr1 = a.Instrument.hmi
+        if series == "45":
+            physobs = (a.Physobs.intensity | a.Physobs.los_magnetic_field | a.Physobs.los_velocity)
+            result = Fido.search(trange, instr1, physobs, sample)
+        else:
+            physobs = (a.jsoc.Series("hmi.M_720s") | a.jsoc.Series("hmi.V_720s") | a.jsoc.Series("hmi.Ic_720s"))
+            result = Fido.search(trange, physobs, sample, notify)#, quality)
 
-    print("About to fetch HMI files starting at date %s" % start)
-    hmi_files = Fido.fetch(result, path=outdir, overwrite=overwrite, progress=progress)
-    # while len(hmi_files.errors) > 0:
-    #     hmi_files = Fido.fetch(hmi_files, path=outdir, overwrite=overwrite, progress=progress)
+        print("About to fetch HMI files starting at date %s" % start)
+        hmi_files = Fido.fetch(result, path=outdir, overwrite=overwrite, progress=progress)
 
-    # set attributes for AIA query
-    level = a.Level(1)
-    instr2 = a.Instrument.aia
-    wavelength = a.Wavelength(1700. * u.AA)
+    if fetch_aia:
+        # set attributes for AIA query; 1700 A is served by VSO, not the JSOC
+        # export queue, so it needs no notify address
+        level = a.Level(1)
+        instr2 = a.Instrument.aia
+        wavelength = a.Wavelength(1700. * u.AA)
 
-    # get query for AIA and download data
-    aia = Fido.search(trange, instr2, wavelength, level, provider, sample)
-    print("About to fetch AIA files starting at date %s" % start)
-    aia_files = Fido.fetch(aia, path=outdir, overwrite=overwrite, progress=progress)
-    # while len(aia_files.errors) > 0:
-    #     aia_files = Fido.fetch(aia_files, path=outdir, overwrite=overwrite, progress=progress)
+        # get query for AIA and download data
+        aia = Fido.search(trange, instr2, wavelength, level, provider, sample)
+        print("About to fetch AIA files starting at date %s" % start)
+        aia_files = Fido.fetch(aia, path=outdir, overwrite=overwrite, progress=progress)
 
     # sort out filenames into categories for output
     con_files = [s for s in hmi_files if "cont" in s]

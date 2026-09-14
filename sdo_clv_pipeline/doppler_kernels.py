@@ -17,6 +17,11 @@ def spacecraft_vel_kernel(rr, xx, yy, mask, rsun_solrad,
     Arithmetic is float64, stored once into the float32 ``out``, as the oracle
     does when it assigns into a float32 array. Off-mask pixels are NaN.
 
+    Sign convention: ``out`` is the observer's velocity projected onto the line
+    of sight to each pixel, positive when the observer recedes from that pixel,
+    which is the sign the Dopplergram carries (its disk-centre median tracks
+    +OBS_VR). The caller removes it as ``image - v_obs``.
+
     Pure per-pixel map, so the prange loop is thread-count invariant.
     """
     n_row, n_col = rr.shape
@@ -35,4 +40,4 @@ def spacecraft_vel_kernel(rr, xx, yy, mask, rsun_solrad,
             vr1 = obs_vr * cos_sig
             vr2 = -obs_vw * sin_sig * sin_chi
             vr3 = -obs_vn * sin_sig * cos_chi
-            out[i, j] = -(vr1 + vr2 + vr3)
+            out[i, j] = vr1 + vr2 + vr3

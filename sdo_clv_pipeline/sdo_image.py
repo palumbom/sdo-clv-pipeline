@@ -156,6 +156,7 @@ class SDOImage(object):
         obs = smap.observer_coordinate
         b0 = obs.lat.to_value(u.rad)
         l0 = obs.lon.to_value(u.rad)
+        self.l0_hgs = obs.lon.to_value(u.deg)   # observer Stonyhurst longitude, deg
 
         self.rsun_solrad = self.dsun_obs / self.rsun_ref
 
@@ -182,6 +183,7 @@ class SDOImage(object):
         obs = smap.observer_coordinate
         b0 = obs.lat.to_value(u.rad)
         l0 = obs.lon.to_value(u.rad)
+        self.l0_hgs = obs.lon.to_value(u.deg)   # observer Stonyhurst longitude, deg
 
         Tx, Ty = pixel_to_hpc(self.wcs, self.naxis1, self.naxis2)
         self.rsun_solrad = self.dsun_obs / self.rsun_ref
@@ -220,6 +222,7 @@ class SDOImage(object):
         obs = smap.observer_coordinate
         b0 = obs.lat.to_value(u.rad)
         l0 = obs.lon.to_value(u.rad)
+        self.l0_hgs = obs.lon.to_value(u.deg)   # observer Stonyhurst longitude, deg
 
         Tx, Ty = pixel_to_hpc(self.wcs, self.naxis1, self.naxis2)
         self.rsun_solrad = self.dsun_obs / self.rsun_ref
@@ -260,6 +263,7 @@ class SDOImage(object):
         # original implementation at https://github.com/samarth-kashyap/hmi-clean-ls
         # get sun map
         smap = sun_map(self.image, self.head)
+        self.l0_hgs = smap.observer_coordinate.lon.to_value(u.deg)
 
         # do coordinate transforms / calculations
         paxis1 = np.arange(self.naxis1)
@@ -348,7 +352,10 @@ class SDOImage(object):
         Parameters
         ----------
         fit_cbs : bool, optional
-            If True, fit convective blueshift components in the bulk velocity model.
+            The radial (limb / convective-blueshift) Legendre rows are always part
+            of the fit. If True they are also removed from ``v_corr``; if False
+            (default) ``v_corr`` keeps the centre-to-limb profile and only the
+            rotation and meridional rows and the disk mean are removed.
         """
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
@@ -396,14 +403,16 @@ class SDOImage(object):
         sin_chi = np.sin(chi)
         cos_chi = np.cos(chi)
 
-        # project satellite velocity into coordinate frame
+        # project satellite velocity onto the line of sight to each pixel;
+        # positive = observer receding, the sign the Dopplergram carries, so the
+        # caller removes it as image - v_obs
         vr1 = self.obs_vr * cos_sig
         vr2 = -self.obs_vw * sin_sig * sin_chi
         vr3 = -self.obs_vn * sin_sig * cos_chi
 
         # scatter back into the full frame
         self.v_obs = np.zeros_like(self.image)
-        self.v_obs[m] = -(vr1 + vr2 + vr3)
+        self.v_obs[m] = vr1 + vr2 + vr3
         self.v_obs[~m] = np.nan
         return None
 
@@ -411,9 +420,7 @@ class SDOImage(object):
         # Fused numba implementation of the bulk-velocity fit. Reproduces
         # calc_bulk_vel_numpy (retained below) but generates the Legendre design
         # matrix via an in-kernel recurrence instead of gen_leg_vec/gen_leg_x_vec,
-        # then runs the identical normal-equations solve. With the rho basis bug
-        # fixed (gen_leg_x_vec no longer mis-scales rho), the fit_cbs=True system
-        # is well-conditioned (cond ~4e7), so the fast path handles both cases.
+        # then runs the identical normal-equations solve.
         # methods adapted from https://arxiv.org/abs/2105.12055
         assert self.is_dopplergram(), "expected dopplergram, got content=%s (%s)" % (self.content, self.filename)
 
@@ -422,44 +429,56 @@ class SDOImage(object):
         # read the raw header float, so the conversion must be explicit.
         cos_B0 = np.cos(np.deg2rad(self.B0))
         sin_B0 = np.sin(np.deg2rad(self.B0))
-        n_poly = 11 if fit_cbs else 6
 
-        # masked inputs as plain arrays (lat/lon in degrees, rho dimensionless)
-        lat_deg = self.lat[self.mask_nan].to_value(u.deg)
-        lon_deg = self.lon[self.mask_nan].to_value(u.deg)
-        rho = self.rr[self.mask_nan].value
+        # Fit angles. theta is the true colatitude: self.lat stores latitude + 90
+        # (polar angle from the south pole), which pixel_area and external
+        # consumers rely on, so the conversion is done here rather than in the
+        # attribute. phi is longitude from the sub-observer meridian: self.lon
+        # is Stonyhurst, offset by the observer's l0. The projection factors in
+        # the kernel (lt, lp) are written for exactly these angles and must both
+        # vanish at the sub-observer pixel.
+        m = self.mask_nan
+        theta_deg = 180.0 - self.lat[m].to_value(u.deg)
+        phi_deg = self.lon[m].to_value(u.deg) - self.l0_hgs
+        rho = self.rr[m].value
 
-        # build the design matrix via the fused numba kernel (replaces the slow
-        # gen_leg_vec/gen_leg_x_vec basis generation), then run the identical
-        # normal-equations solve as calc_bulk_vel_numpy.
-        self.im_arr = bulk_vel_design(lat_deg, lon_deg, rho, cos_B0, sin_B0,
-                                      n_poly, basis_scale)
+        # All 11 rows are always fitted. Without the rho rows the several-hundred
+        # m/s centre-to-limb profile has nowhere to go but the meridional rows.
+        self.im_arr = bulk_vel_design(theta_deg, phi_deg, rho, cos_B0, sin_B0,
+                                      11, basis_scale)
 
         # subtract on the masked subset directly, avoiding a full-frame temporary.
         # Bitwise-identical to (image - v_obs - v_grav)[mask_nan] (v_grav is scalar;
         # the result is already a fresh array, so no .copy() is needed).
-        m = self.mask_nan
         self.dat = self.image[m] - self.v_obs[m] - self.v_grav
         self.RHS = self.im_arr.dot(self.dat)
         A = self.im_arr @ self.im_arr.T
         self.fit_params = np.linalg.solve(A, self.RHS)
 
         self.v_rot = np.zeros_like(self.image)
-        self.v_rot[self.mask_nan] = self.fit_params[:3].dot(self.im_arr[:3, :])
-        self.v_rot[~self.mask_nan] = np.nan
+        self.v_rot[m] = self.fit_params[:3].dot(self.im_arr[:3, :])
+        self.v_rot[~m] = np.nan
 
         self.v_mer = np.zeros_like(self.image)
-        self.v_mer[self.mask_nan] = self.fit_params[3:5].dot(self.im_arr[3:5, :])
-        self.v_mer[~self.mask_nan] = np.nan
+        self.v_mer[m] = self.fit_params[3:5].dot(self.im_arr[3:5, :])
+        self.v_mer[~m] = np.nan
 
         self.v_cbs = np.zeros_like(self.image)
-        self.v_cbs[self.mask_nan] = self.fit_params[5:].dot(self.im_arr[5:, :])
-        self.v_cbs[~self.mask_nan] = np.nan
+        self.v_cbs[m] = self.fit_params[5:].dot(self.im_arr[5:, :])
+        self.v_cbs[~m] = np.nan
 
-        self.dat -= self.fit_params.dot(self.im_arr)
+        # v_corr: rotation and meridional rows are always removed. With fit_cbs
+        # the radial rows go too and the residual is orthogonal to the constant
+        # row; without it the centre-to-limb profile stays and the disk mean is
+        # removed explicitly, so v_corr is zero-mean over the fit mask either way.
+        if fit_cbs:
+            self.dat -= self.fit_params.dot(self.im_arr)
+        else:
+            self.dat -= self.fit_params[:5].dot(self.im_arr[:5, :])
+            self.dat -= self.dat.mean(dtype=np.float64)
         self.v_corr = np.zeros_like(self.image)
-        self.v_corr[self.mask_nan] = self.dat
-        self.v_corr[~self.mask_nan] = np.nan
+        self.v_corr[m] = self.dat
+        self.v_corr[~m] = np.nan
         return None
 
     def calc_bulk_vel_numpy(self, fit_cbs=False):
@@ -474,32 +493,28 @@ class SDOImage(object):
         cos_B0 = np.cos(np.deg2rad(self.B0))
         sin_B0 = np.sin(np.deg2rad(self.B0))
 
-        self.lat_mask = self.lat[self.mask_nan]#.copy()
-        self.lon_mask = self.lon[self.mask_nan]#.copy()
-        self.rho_mask = self.rr[self.mask_nan]#.copy()
+        # fit angles: true colatitude and longitude from the sub-observer
+        # meridian (see calc_bulk_vel)
+        self.theta_mask = 180.0 * u.deg - self.lat[self.mask_nan]
+        self.phi_mask = self.lon[self.mask_nan] - self.l0_hgs * u.deg
+        self.rho_mask = self.rr[self.mask_nan]
 
-        cos_theta = np.cos(self.lat_mask)
-        sin_theta = np.sin(self.lat_mask)
-        cos_phi = np.cos(self.lon_mask)
-        sin_phi = np.sin(self.lon_mask)
+        cos_theta = np.cos(self.theta_mask)
+        sin_theta = np.sin(self.theta_mask)
+        cos_phi = np.cos(self.phi_mask)
+        sin_phi = np.sin(self.phi_mask)
 
+        # line-of-sight projection of the theta-hat and phi-hat directions;
+        # both are zero at the sub-observer point
         self.lt = sin_B0 * sin_theta - cos_B0 * cos_theta * cos_phi
         self.lp = cos_B0 * sin_phi
 
         # calculate legendre poylnomials
-        pl_theta, dt_pl_theta = gen_leg_vec(5, self.lat_mask)
-        if fit_cbs:
-            pl_rho, dt_pl_rho = gen_leg_x_vec(5, self.rho_mask)
-        else:
-            pl_rho, dt_pl_rho = gen_leg_x_vec(0, self.rho_mask)
+        pl_theta, dt_pl_theta = gen_leg_vec(5, self.theta_mask)
+        pl_rho, dt_pl_rho = gen_leg_x_vec(5, self.rho_mask)
 
-        # figure out how many polynomials we need
-        if fit_cbs:
-            n_poly = 11
-        else:
-            n_poly = 6
-
-        # allocate memory
+        # allocate memory: all 11 rows are always fitted
+        n_poly = 11
         self.im_arr = np.zeros((n_poly, self.lt.shape[0]))
 
         # differential rotation (axisymmetric feature; s = 1, 3, 5)
@@ -515,12 +530,11 @@ class SDOImage(object):
         # axisymmetric feature (frame=pole at disk-center)
         # s = 0-5
         self.im_arr[5, :] = pl_rho[0, :]
-        if fit_cbs:
-            self.im_arr[6, :] = pl_rho[1, :]
-            self.im_arr[7, :] = pl_rho[2, :]
-            self.im_arr[8, :] = pl_rho[3, :]
-            self.im_arr[9, :] = pl_rho[4, :]
-            self.im_arr[10, :] = pl_rho[5, :]
+        self.im_arr[6, :] = pl_rho[1, :]
+        self.im_arr[7, :] = pl_rho[2, :]
+        self.im_arr[8, :] = pl_rho[3, :]
+        self.im_arr[9, :] = pl_rho[4, :]
+        self.im_arr[10, :] = pl_rho[5, :]
 
         # get the data to fit and compute RHS
         self.dat = (self.image - self.v_obs - self.v_grav)[self.mask_nan].copy()
@@ -545,8 +559,12 @@ class SDOImage(object):
         self.v_cbs[self.mask_nan] = self.fit_params[5:].dot(self.im_arr[5:, :])
         self.v_cbs[~self.mask_nan] = np.nan
 
-        # get corrected velocity
-        self.dat -= self.fit_params.dot(self.im_arr)
+        # get corrected velocity (see calc_bulk_vel for the two conventions)
+        if fit_cbs:
+            self.dat -= self.fit_params.dot(self.im_arr)
+        else:
+            self.dat -= self.fit_params[:5].dot(self.im_arr[:5, :])
+            self.dat -= self.dat.mean(dtype=np.float64)
         self.v_corr = np.zeros_like(self.image)
         self.v_corr[self.mask_nan] = self.dat
         self.v_corr[~self.mask_nan] = np.nan

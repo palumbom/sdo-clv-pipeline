@@ -102,7 +102,7 @@ This chains: `runall.sh` → `merge_output.sh` → `preprocess_output.sh` via `-
 3. Reproject AIA onto HMI pixel scale via `aia.rescale_to_hmi(con)` (bilinear interpolation using a numba-JIT'd kernel in `reproject.py`).
 4. Fit quadratic limb darkening law per image; divide out to get `iflat` (limb-flattened intensity).
 5. Correct magnetogram for foreshortening (`image /= mu`).
-6. Correct Dopplergram: subtract spacecraft velocity (`calc_spacecraft_vel`), then fit and remove differential rotation + meridional circulation + convective blueshift (CBS) using Legendre polynomial decomposition (`calc_bulk_vel`). Residual is `v_corr`.
+6. Correct Dopplergram: subtract spacecraft velocity (`calc_spacecraft_vel`; positive = observer receding, the Dopplergram's own sign), then fit differential rotation + meridional circulation + a radial centre-to-limb (CBS) profile by Legendre least squares (`calc_bulk_vel`, always 11 rows). `v_corr` is the data minus rotation and meridional terms and the disk mean; with `fit_cbs=True` the radial terms are removed too. The fit uses the true colatitude (`180 - lat`) and longitude from the sub-observer meridian (`lon - l0_hgs`); `SDOImage.lat` itself stores latitude + 90.
 7. Mask pixels with `mu < mu_thresh` (default 0.1).
 8. Build `SunMask` — classifies every pixel into one of six region types (see below).
 9. Compute velocity/magnetic/intensity statistics per mu-annulus per region; write to CSV.
@@ -142,7 +142,7 @@ The AIA 1700 Å image contributes to plage/network detection. Isolated single-pi
 
 ### Legendre polynomial decomposition (in `legendre.py`)
 
-Adapted from Kashyap et al. (2021, arXiv:2105.12055). `gen_leg_vec` operates on heliographic latitude; `gen_leg_x_vec` operates on the disk-plane radial coordinate (rho). The model is a 6-term system (or 11 terms with `fit_cbs=True`): 3 differential rotation terms (odd l=1,3,5), 2 meridional circulation terms (even l=2,4), and 1–6 CBS Legendre terms. Solved via normal equations (`np.linalg.solve`).
+Adapted from Kashyap et al. (2021, arXiv:2105.12055). `gen_leg_vec` operates on colatitude (the fit passes `180 - SDOImage.lat`); `gen_leg_x_vec` operates on the disk-plane radial coordinate (rho). The model is an 11-term system: 3 differential rotation terms (odd l=1,3,5), 2 meridional circulation terms (even l=2,4), and 6 radial CBS Legendre terms (l=0–5). Solved via normal equations (`np.linalg.solve`). `v_mer` is a nuisance regressor, not a meridional-flow measurement: it also absorbs a persistent north–south gradient in HMI Dopplergrams.
 
 ### Parallel execution
 

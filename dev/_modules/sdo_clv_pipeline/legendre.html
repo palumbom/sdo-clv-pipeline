@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=4418a689" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=810fe235" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../_static/documentation_options.js?v=4861a642"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,31 +50,38 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sdo_clv_pipeline/legendre';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -100,7 +107,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -246,11 +293,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -286,7 +340,7 @@
 <span class="c1"># original author: Samarth Ganesh Kashyap (g.samarth@tifr.res.in)</span>
 <span class="c1"># original associated publication: https://arxiv.org/abs/2105.12055</span>
 
-<span class="sd">&quot;&quot;&quot;Legendre basis helpers used for dopplergram bulk-velocity fits.&quot;&quot;&quot;</span>
+<span class="sd">"""Legendre basis helpers used for dopplergram bulk-velocity fits."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -298,7 +352,7 @@
 <div class="viewcode-block" id="gen_leg_vec">
 <a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.legendre.gen_leg_vec">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">gen_leg_vec</span><span class="p">(</span><span class="n">lmax</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate normalized Legendre basis and derivative vs latitude.</span>
+<span class="w">    </span><span class="sd">"""Generate normalized Legendre basis and derivative vs latitude.</span>
 
 <span class="sd">    This is used by dopplergram bulk-velocity modeling to build design matrices.</span>
 
@@ -307,8 +361,9 @@
 <span class="sd">    lmax : int</span>
 <span class="sd">        Maximum degree of the Legendre series.</span>
 <span class="sd">    theta : astropy.units.Quantity</span>
-<span class="sd">        Colatitude in degrees.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Colatitude in degrees (polar angle from the north pole, 90 - latitude;</span>
+<span class="sd">        note ``SDOImage.lat`` stores latitude + 90 and must be converted).</span>
+<span class="sd">    """</span>
     <span class="c1"># build cos, sin and l arrays</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
     <span class="n">cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
@@ -319,13 +374,13 @@
     <span class="n">norm_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ell</span><span class="o">*</span><span class="p">(</span><span class="n">ell</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">norm_l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="c1"># shtools &quot;geodesy&quot; normalization sqrt(2l+1)</span>
+    <span class="c1"># shtools "geodesy" normalization sqrt(2l+1)</span>
     <span class="n">norm_sht</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ell</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># evaluate P_l(cost) for all l and all theta</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">eval_legendre</span><span class="p">(</span><span class="n">ell</span><span class="p">[:,</span><span class="kc">None</span><span class="p">],</span> <span class="n">cost</span><span class="p">[</span><span class="kc">None</span><span class="p">,:])</span>
 
-    <span class="c1"># compute dP_l / dz via (1–z^2)P&#39;_l(z) = l[P_(l-1)(z) – z P_l(z)] (recurrence relation)</span>
+    <span class="c1"># compute dP_l / dz via (1–z^2)P'_l(z) = l[P_(l-1)(z) – z P_l(z)] (recurrence relation)</span>
     <span class="n">dP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">cost</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span>
     <span class="n">l</span> <span class="o">=</span> <span class="n">ell</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span><span class="kc">None</span><span class="p">]</span>
@@ -345,7 +400,7 @@
 <div class="viewcode-block" id="gen_leg_x_vec">
 <a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.legendre.gen_leg_x_vec">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">gen_leg_x_vec</span><span class="p">(</span><span class="n">lmax</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate normalized Legendre basis and derivative vs x.</span>
+<span class="w">    </span><span class="sd">"""Generate normalized Legendre basis and derivative vs x.</span>
 
 <span class="sd">    This is used by dopplergram bulk-velocity modeling to build design matrices.</span>
 
@@ -359,7 +414,7 @@
 <span class="sd">        (A previous version erroneously scaled this by pi/180 as if it were an</span>
 <span class="sd">        angle in degrees, which collapsed the argument to ~[0, 0.017] and made</span>
 <span class="sd">        the fit_cbs=True normal-equations system singular; cond ~3e18.)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># rho is already the (dimensionless) Legendre argument; no angle conversion</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span>
 
@@ -370,7 +425,7 @@
     <span class="n">norm_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ell</span><span class="o">*</span><span class="p">(</span><span class="n">ell</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">norm_l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="c1"># shtools &quot;geodesy&quot; normalization sqrt(2l+1)</span>
+    <span class="c1"># shtools "geodesy" normalization sqrt(2l+1)</span>
     <span class="n">norm_sht</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ell</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># evaluate all P_l(x)</span>
@@ -410,7 +465,7 @@
 <span class="c1">#   norm_sht = sqrt(2l+1)</span>
 <span class="c1">#   basis scaling = norm_sht[l] / (sqrt(2) * norm_l[l])</span>
 <span class="c1"># theta basis additionally carries the -sin(theta) factor and uses the Legendre</span>
-<span class="c1"># derivative dP_l/dz; rho basis uses P_l(x) directly with x = rho * pi/180.</span>
+<span class="c1"># derivative dP_l/dz; rho basis uses P_l(rho) directly (rho dimensionless).</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
 <span class="c1"># precomputed norm_sht[l] / (sqrt(2)*norm_l[l]) for l = 0..5</span>
@@ -425,15 +480,20 @@
 <span class="p">])</span>
 
 
-<span class="nd">@njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_bulk_vel_basis</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fill b[0:n_poly] with the bulk-velocity design row for one pixel.&quot;&quot;&quot;</span>
+<span class="nd">@njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="s2">"always"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bulk_vel_basis</span><span class="p">(</span><span class="n">theta_deg</span><span class="p">,</span> <span class="n">phi_deg</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Fill b[0:n_poly] with the bulk-velocity design row for one pixel.</span>
+
+<span class="sd">    theta_deg is the true colatitude and phi_deg the longitude from the</span>
+<span class="sd">    sub-observer meridian; lt and lp below are the line-of-sight projections of</span>
+<span class="sd">    theta-hat and phi-hat for those angles and vanish at the sub-observer point.</span>
+<span class="sd">    """</span>
     <span class="n">deg2rad</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
 
-    <span class="n">theta</span> <span class="o">=</span> <span class="n">lat_deg</span> <span class="o">*</span> <span class="n">deg2rad</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">theta_deg</span> <span class="o">*</span> <span class="n">deg2rad</span>
     <span class="n">cost</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
     <span class="n">sint</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">lon_deg</span> <span class="o">*</span> <span class="n">deg2rad</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi_deg</span> <span class="o">*</span> <span class="n">deg2rad</span>
     <span class="n">cphi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
     <span class="n">sphi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
 
@@ -489,27 +549,27 @@
 
 
 <span class="nd">@njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">bulk_vel_design</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the design matrix (n_poly x N) for the bulk-velocity fit.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bulk_vel_design</span><span class="p">(</span><span class="n">theta_deg</span><span class="p">,</span> <span class="n">phi_deg</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the design matrix (n_poly x N) for the bulk-velocity fit.</span>
 
 <span class="sd">    Drop-in fast replacement for the gen_leg_vec / gen_leg_x_vec basis generation</span>
 <span class="sd">    plus the im_arr assembly in calc_bulk_vel: same columns, generated by an</span>
 <span class="sd">    in-kernel Legendre recurrence instead of scipy.special.eval_legendre, and</span>
 <span class="sd">    without the six (6 x N) Legendre intermediates. The caller then runs the</span>
-<span class="sd">    identical normal-equations solve (im_arr @ im_arr.T), which keeps results</span>
-<span class="sd">    faithful even for the ill-conditioned fit_cbs=True system.</span>
+<span class="sd">    identical normal-equations solve (im_arr @ im_arr.T). theta_deg is the true</span>
+<span class="sd">    colatitude, phi_deg the longitude from the sub-observer meridian.</span>
 
 <span class="sd">    Returns im_arr with shape (n_poly, N), matching the original layout. Each</span>
 <span class="sd">    pixel writes a disjoint column, so the prange loop is thread-count invariant</span>
 <span class="sd">    (identical results on 1 vs many threads); thread count is set at runtime via</span>
 <span class="sd">    parallel.set_compute_threads (default 1). The per-pixel basis buffer is</span>
 <span class="sd">    allocated inside the loop so it is private to each thread.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">lat_deg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">theta_deg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">im_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_poly</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_poly</span><span class="p">)</span>
-        <span class="n">_bulk_vel_basis</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lon_deg</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">_bulk_vel_basis</span><span class="p">(</span><span class="n">theta_deg</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">phi_deg</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cos_B0</span><span class="p">,</span> <span class="n">sin_B0</span><span class="p">,</span> <span class="n">n_poly</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_poly</span><span class="p">):</span>
             <span class="n">im_arr</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">im_arr</span>
@@ -568,8 +628,8 @@ By Michael Palumbo
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

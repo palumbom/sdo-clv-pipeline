@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=4418a689" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=810fe235" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../_static/documentation_options.js?v=4861a642"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,31 +50,38 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sdo_clv_pipeline/sdo_vels';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -100,7 +107,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -246,11 +293,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -282,25 +336,28 @@
                 <article class="bd-article">
                   
   <h1>Source code for sdo_clv_pipeline.sdo_vels</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Velocity aggregation helpers for disk- and region-level summaries.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Velocity aggregation helpers for disk- and region-level summaries."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pdb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndimage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_image</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">region_acc</span><span class="p">,</span> <span class="n">flag_acc</span><span class="p">,</span> <span class="n">region_lut</span><span class="p">,</span>
+                        <span class="n">Q_VHAT</span><span class="p">,</span> <span class="n">Q_VPHOT</span><span class="p">,</span> <span class="n">Q_INT</span><span class="p">,</span> <span class="n">Q_IFLAT</span><span class="p">,</span> <span class="n">Q_MAG</span><span class="p">,</span> <span class="n">Q_PIX</span><span class="p">,</span>
+                        <span class="n">Q_VQUIET</span><span class="p">,</span> <span class="n">Q_INT_QUIET</span><span class="p">,</span>
+                        <span class="n">F_VHAT</span><span class="p">,</span> <span class="n">F_VPHOT</span><span class="p">,</span> <span class="n">F_INT</span><span class="p">,</span> <span class="n">F_IFLAT</span><span class="p">,</span> <span class="n">F_MAG</span><span class="p">,</span> <span class="n">F_PIX</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a flat region-code array to dense indices [0, len(region_codes)).</span>
+<span class="w">    </span><span class="sd">"""Map a flat region-code array to dense indices [0, len(region_codes)).</span>
 
 <span class="sd">    Vectorized replacement for the per-pixel ``dict.get`` loop: builds a small</span>
 <span class="sd">    lookup table indexed by region code and gathers in one pass. Codes not in</span>
 <span class="sd">    ``region_codes`` (including NaN, mapped to 0) become -1, matching the old</span>
 <span class="sd">    ``reg_map.get(r, -1)`` semantics.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">maxc</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)</span>
-    <span class="n">lut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">maxc</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_codes</span><span class="p">):</span>
-        <span class="n">lut</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="n">lut</span> <span class="o">=</span> <span class="n">region_lut</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)</span>
     <span class="n">codes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxc</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">codes</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">lut</span><span class="p">[</span><span class="n">codes</span><span class="p">]</span>
@@ -308,14 +365,14 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span> <span class="n">flat_ld</span><span class="p">,</span>
                     <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-pixel weighted products reused by all three aggregation functions.</span>
+<span class="w">    </span><span class="sd">"""Per-pixel weighted products reused by all three aggregation functions.</span>
 
 <span class="sd">    Computing these once (in process_data_set) instead of inside each of</span>
 <span class="sd">    compute_disk/region_only/region_results avoids recomputing the same</span>
 <span class="sd">    16.8M-element products three times. Returns (p_vhat, p_vphot, p_mag) where</span>
 <span class="sd">    p_vhat = int*v_corr (also used for the quiet-sun numerator), p_vphot is the</span>
 <span class="sd">    photometric term, p_mag = |B|*int.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">p_vhat</span> <span class="o">=</span> <span class="n">flat_int</span> <span class="o">*</span> <span class="n">flat_v_corr</span>
     <span class="n">p_vphot</span> <span class="o">=</span> <span class="n">flat_v_rot</span> <span class="o">*</span> <span class="p">(</span><span class="n">flat_int</span> <span class="o">-</span> <span class="n">k_hat_con</span> <span class="o">*</span> <span class="n">flat_ld</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat_w_active</span>
     <span class="n">p_mag</span> <span class="o">=</span> <span class="n">flat_abs_mag</span> <span class="o">*</span> <span class="n">flat_int</span>
@@ -326,8 +383,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_disk_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
                          <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span>
                          <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
-                         <span class="n">p_vhat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute disk-integrated velocity and intensity metrics.</span>
+                         <span class="n">p_vhat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute disk-integrated velocity and intensity metrics.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -345,35 +402,42 @@
 <span class="sd">        Minimum mu to include in the aggregation.</span>
 <span class="sd">    k_hat_con : float</span>
 <span class="sd">        Continuum scaling factor for the photometric term.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">p_vhat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span> <span class="o">=</span> <span class="n">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
                                                  <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">)</span>
 
-    <span class="n">valid</span> <span class="o">=</span> <span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span>
-
-    <span class="c1"># boolean indexing materializes a new array each time, and the masked</span>
-    <span class="c1"># intensity sum / valid-pixel count are each reused several times below.</span>
-    <span class="c1"># Compute them once; the operands and operation order are unchanged, so</span>
-    <span class="c1"># every result is bit-identical to recomputing them inline.</span>
+    <span class="c1"># Gather once and reuse: the masked intensity sum and valid-pixel count are</span>
+    <span class="c1"># each used several times below. This row stays on numpy even when a context</span>
+    <span class="c1"># is supplied, because np.nansum's pairwise summation cannot be reproduced by</span>
+    <span class="c1"># a sequential kernel loop; the context supplies only the mask and totals.</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span><span class="p">)</span> <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">agg</span><span class="o">.</span><span class="n">valid</span>
     <span class="n">fi</span> <span class="o">=</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
     <span class="n">fwq</span> <span class="o">=</span> <span class="n">flat_w_quiet</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-    <span class="n">light_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
-    <span class="n">n_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+    <span class="n">vhat_v</span> <span class="o">=</span> <span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+    <span class="n">vphot_v</span> <span class="o">=</span> <span class="n">p_vphot</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+    <span class="n">mag_v</span> <span class="o">=</span> <span class="n">p_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+    <span class="n">iflat_v</span> <span class="o">=</span> <span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">light_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+        <span class="n">n_valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">light_sum</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">total_light</span>
+        <span class="n">n_valid</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">n_valid</span>
 
     <span class="n">all_pixels</span> <span class="o">=</span> <span class="n">n_valid</span>
     <span class="n">all_light</span> <span class="o">=</span> <span class="n">light_sum</span>
 
     <span class="n">denom</span> <span class="o">=</span> <span class="n">light_sum</span>
-    <span class="n">v_hat_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
-    <span class="n">v_phot_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_vphot</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
-    <span class="n">v_quiet_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">fwq</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">fi</span> <span class="o">*</span> <span class="n">fwq</span><span class="p">)</span>
+    <span class="n">v_hat_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">vhat_v</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
+    <span class="n">v_phot_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">vphot_v</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
+    <span class="n">v_quiet_di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">vhat_v</span> <span class="o">*</span> <span class="n">fwq</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">fi</span> <span class="o">*</span> <span class="n">fwq</span><span class="p">)</span>
     <span class="n">v_cbs_di</span> <span class="o">=</span> <span class="n">v_hat_di</span> <span class="o">-</span> <span class="n">v_quiet_di</span>
 
-    <span class="n">mag_unsigned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
+    <span class="n">mag_unsigned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">mag_v</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
 
     <span class="n">avg_int</span> <span class="o">=</span> <span class="n">light_sum</span> <span class="o">/</span> <span class="n">n_valid</span>
-    <span class="n">avg_int_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="n">n_valid</span>
+    <span class="n">avg_int_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">iflat_v</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_valid</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">mjd</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
             <span class="n">all_pixels</span><span class="p">,</span> <span class="n">all_light</span><span class="p">,</span>
@@ -388,37 +452,62 @@
                                 <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span>
                                 <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
                                 <span class="n">p_vhat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                <span class="n">reg_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute region-aggregated metrics across the full disk.&quot;&quot;&quot;</span>
+                                <span class="n">reg_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute region-aggregated metrics across the full disk."""</span>
     <span class="k">if</span> <span class="n">p_vhat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span> <span class="o">=</span> <span class="n">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
                                                  <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">)</span>
 
-    <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span>
-
     <span class="c1"># aggregate sums by region</span>
     <span class="n">regions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">reg_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">)</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">,</span> <span class="n">reg_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">grp</span> <span class="o">=</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
     <span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span>
 
-    <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">valid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span>
+        <span class="k">if</span> <span class="n">reg_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">)</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">,</span> <span class="n">reg_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">grp</span> <span class="o">=</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_vhat</span> <span class="o">=</span> <span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_vphot</span> <span class="o">=</span> <span class="n">p_vphot</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_int</span> <span class="o">=</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_iflat</span> <span class="o">=</span> <span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_mag</span> <span class="o">=</span> <span class="n">p_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">q_valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">flat_w_quiet</span>
+        <span class="n">grp_q</span> <span class="o">=</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+        <span class="n">q_vhat</span> <span class="o">=</span> <span class="n">p_vhat</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+        <span class="n">q_int</span> <span class="o">=</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+        <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+        <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+        <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_vhat</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_vphot</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_int</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_iflat</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_mag</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+        <span class="c1"># counting is exact below 2^53, and drops an int64 temporary plus a gather</span>
+        <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">sum_vquiet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">q_vhat</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">sum_int_q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">q_int</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Sum the shared (ring, region) accumulator over rings. These rows are</span>
+        <span class="c1"># the only ones held to the 1e-12 tolerance rather than bit-identity:</span>
+        <span class="c1"># summing ring partials reassociates the total. It is also the better</span>
+        <span class="c1"># conditioned order, being many partial sums instead of one long one.</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="n">region_acc</span><span class="p">(</span><span class="n">agg</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span>
+                         <span class="n">p_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span>
+                         <span class="nb">len</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_VHAT</span><span class="p">]</span>
+        <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_VPHOT</span><span class="p">]</span>
+        <span class="n">sum_int</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_INT</span><span class="p">]</span>
+        <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_IFLAT</span><span class="p">]</span>
+        <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_MAG</span><span class="p">]</span>
+        <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_PIX</span><span class="p">]</span>
+        <span class="n">sum_vquiet</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_VQUIET</span><span class="p">]</span>
+        <span class="n">sum_int_q</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="n">Q_INT_QUIET</span><span class="p">]</span>
+        <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">n_valid</span>
+        <span class="n">total_light</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">total_light</span>
 
     <span class="n">quiet_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">regions</span> <span class="o">==</span> <span class="n">quiet_sun_code</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">q_valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">flat_w_quiet</span>
-    <span class="n">grp_q</span> <span class="o">=</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
-    <span class="n">sum_vquiet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">sum_int_q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-
-    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
-    <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
     <span class="n">pix_frac</span> <span class="o">=</span> <span class="n">sum_pix</span> <span class="o">/</span> <span class="n">total_pixels</span>
     <span class="n">light_frac</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">total_light</span>
 
@@ -439,11 +528,132 @@
     <span class="n">mjd_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span> <span class="n">mjd</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">nan_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">regs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mjd_arr</span><span class="p">,</span> <span class="n">regs</span><span class="p">,</span> <span class="n">nan_arr</span><span class="p">,</span> <span class="n">nan_arr</span><span class="p">,</span>
-                      <span class="n">pix_frac</span><span class="p">,</span> <span class="n">light_frac</span><span class="p">,</span> <span class="n">v_hat</span><span class="p">,</span> 
-                      <span class="n">v_phot</span><span class="p">,</span> <span class="n">v_q</span><span class="p">,</span> <span class="n">v_conv</span><span class="p">,</span> <span class="n">mag_u</span><span class="p">,</span> 
+                      <span class="n">pix_frac</span><span class="p">,</span> <span class="n">light_frac</span><span class="p">,</span> <span class="n">v_hat</span><span class="p">,</span>
+                      <span class="n">v_phot</span><span class="p">,</span> <span class="n">v_q</span><span class="p">,</span> <span class="n">v_conv</span><span class="p">,</span> <span class="n">mag_u</span><span class="p">,</span>
                       <span class="n">avg_i</span><span class="p">,</span> <span class="n">avg_if</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_region_only_flag_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span>
+                                      <span class="n">selections</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">quiet_ref</span><span class="p">,</span>
+                                      <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Disk-aggregated metrics for non-exclusive feature selections.</span>
+
+<span class="sd">    Unlike the mutually-exclusive region codes, ``selections`` may overlap (a</span>
+<span class="sd">    moat pixel can also be plage), so each ``(code, mask)`` is aggregated on its</span>
+<span class="sd">    own boolean mask rather than through a single partition bincount. A pixel in</span>
+<span class="sd">    two selections contributes to both rows. Flags are never the quiet-Sun</span>
+<span class="sd">    reference, so the v_quiet column is 0 and v_conv = v_hat - quiet_ref (the</span>
+<span class="sd">    per-disk quiet reference computed by the base region aggregation).</span>
+<span class="sd">    """</span>
+    <span class="c1"># Stays on the numpy path even with a context: these sums come from np.nansum</span>
+    <span class="c1"># over float32 arrays and so accumulate in float32, whereas any kernel (like</span>
+    <span class="c1"># np.bincount) accumulates in float64. The two differ by ~1e-8, outside the</span>
+    <span class="c1"># tolerance, so this path is kept for exact agreement. The mu-binned flag rows</span>
+    <span class="c1"># below use np.bincount and therefore do fuse bit-identically.</span>
+    <span class="n">valid_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span><span class="p">)</span> <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">agg</span><span class="o">.</span><span class="n">valid</span>
+    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">agg</span><span class="o">.</span><span class="n">n_valid</span>
+    <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span> <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">agg</span><span class="o">.</span><span class="n">total_light</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">sel</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">valid_mask</span> <span class="o">&amp;</span> <span class="n">sel</span>
+        <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_vphot</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">p_mag</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+
+        <span class="c1"># avoid division by zero (empty selection emits a zeroed row, not NaN)</span>
+        <span class="n">sum_int_safe</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="k">if</span> <span class="n">sum_int</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">sum_pix_safe</span> <span class="o">=</span> <span class="n">sum_pix</span> <span class="k">if</span> <span class="n">sum_pix</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+
+        <span class="n">pix_frac</span> <span class="o">=</span> <span class="n">sum_pix</span> <span class="o">/</span> <span class="n">total_pixels</span>
+        <span class="n">light_frac</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">total_light</span>
+        <span class="n">v_hat</span> <span class="o">=</span> <span class="n">sum_vhat</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+        <span class="n">v_phot</span> <span class="o">=</span> <span class="n">sum_vphot</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+        <span class="n">mag_u</span> <span class="o">=</span> <span class="n">sum_mag</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+        <span class="n">avg_i</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">sum_pix_safe</span>
+        <span class="n">avg_if</span> <span class="o">=</span> <span class="n">sum_iflat</span> <span class="o">/</span> <span class="n">sum_pix_safe</span>
+        <span class="n">v_quiet</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">v_conv</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_hat</span> <span class="o">-</span> <span class="n">quiet_ref</span><span class="p">)</span> <span class="k">if</span> <span class="n">v_hat</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">mjd</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">pix_frac</span><span class="p">,</span> <span class="n">light_frac</span><span class="p">,</span>
+                     <span class="n">v_hat</span><span class="p">,</span> <span class="n">v_phot</span><span class="p">,</span> <span class="n">v_quiet</span><span class="p">,</span> <span class="n">v_conv</span><span class="p">,</span> <span class="n">mag_u</span><span class="p">,</span> <span class="n">avg_i</span><span class="p">,</span> <span class="n">avg_if</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">rows</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_region_flag_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span>
+                                <span class="n">selections</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">,</span> <span class="n">quiet_ref_by_bin</span><span class="p">,</span>
+                                <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Mu-binned metrics for non-exclusive feature selections.</span>
+
+<span class="sd">    Same overlapping-mask semantics as compute_region_only_flag_results, but</span>
+<span class="sd">    resolved into the n_rings-1 mu bins. ``quiet_ref_by_bin`` is the per-ring</span>
+<span class="sd">    quiet-Sun reference returned by compute_region_results, subtracted to form</span>
+<span class="sd">    v_conv (the v_quiet column stays 0 as flags are never the quiet reference).</span>
+<span class="sd">    """</span>
+    <span class="n">n_bins</span> <span class="o">=</span> <span class="n">n_rings</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu_thresh</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">)</span>
+        <span class="n">bin_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">flat_mu</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_rings</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">valid_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span><span class="p">)</span>
+        <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+        <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># shared traversal; bit-identical to the bincounts it replaces</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">bins</span>
+        <span class="n">valid_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">n_valid</span>
+        <span class="n">total_light</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">total_light</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="n">flag_acc</span><span class="p">(</span><span class="n">agg</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span>
+                       <span class="n">p_mag</span><span class="p">,</span> <span class="n">selections</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)</span>
+
+    <span class="n">lo_mu</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">hi_mu</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">sel</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selections</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">acc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">valid_mask</span> <span class="o">&amp;</span> <span class="n">sel</span>
+            <span class="n">grp</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+            <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+            <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+            <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+            <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+            <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_mag</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:,</span> <span class="n">F_PIX</span><span class="p">]</span>
+            <span class="n">sum_int</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:,</span> <span class="n">F_INT</span><span class="p">]</span>
+            <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:,</span> <span class="n">F_IFLAT</span><span class="p">]</span>
+            <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:,</span> <span class="n">F_VHAT</span><span class="p">]</span>
+            <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:,</span> <span class="n">F_VPHOT</span><span class="p">]</span>
+            <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:,</span> <span class="n">F_MAG</span><span class="p">]</span>
+
+        <span class="c1"># avoid division by zero (empty ring emits a zeroed row, not NaN)</span>
+        <span class="n">sum_int_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_int</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_int</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sum_pix_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sum_pix</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sum_pix</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">pix_frac</span> <span class="o">=</span> <span class="n">sum_pix</span> <span class="o">/</span> <span class="n">total_pixels</span>
+        <span class="n">light_frac</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">total_light</span>
+        <span class="n">v_hat</span> <span class="o">=</span> <span class="n">sum_vhat</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+        <span class="n">v_phot</span> <span class="o">=</span> <span class="n">sum_vphot</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+        <span class="n">mag_u</span> <span class="o">=</span> <span class="n">sum_mag</span> <span class="o">/</span> <span class="n">sum_int_safe</span>
+        <span class="n">avg_i</span> <span class="o">=</span> <span class="n">sum_int</span> <span class="o">/</span> <span class="n">sum_pix_safe</span>
+        <span class="n">avg_if</span> <span class="o">=</span> <span class="n">sum_iflat</span> <span class="o">/</span> <span class="n">sum_pix_safe</span>
+        <span class="n">v_quiet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_bins</span><span class="p">)</span>
+        <span class="n">v_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v_hat</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v_hat</span> <span class="o">-</span> <span class="n">quiet_ref_by_bin</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">code_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">mjd_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_bins</span><span class="p">,</span> <span class="n">mjd</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mjd_arr</span><span class="p">,</span> <span class="n">code_arr</span><span class="p">,</span> <span class="n">lo_mu</span><span class="p">,</span> <span class="n">hi_mu</span><span class="p">,</span> <span class="n">pix_frac</span><span class="p">,</span> <span class="n">light_frac</span><span class="p">,</span>
+                          <span class="n">v_hat</span><span class="p">,</span> <span class="n">v_phot</span><span class="p">,</span> <span class="n">v_quiet</span><span class="p">,</span> <span class="n">v_conv</span><span class="p">,</span> <span class="n">mag_u</span><span class="p">,</span>
+                          <span class="n">avg_i</span><span class="p">,</span> <span class="n">avg_if</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rows</span>
 
 <div class="viewcode-block" id="compute_region_results">
 <a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_region_results">[docs]</a>
@@ -451,41 +661,63 @@
                            <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span>
                            <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
                            <span class="n">p_vhat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">reg_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute region-aggregated metrics in mu rings.&quot;&quot;&quot;</span>
+                           <span class="n">reg_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute region-aggregated metrics in mu rings."""</span>
     <span class="k">if</span> <span class="n">p_vhat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span> <span class="o">=</span> <span class="n">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
                                                  <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">)</span>
 
-    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu_thresh</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">)</span>
-    <span class="n">bin_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">flat_mu</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_rings</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">valid_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span><span class="p">)</span>
-
     <span class="c1"># aggregate sums by (bin, region)</span>
     <span class="n">regions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">region_codes</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">reg_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">)</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="n">valid_mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">reg_idx</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">grp</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span> <span class="o">+</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span>
+    <span class="n">n_reg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_reg</span>
 
-    <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-    <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-    <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-    <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-    <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-    <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">valid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="n">valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu_thresh</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">)</span>
+        <span class="n">bin_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">flat_mu</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_rings</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">valid_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_mu</span> <span class="o">&gt;=</span> <span class="n">mu_thresh</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reg_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">)</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">valid_mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">reg_idx</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">grp</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_reg</span> <span class="o">+</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_vhat</span> <span class="o">=</span> <span class="n">p_vhat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_vphot</span> <span class="o">=</span> <span class="n">p_vphot</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_int</span> <span class="o">=</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_iflat</span> <span class="o">=</span> <span class="n">flat_iflat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">w_mag</span> <span class="o">=</span> <span class="n">p_mag</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+        <span class="n">q_valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">flat_w_quiet</span>
+        <span class="n">grp_q</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_reg</span> <span class="o">+</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+        <span class="n">q_vhat</span> <span class="o">=</span> <span class="n">p_vhat</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+        <span class="n">q_int</span> <span class="o">=</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
+        <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+        <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
+        <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_vhat</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_vphot</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_int</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_iflat</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w_mag</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_vquiet_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">q_vhat</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_int_q_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">q_int</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n_reg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># one shared traversal; bit-identical to the bincounts it replaces</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">bins</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="n">region_acc</span><span class="p">(</span><span class="n">agg</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span>
+                         <span class="n">p_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span>
+                         <span class="n">n_rings</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_reg</span><span class="p">)</span>
+        <span class="n">sum_vhat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_VHAT</span><span class="p">]</span>
+        <span class="n">sum_vphot</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_VPHOT</span><span class="p">]</span>
+        <span class="n">sum_int</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_INT</span><span class="p">]</span>
+        <span class="n">sum_iflat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_IFLAT</span><span class="p">]</span>
+        <span class="n">sum_mag</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_MAG</span><span class="p">]</span>
+        <span class="n">sum_pix</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_PIX</span><span class="p">]</span>
+        <span class="n">sum_vquiet_flat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_VQUIET</span><span class="p">]</span>
+        <span class="n">sum_int_q_flat</span> <span class="o">=</span> <span class="n">acc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">Q_INT_QUIET</span><span class="p">]</span>
+        <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">n_valid</span>
+        <span class="n">total_light</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">total_light</span>
 
     <span class="c1"># quiet-sun sums</span>
     <span class="n">quiet_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">regions</span> <span class="o">==</span> <span class="n">quiet_sun_code</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">q_valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">flat_w_quiet</span>
-    <span class="n">grp_q</span> <span class="o">=</span> <span class="n">bin_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)</span> <span class="o">+</span> <span class="n">reg_idx</span><span class="p">[</span><span class="n">q_valid</span><span class="p">]</span>
-    <span class="n">sum_vquiet_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-    <span class="n">sum_int_q_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">grp_q</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_int</span><span class="p">[</span><span class="n">q_valid</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rings</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
-
-    <span class="c1"># compute metrics</span>
-    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
-    <span class="n">total_light</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">flat_int</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span>
     <span class="n">pix_frac</span> <span class="o">=</span> <span class="n">sum_pix</span><span class="o">/</span><span class="n">total_pixels</span>
     <span class="n">light_frac</span> <span class="o">=</span> <span class="n">sum_int</span><span class="o">/</span><span class="n">total_light</span>
 
@@ -511,11 +743,145 @@
     <span class="n">bin_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">lo_mu</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">hi_mu</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">regions</span><span class="p">))</span>
     <span class="n">region_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lo_mu</span><span class="p">))</span>
 
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">v_phot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">mjd</span><span class="p">),</span> <span class="n">region_list</span><span class="p">,</span> <span class="n">bin_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
-                      <span class="n">bin_idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pix_frac</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">light_frac</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> 
-                      <span class="n">v_hat</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_phot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_q</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_conv</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> 
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">v_phot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">mjd</span><span class="p">),</span> <span class="n">region_list</span><span class="p">,</span> <span class="n">bin_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                      <span class="n">bin_idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pix_frac</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">light_frac</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                      <span class="n">v_hat</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_phot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_q</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">v_conv</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
                       <span class="n">mag_u</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">avg_i</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">avg_if</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">data</span></div>
+    <span class="c1"># also surface the per-ring quiet-Sun reference (the scalar subtracted to form</span>
+    <span class="c1"># v_conv) and the ring edges, so the feature catalog can subtract the identical</span>
+    <span class="c1"># reference per pixel without recomputing it.</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">v_q</span><span class="p">[:,</span> <span class="n">quiet_idx</span><span class="p">],</span> <span class="n">bins</span></div>
+
+
+<div class="viewcode-block" id="compute_feature_catalog">
+<a class="viewcode-back" href="../../api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_feature_catalog">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_feature_catalog</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">regions</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span>
+                            <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_abs_mag_rad</span><span class="p">,</span> <span class="n">flat_pix_area</span><span class="p">,</span>
+                            <span class="n">flat_lon</span><span class="p">,</span> <span class="n">flat_lat</span><span class="p">,</span> <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span>
+                            <span class="n">flat_v_quiet_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">region_codes_to_label</span><span class="o">=</span><span class="p">(</span><span class="n">umbrae_code</span><span class="p">,</span> <span class="n">penumbrae_code</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">"""Per-feature catalog of connected umbra/penumbra blobs.</span>
+
+<span class="sd">    Each connected component (8-connectivity) of a region-type mask is one</span>
+<span class="sd">    feature; field strength can then be split downstream without re-running the</span>
+<span class="sd">    pipeline. Velocities and field means use the same intensity-weighted</span>
+<span class="sd">    estimator as the region curves; area and unsigned flux use the per-pixel</span>
+<span class="sd">    solar area (microhemispheres). ``regions`` is the 2D region-code map (NaN</span>
+<span class="sd">    off-disk / sub-threshold); all other per-pixel inputs are flattened in the</span>
+<span class="sd">    same C-order.</span>
+
+<span class="sd">    Two magnetic-field conventions are recorded, matching how the literature uses</span>
+<span class="sd">    each (see Haywood et al. 2016 vs Yeo et al. 2013 / Milbourne et al. 2019):</span>
+<span class="sd">    ``flat_abs_mag`` is the line-of-sight field ``|B_obs|`` (the Haywood unsigned-</span>
+<span class="sd">    flux proxy, matching the pipeline's ``mag_unsigned``), reported in the ``_los``</span>
+<span class="sd">    columns; ``flat_abs_mag_rad`` is the foreshortening-corrected radial field</span>
+<span class="sd">    ``|B_obs|/mu`` (the canonical field for magnetic-strength classification),</span>
+<span class="sd">    reported in the ``_rad`` columns and used for the unsigned flux. NOTE the</span>
+<span class="sd">    radial field amplifies noise at low mu (x10 at mu=0.1), so ``max_abs_b_rad``</span>
+<span class="sd">    is spike-prone near the limb.</span>
+
+<span class="sd">    ``flat_lon``/``flat_lat`` are plain degree arrays (caller extracts ``.value``</span>
+<span class="sd">    from the astropy Quantities). ``flat_lat`` is the pipeline's internal</span>
+<span class="sd">    heliographic colatitude (0=N pole, 90=equator); ``centroid_lat`` is converted</span>
+<span class="sd">    to standard Stonyhurst latitude in [-90, 90] (lat - 90).</span>
+
+<span class="sd">    ``unsigned_flux_rad_g_uhem`` = sum(|B_rad| * pix_area) in Gauss*microhemisphere</span>
+<span class="sd">    -- proportional to the true vertical flux (multiply by ~3.0e16 cm^2/uHem, i.e.</span>
+<span class="sd">    1e-6 * 2*pi*R_sun^2, for Maxwells).</span>
+
+<span class="sd">    ``flat_v_quiet_ref`` is the per-pixel quiet-Sun velocity reference of each</span>
+<span class="sd">    pixel's mu-ring (``v_q[ring, quiet_idx]`` from compute_region_results, mapped</span>
+<span class="sd">    to pixels). When supplied, ``v_quiet`` is its intensity-weighted mean over the</span>
+<span class="sd">    feature and ``v_conv = v_hat - v_quiet`` -- the exact per-pixel-ring analogue</span>
+<span class="sd">    of the region-level convective term, correct even when a feature straddles</span>
+<span class="sd">    rings. When omitted (e.g. unit tests), both columns are NaN.</span>
+
+<span class="sd">    Returns one row per feature (quality_flag appended by the caller):</span>
+<span class="sd">      [mjd, region, feature_id, n_pix, area_uhem, mean_mu_iw, min_mu, max_mu,</span>
+<span class="sd">       centroid_lon, centroid_lat, mean_abs_b_iw_los, mean_abs_b_aw_los,</span>
+<span class="sd">       max_abs_b_los, mean_abs_b_iw_rad, mean_abs_b_aw_rad, max_abs_b_rad,</span>
+<span class="sd">       unsigned_flux_rad_g_uhem, v_hat, v_phot, avg_int, avg_int_flat,</span>
+<span class="sd">       v_conv, v_quiet]</span>
+<span class="sd">    """</span>
+    <span class="n">corners</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">generate_binary_structure</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">region_codes_to_label</span><span class="p">:</span>
+        <span class="n">labels2d</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">regions</span> <span class="o">==</span> <span class="n">code</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">corners</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="c1"># restrict to labeled pixels first: features cover &lt;&lt;1% of the disk, so</span>
+        <span class="c1"># doing the arithmetic on this small subset instead of the full</span>
+        <span class="c1"># ~16.8M-pixel frame is the difference between ~8s and well under 1s.</span>
+        <span class="c1"># np.flatnonzero is a single full pass; the gathers below touch only the</span>
+        <span class="c1"># feature pixels.</span>
+        <span class="n">lab</span> <span class="o">=</span> <span class="n">labels2d</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">lab</span><span class="p">)</span>
+        <span class="n">labs</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">nb</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># subset weights once, then reuse</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">flat_int</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">flat_abs_mag</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>        <span class="c1"># line-of-sight |B_obs|</span>
+        <span class="n">b_rad</span> <span class="o">=</span> <span class="n">flat_abs_mag_rad</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>  <span class="c1"># radial |B_obs|/mu</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">flat_pix_area</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">mu_</span> <span class="o">=</span> <span class="n">flat_mu</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="c1"># per-label weighted sums; bin 0 is empty (labs &gt;= 1) but kept for index</span>
+        <span class="c1"># alignment, then sliced off. Feature pixels carry no NaN (sub-threshold</span>
+        <span class="c1"># pixels were masked to regions=NaN before labeling), so bincount is safe.</span>
+        <span class="n">s_pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_iflat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_iflat</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_mu_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">mu_</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_b_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">b</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_b_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">b</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_brad_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">b_rad</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_brad_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">b_rad</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_lon_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_lon</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_lat_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_lat</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_vhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">s_vphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># per-label extrema (bincount only sums), on the subset</span>
+        <span class="n">min_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">ndimage</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">mu_</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">))</span>
+        <span class="n">max_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">ndimage</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">mu_</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">))</span>
+        <span class="n">max_b_los</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">ndimage</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">))</span>
+        <span class="n">max_b_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">ndimage</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">b_rad</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">))</span>
+
+        <span class="c1"># intensity-weighted (iw) and area-weighted (aw) means</span>
+        <span class="n">mean_mu_iw</span> <span class="o">=</span> <span class="n">s_mu_i</span> <span class="o">/</span> <span class="n">s_int</span>
+        <span class="n">mean_abs_b_iw_los</span> <span class="o">=</span> <span class="n">s_b_i</span> <span class="o">/</span> <span class="n">s_int</span>
+        <span class="n">mean_abs_b_aw_los</span> <span class="o">=</span> <span class="n">s_b_area</span> <span class="o">/</span> <span class="n">s_area</span>
+        <span class="n">mean_abs_b_iw_rad</span> <span class="o">=</span> <span class="n">s_brad_i</span> <span class="o">/</span> <span class="n">s_int</span>
+        <span class="n">mean_abs_b_aw_rad</span> <span class="o">=</span> <span class="n">s_brad_area</span> <span class="o">/</span> <span class="n">s_area</span>
+        <span class="n">centroid_lon</span> <span class="o">=</span> <span class="n">s_lon_i</span> <span class="o">/</span> <span class="n">s_int</span>
+        <span class="n">centroid_lat</span> <span class="o">=</span> <span class="n">s_lat_i</span> <span class="o">/</span> <span class="n">s_int</span> <span class="o">-</span> <span class="mf">90.0</span>  <span class="c1"># colatitude -&gt; Stonyhurst latitude</span>
+        <span class="n">v_hat</span> <span class="o">=</span> <span class="n">s_vhat</span> <span class="o">/</span> <span class="n">s_int</span>
+        <span class="n">v_phot</span> <span class="o">=</span> <span class="n">s_vphot</span> <span class="o">/</span> <span class="n">s_int</span>
+        <span class="n">avg_int</span> <span class="o">=</span> <span class="n">s_int</span> <span class="o">/</span> <span class="n">s_pix</span>
+        <span class="n">avg_int_flat</span> <span class="o">=</span> <span class="n">s_iflat</span> <span class="o">/</span> <span class="n">s_pix</span>
+
+        <span class="c1"># convective term: subtract the intensity-weighted per-pixel quiet-Sun</span>
+        <span class="c1"># ring reference (matches the region v_conv definition exactly)</span>
+        <span class="k">if</span> <span class="n">flat_v_quiet_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s_vq_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">flat_v_quiet_ref</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">minlength</span><span class="o">=</span><span class="n">nb</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">v_quiet</span> <span class="o">=</span> <span class="n">s_vq_i</span> <span class="o">/</span> <span class="n">s_int</span>
+            <span class="n">v_conv</span> <span class="o">=</span> <span class="n">v_hat</span> <span class="o">-</span> <span class="n">v_quiet</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">v_quiet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">v_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">mjd</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">s_pix</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="n">s_area</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                         <span class="n">mean_mu_iw</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">min_mu</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">max_mu</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                         <span class="n">centroid_lon</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">centroid_lat</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                         <span class="n">mean_abs_b_iw_los</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">mean_abs_b_aw_los</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">max_b_los</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                         <span class="n">mean_abs_b_iw_rad</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">mean_abs_b_aw_rad</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">max_b_rad</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                         <span class="n">s_brad_area</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">v_hat</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">v_phot</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                         <span class="n">avg_int</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">avg_int_flat</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">v_conv</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">v_quiet</span><span class="p">[</span><span class="n">j</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">rows</span></div>
 
 </pre></div>
 
@@ -572,8 +938,8 @@ By Michael Palumbo
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

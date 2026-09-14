@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=4418a689" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=810fe235" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="_static/documentation_options.js?v=4861a642"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,31 +50,38 @@
     <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -100,7 +107,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -246,11 +293,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -288,19 +342,27 @@
  <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  
 </div>
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.reproject.bilinear_reproject">bilinear_reproject() (in module sdo_clv_pipeline.reproject)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.blu_pen_frac">blu_pen_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -316,15 +378,23 @@
 </li>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_numpy">calc_geometry_numpy() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
 </li>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_numpy_noquant">calc_geometry_numpy_noquant() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
+</li>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_geometry_sunpy">calc_geometry_sunpy() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
 </li>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening">calc_limb_darkening() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
+</li>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_limb_darkening_numpy">calc_limb_darkening_numpy() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel">calc_spacecraft_vel() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
 </li>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.calc_spacecraft_vel_numpy">calc_spacecraft_vel_numpy() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
+</li>
       <li><a href="api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_disk_results">compute_disk_results() (in module sdo_clv_pipeline.sdo_vels)</a>
+</li>
+      <li><a href="api-velocities.html#sdo_clv_pipeline.sdo_vels.compute_feature_catalog">compute_feature_catalog() (in module sdo_clv_pipeline.sdo_vels)</a>
 </li>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.reproject.compute_pixel_mapping">compute_pixel_mapping() (in module sdo_clv_pipeline.reproject)</a>
 </li>
@@ -343,6 +413,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_download.download_data">download_data() (in module sdo_clv_pipeline.sdo_download)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.ff">ff (sdo_clv_pipeline.sdo_image.SunMask property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -415,6 +493,10 @@
       <li><a href="api-utilities.html#sdo_clv_pipeline.sdo_plot.label_moats_on_sun">label_moats_on_sun() (in module sdo_clv_pipeline.sdo_plot)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.left_moat_frac">left_moat_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
@@ -427,6 +509,22 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.moat_frac">moat_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.network_frac">network_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.npix">npix (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
@@ -434,10 +532,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.parse_header">parse_header() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
 </li>
-      <li><a href="api-utilities.html#sdo_clv_pipeline.sdo_plot.plot_image">plot_image() (in module sdo_clv_pipeline.sdo_plot)</a>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.pen_frac">pen_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.plage_frac">plage_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-utilities.html#sdo_clv_pipeline.sdo_plot.plot_image">plot_image() (in module sdo_clv_pipeline.sdo_plot)</a>
+</li>
       <li><a href="api-utilities.html#sdo_clv_pipeline.sdo_plot.plot_mask">plot_mask() (in module sdo_clv_pipeline.sdo_plot)</a>
 </li>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_process.process_data_set">process_data_set() (in module sdo_clv_pipeline.sdo_process)</a>
@@ -447,14 +549,26 @@
   </ul></td>
 </tr></table>
 
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.quiet_frac">quiet_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.red_pen_frac">red_pen_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
+</li>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_process.reduce_sdo_images">reduce_sdo_images() (in module sdo_clv_pipeline.sdo_process)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SDOImage.rescale_to_hmi">rescale_to_hmi() (sdo_clv_pipeline.sdo_image.SDOImage method)</a>
+</li>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.right_moat_frac">right_moat_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -467,6 +581,14 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask">SunMask (class in sdo_clv_pipeline.sdo_image)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api-preprocessing.html#sdo_clv_pipeline.sdo_image.SunMask.umb_frac">umb_frac (sdo_clv_pipeline.sdo_image.SunMask property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -526,8 +648,8 @@ By Michael Palumbo
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=4418a689" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=810fe235" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../_static/documentation_options.js?v=4861a642"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,31 +50,38 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sdo_clv_pipeline/sdo_download';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -100,7 +107,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -246,11 +293,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -290,76 +344,74 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">sunpy.net</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fido</span><span class="p">,</span> <span class="n">attrs</span> <span class="k">as</span> <span class="n">a</span>
 <span class="c1"># from astropy.units.quantity import AstropyDeprecationWarning</span>
 
-<span class="n">email</span>   <span class="o">=</span> <span class="s1">&#39;mlp95@psu.edu&#39;</span> <span class="c1"># be kind</span>
+<span class="n">email</span>   <span class="o">=</span> <span class="s1">'mlp95@psu.edu'</span> <span class="c1"># be kind</span>
 
 <div class="viewcode-block" id="download_data">
 <a class="viewcode-back" href="../../api-preprocessing.html#sdo_clv_pipeline.sdo_download.download_data">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="n">series</span><span class="o">=</span><span class="s2">&quot;720&quot;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="n">series</span><span class="o">=</span><span class="s2">"720"</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fetch_hmi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fetch_aia</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">series</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"45"</span><span class="p">,</span> <span class="s2">"720"</span><span class="p">),</span> <span class="s2">"series must be '45' or '720', got </span><span class="si">%r</span><span class="s2">"</span> <span class="o">%</span> <span class="n">series</span>
+
     <span class="c1"># setup arguments</span>
     <span class="n">trange</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Time</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
     <span class="n">sample</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Sample</span><span class="p">(</span><span class="n">sample</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span>
-    <span class="n">provider</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Provider</span><span class="p">(</span><span class="s2">&quot;JSOC&quot;</span><span class="p">)</span>
+    <span class="n">provider</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Provider</span><span class="p">(</span><span class="s2">"JSOC"</span><span class="p">)</span>
     <span class="n">notify</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Notify</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-    <span class="c1"># quality = a.jsoc.Keyword(&quot;QUALLEV1&quot;) == 0</span>
+    <span class="c1"># quality = a.jsoc.Keyword("QUALLEV1") == 0</span>
 
-    <span class="c1"># set attributes for HMI query</span>
-    <span class="n">instr1</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">hmi</span>
-    <span class="k">if</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;45&quot;</span><span class="p">:</span>
-        <span class="n">physobs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">intensity</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">los_magnetic_field</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">los_velocity</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;720&quot;</span><span class="p">:</span>
-        <span class="n">physobs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;hmi.M_720s&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;hmi.V_720s&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;hmi.Ic_720s&quot;</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">hmi_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">aia_files</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># get query for HMI and download data, retry failed downloads</span>
-    <span class="k">if</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;45&quot;</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">instr1</span><span class="p">,</span> <span class="n">physobs</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">&quot;720&quot;</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">physobs</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span><span class="c1">#, quality)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+    <span class="c1"># skipping the HMI half skips the staged JSOC export, which is the slow step;</span>
+    <span class="c1"># overwrite=False only ever skipped the re-download</span>
+    <span class="k">if</span> <span class="n">fetch_hmi</span><span class="p">:</span>
+        <span class="c1"># set attributes for HMI query</span>
+        <span class="n">instr1</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">hmi</span>
+        <span class="k">if</span> <span class="n">series</span> <span class="o">==</span> <span class="s2">"45"</span><span class="p">:</span>
+            <span class="n">physobs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">intensity</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">los_magnetic_field</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">Physobs</span><span class="o">.</span><span class="n">los_velocity</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">instr1</span><span class="p">,</span> <span class="n">physobs</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">physobs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">"hmi.M_720s"</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">"hmi.V_720s"</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="o">.</span><span class="n">jsoc</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">"hmi.Ic_720s"</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">physobs</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span><span class="c1">#, quality)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;About to fetch HMI files starting at date </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">start</span><span class="p">)</span>
-    <span class="n">hmi_files</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
-    <span class="c1"># while len(hmi_files.errors) &gt; 0:</span>
-    <span class="c1">#     hmi_files = Fido.fetch(hmi_files, path=outdir, overwrite=overwrite, progress=progress)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"About to fetch HMI files starting at date </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">start</span><span class="p">)</span>
+        <span class="n">hmi_files</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
 
-    <span class="c1"># set attributes for AIA query</span>
-    <span class="n">level</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Level</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">instr2</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">aia</span>
-    <span class="n">wavelength</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Wavelength</span><span class="p">(</span><span class="mf">1700.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">AA</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fetch_aia</span><span class="p">:</span>
+        <span class="c1"># set attributes for AIA query; 1700 A is served by VSO, not the JSOC</span>
+        <span class="c1"># export queue, so it needs no notify address</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Level</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">instr2</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Instrument</span><span class="o">.</span><span class="n">aia</span>
+        <span class="n">wavelength</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">Wavelength</span><span class="p">(</span><span class="mf">1700.</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">AA</span><span class="p">)</span>
 
-    <span class="c1"># get query for AIA and download data</span>
-    <span class="n">aia</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">instr2</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;About to fetch AIA files starting at date </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">start</span><span class="p">)</span>
-    <span class="n">aia_files</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">aia</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
-    <span class="c1"># while len(aia_files.errors) &gt; 0:</span>
-    <span class="c1">#     aia_files = Fido.fetch(aia_files, path=outdir, overwrite=overwrite, progress=progress)</span>
+        <span class="c1"># get query for AIA and download data</span>
+        <span class="n">aia</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">trange</span><span class="p">,</span> <span class="n">instr2</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"About to fetch AIA files starting at date </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="n">start</span><span class="p">)</span>
+        <span class="n">aia_files</span> <span class="o">=</span> <span class="n">Fido</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">aia</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">outdir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
 
     <span class="c1"># sort out filenames into categories for output</span>
-    <span class="n">con_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">&quot;cont&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
-    <span class="n">mag_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">&quot;magn&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
-    <span class="n">dop_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">&quot;dopp&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">con_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">"cont"</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">mag_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">"magn"</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+    <span class="n">dop_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">hmi_files</span> <span class="k">if</span> <span class="s2">"dopp"</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
     <span class="n">aia_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">aia_files</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">con_files</span><span class="p">,</span> <span class="n">mag_files</span><span class="p">,</span> <span class="n">dop_files</span><span class="p">,</span> <span class="n">aia_files</span></div>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="c1"># supress warnings</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
-    <span class="c1"># warnings.simplefilter(action=&#39;ignore&#39;, category=AstropyDeprecationWarning)</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">'ignore'</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+    <span class="c1"># warnings.simplefilter(action='ignore', category=AstropyDeprecationWarning)</span>
 
     <span class="c1"># initialize argparser</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Download SDO/HMI data using sunpy&#39;</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--outdir&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;full directory path for file writeout&#39;</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--start_date&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;start_date&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>   <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2024-01-01&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Start date for query [yyyy-mm-dd]&#39;</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--stop_date&#39;</span><span class="p">,</span>  <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;stop_date&#39;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>   <span class="n">default</span><span class="o">=</span><span class="s1">&#39;2024-01-03&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Stop date for query [yyyy-mm-dd]&#39;</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--cadence&#39;</span><span class="p">,</span>    <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;cadence&#39;</span><span class="p">,</span>    <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Cadence for query [hours]&#39;</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--overwrite&#39;</span><span class="p">,</span>  <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;overwrite&#39;</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to overwrite existing files&#39;</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--fast&#39;</span><span class="p">,</span>       <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span>       <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to use the fast (45 sec) data. Default is False (720 sec.)&#39;</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">'Download SDO/HMI data using sunpy'</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'--outdir'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'full directory path for file writeout'</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-s'</span><span class="p">,</span> <span class="s1">'--start_date'</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">'start_date'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>   <span class="n">default</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Start date for query [yyyy-mm-dd]'</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-e'</span><span class="p">,</span> <span class="s1">'--stop_date'</span><span class="p">,</span>  <span class="n">dest</span><span class="o">=</span><span class="s1">'stop_date'</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>   <span class="n">default</span><span class="o">=</span><span class="s1">'2024-01-03'</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Stop date for query [yyyy-mm-dd]'</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-c'</span><span class="p">,</span> <span class="s1">'--cadence'</span><span class="p">,</span>    <span class="n">dest</span><span class="o">=</span><span class="s1">'cadence'</span><span class="p">,</span>    <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Cadence for query [hours]'</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-o'</span><span class="p">,</span> <span class="s1">'--overwrite'</span><span class="p">,</span>  <span class="n">dest</span><span class="o">=</span><span class="s1">'overwrite'</span><span class="p">,</span>  <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Whether to overwrite existing files'</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-f'</span><span class="p">,</span> <span class="s1">'--fast'</span><span class="p">,</span>       <span class="n">dest</span><span class="o">=</span><span class="s1">'fast'</span><span class="p">,</span>       <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">'Whether to use the fast (45 sec) data. Default is False (720 sec.)'</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="n">series</span> <span class="o">=</span> <span class="s2">&quot;45&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">fast</span> <span class="k">else</span> <span class="s2">&quot;720&quot;</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="s2">"45"</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">fast</span> <span class="k">else</span> <span class="s2">"720"</span>
 
     <span class="c1"># Download per-day in order to catch failures </span>
     <span class="n">tstart</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">start_date</span><span class="p">)</span>
@@ -377,13 +429,13 @@
                                   <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cadence</span><span class="p">,</span> 
                                   <span class="n">overwrite</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">overwrite</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Fido fetch failed for </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Fido fetch failed for </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -440,8 +492,8 @@ By Michael Palumbo
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

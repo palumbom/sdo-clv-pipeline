@@ -26,20 +26,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=4418a689" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=810fe235" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="../../_static/documentation_options.js?v=4861a642"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,31 +50,38 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sdo_clv_pipeline/sdo_process';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -100,7 +107,47 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -246,11 +293,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -282,7 +336,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for sdo_clv_pipeline.sdo_process</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;SDO processing pipeline entry points for per-epoch reductions.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""SDO processing pipeline entry points for per-epoch reductions."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -296,7 +350,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.paths</span><span class="w"> </span><span class="kn">import</span> <span class="n">root</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_io</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_vels</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_vels</span><span class="w"> </span><span class="kn">import</span> <span class="n">_region_index</span>  <span class="c1"># private: not re-exported by `import *`</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_agg_inputs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sdo_image</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.quality</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
@@ -308,31 +362,31 @@
 
 <span class="c1"># per-epoch outcome codes; STATUS_OK marks success, the SKIP_* codes name the</span>
 <span class="c1"># reason an epoch was skipped so callers can tally a run summary</span>
-<span class="n">status_ok</span> <span class="o">=</span> <span class="s2">&quot;ok&quot;</span>
-<span class="n">skip_invalid_file</span> <span class="o">=</span> <span class="s2">&quot;invalid_file&quot;</span>
-<span class="n">skip_quality</span> <span class="o">=</span> <span class="s2">&quot;quality&quot;</span>
-<span class="n">skip_limb_dark</span> <span class="o">=</span> <span class="s2">&quot;limb_darkening&quot;</span>
-<span class="n">skip_doppler</span> <span class="o">=</span> <span class="s2">&quot;dopplergram&quot;</span>
-<span class="n">skip_regions</span> <span class="o">=</span> <span class="s2">&quot;region_id&quot;</span>
-<span class="n">skip_unknown</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+<span class="n">status_ok</span> <span class="o">=</span> <span class="s2">"ok"</span>
+<span class="n">skip_invalid_file</span> <span class="o">=</span> <span class="s2">"invalid_file"</span>
+<span class="n">skip_quality</span> <span class="o">=</span> <span class="s2">"quality"</span>
+<span class="n">skip_limb_dark</span> <span class="o">=</span> <span class="s2">"limb_darkening"</span>
+<span class="n">skip_doppler</span> <span class="o">=</span> <span class="s2">"dopplergram"</span>
+<span class="n">skip_regions</span> <span class="o">=</span> <span class="s2">"region_id"</span>
+<span class="n">skip_unknown</span> <span class="o">=</span> <span class="s2">"unknown"</span>
 
 <div class="viewcode-block" id="is_quality_data">
 <a class="viewcode-back" href="../../api-preprocessing.html#sdo_clv_pipeline.sdo_process.is_quality_data">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">is_quality_data</span><span class="p">(</span><span class="n">sdo_image</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True when the SDO image passes the QUALITY flag check.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return True when the SDO image passes the QUALITY flag check."""</span>
     <span class="k">return</span> <span class="n">sdo_image</span><span class="o">.</span><span class="n">quality</span> <span class="o">==</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="reduce_sdo_images">
 <a class="viewcode-back" href="../../api-preprocessing.html#sdo_clv_pipeline.sdo_process.reduce_sdo_images">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">reduce_sdo_images</span><span class="p">(</span><span class="n">con_file</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">fit_cbs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load, validate, and reduce a set of SDO images for a single epoch.</span>
+<span class="w">    </span><span class="sd">"""Load, validate, and reduce a set of SDO images for a single epoch.</span>
 
 <span class="sd">    Public API. Returns a 5-tuple ``(con, mag, dop, aia, mask)`` on success or</span>
 <span class="sd">    ``None`` when the epoch is skipped; in the skip case a specific diagnostic</span>
 <span class="sd">    has already been printed by ``_reduce_sdo_images``. External callers rely on</span>
 <span class="sd">    this exact contract, so the skip reason is intentionally not exposed here.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">images</span><span class="p">,</span> <span class="n">_reason</span> <span class="o">=</span> <span class="n">_reduce_sdo_images</span><span class="p">(</span><span class="n">con_file</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">,</span>
                                          <span class="n">mu_thresh</span><span class="o">=</span><span class="n">mu_thresh</span><span class="p">,</span> <span class="n">fit_cbs</span><span class="o">=</span><span class="n">fit_cbs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">images</span></div>
@@ -340,7 +394,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_sdo_images</span><span class="p">(</span><span class="n">con_file</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">fit_cbs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load, validate, and reduce a set of SDO images for a single epoch.</span>
+<span class="w">    </span><span class="sd">"""Load, validate, and reduce a set of SDO images for a single epoch.</span>
 
 <span class="sd">    This handles geometry setup, limb darkening, doppler/magnetogram corrections,</span>
 <span class="sd">    and region classification.</span>
@@ -349,40 +403,40 @@
 <span class="sd">    ``(con, mag, dop, aia, mask)`` and ``reason`` is None, and on a skip</span>
 <span class="sd">    ``images`` is None and ``reason`` is one of the module-level skip_* codes.</span>
 <span class="sd">    A specific diagnostic is logged at each skip point.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># assertions</span>
-    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">con_file</span><span class="p">),</span> <span class="s2">&quot;missing continuum file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">con_file</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">mag_file</span><span class="p">),</span> <span class="s2">&quot;missing magnetogram file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mag_file</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">dop_file</span><span class="p">),</span> <span class="s2">&quot;missing dopplergram file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dop_file</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">aia_file</span><span class="p">),</span> <span class="s2">&quot;missing aia file: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">aia_file</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">con_file</span><span class="p">),</span> <span class="s2">"missing continuum file: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">con_file</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">mag_file</span><span class="p">),</span> <span class="s2">"missing magnetogram file: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mag_file</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">dop_file</span><span class="p">),</span> <span class="s2">"missing dopplergram file: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dop_file</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">exists</span><span class="p">(</span><span class="n">aia_file</span><span class="p">),</span> <span class="s2">"missing aia file: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">aia_file</span><span class="p">)</span>
 
     <span class="c1"># get the datetime</span>
     <span class="n">iso</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">con_file</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
 
     <span class="c1"># make SDOImage instances; load one at a time so a bad file is named</span>
     <span class="n">images</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">fname</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="n">con_file</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;MAG&quot;</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">),</span>
-                         <span class="p">(</span><span class="s2">&quot;DOP&quot;</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;AIA&quot;</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">fname</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"CON"</span><span class="p">,</span> <span class="n">con_file</span><span class="p">),</span> <span class="p">(</span><span class="s2">"MAG"</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">),</span>
+                         <span class="p">(</span><span class="s2">"DOP"</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">),</span> <span class="p">(</span><span class="s2">"AIA"</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">)):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">SDOImage</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Invalid file, skipping </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%r</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Invalid file, skipping </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%r</span><span class="s2">)"</span><span class="p">,</span> <span class="n">iso</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_invalid_file</span>
-    <span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;CON&quot;</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;MAG&quot;</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;DOP&quot;</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">&quot;AIA&quot;</span><span class="p">]</span>
+    <span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="s2">"CON"</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">"MAG"</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">"DOP"</span><span class="p">],</span> <span class="n">images</span><span class="p">[</span><span class="s2">"AIA"</span><span class="p">]</span>
 
     <span class="c1"># check QUALITY flags: any fatal bit skips the epoch; tolerable (soft) bits are</span>
     <span class="c1"># processed but warned about, and recorded downstream via the combined quality_flag</span>
-    <span class="n">fatal</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="s2">&quot;MAG&quot;</span><span class="p">,</span> <span class="s2">&quot;DOP&quot;</span><span class="p">,</span> <span class="s2">&quot;AIA&quot;</span><span class="p">)</span>
+    <span class="n">fatal</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"CON"</span><span class="p">,</span> <span class="s2">"MAG"</span><span class="p">,</span> <span class="s2">"DOP"</span><span class="p">,</span> <span class="s2">"AIA"</span><span class="p">)</span>
              <span class="k">if</span> <span class="ow">not</span> <span class="n">is_tolerable_quality</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">quality</span><span class="p">)]</span>
     <span class="k">if</span> <span class="n">fatal</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">fatal</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Quality skip </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Quality skip </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span>
                            <span class="n">iso</span><span class="p">,</span> <span class="n">format_quality</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">im</span><span class="o">.</span><span class="n">quality</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_quality</span>
-    <span class="n">flagged</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="s2">&quot;MAG&quot;</span><span class="p">,</span> <span class="s2">&quot;DOP&quot;</span><span class="p">,</span> <span class="s2">&quot;AIA&quot;</span><span class="p">)</span>
+    <span class="n">flagged</span> <span class="o">=</span> <span class="p">[(</span><span class="n">label</span><span class="p">,</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"CON"</span><span class="p">,</span> <span class="s2">"MAG"</span><span class="p">,</span> <span class="s2">"DOP"</span><span class="p">,</span> <span class="s2">"AIA"</span><span class="p">)</span>
                <span class="k">if</span> <span class="n">images</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">quality</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">flagged</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Quality warning </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">) [tolerated, processing]&quot;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Quality warning </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">) [tolerated, processing]"</span><span class="p">,</span>
                        <span class="n">iso</span><span class="p">,</span> <span class="n">format_quality</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">im</span><span class="o">.</span><span class="n">quality</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span>
 
     <span class="c1"># calculate geometries</span>
@@ -398,7 +452,7 @@
         <span class="n">con</span><span class="o">.</span><span class="n">calc_limb_darkening</span><span class="p">()</span>
         <span class="n">aia</span><span class="o">.</span><span class="n">calc_limb_darkening</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Limb darkening fit failed, skipping </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">"Limb darkening fit failed, skipping </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_limb_dark</span>
 
     <span class="c1"># correct magnetogram for foreshortening</span>
@@ -410,7 +464,7 @@
     <span class="c1"># check that the dopplergram correction went well</span>
     <span class="n">v_rot_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dop</span><span class="o">.</span><span class="n">v_rot</span><span class="p">)))</span>
     <span class="k">if</span> <span class="n">v_rot_max</span> <span class="o">&lt;</span> <span class="mf">1000.0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Dopplergram correction failed </span><span class="si">%s</span><span class="s2">: max|v_rot|=</span><span class="si">%.3f</span><span class="s2"> m/s &lt; 1000.0, skipping&quot;</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Dopplergram correction failed </span><span class="si">%s</span><span class="s2">: max|v_rot|=</span><span class="si">%.3f</span><span class="s2"> m/s &lt; 1000.0, skipping"</span><span class="p">,</span>
                        <span class="n">iso</span><span class="p">,</span> <span class="n">v_rot_max</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_doppler</span>
 
@@ -422,11 +476,11 @@
 
     <span class="c1"># identify regions for thresholding</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># print(&quot;About to construct SunMask&quot;)</span>
+        <span class="c1"># print("About to construct SunMask")</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">SunMask</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">mask</span><span class="o">.</span><span class="n">mask_low_mu</span><span class="p">(</span><span class="n">mu_thresh</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Region identification failed, skipping </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">"Region identification failed, skipping </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">skip_regions</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">dop</span><span class="p">,</span> <span class="n">aia</span><span class="p">,</span> <span class="n">mask</span><span class="p">),</span> <span class="kc">None</span>
@@ -435,11 +489,11 @@
 <div class="viewcode-block" id="process_data_set_parallel">
 <a class="viewcode-back" href="../../api-preprocessing.html#sdo_clv_pipeline.sdo_process.process_data_set_parallel">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">process_data_set_parallel</span><span class="p">(</span><span class="n">con_file</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">,</span> <span class="n">datadir</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for multiprocessing that forwards to process_data_set.</span>
+<span class="w">    </span><span class="sd">"""Wrapper for multiprocessing that forwards to process_data_set.</span>
 
 <span class="sd">    Returns the per-epoch status so pool.starmap carries it back to the parent</span>
 <span class="sd">    for the end-of-run summary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">process_data_set</span><span class="p">(</span><span class="n">con_file</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">,</span>
                             <span class="n">mu_thresh</span><span class="o">=</span><span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="o">=</span><span class="n">n_rings</span><span class="p">,</span>
                             <span class="n">suffix</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">pid</span><span class="p">),</span> <span class="n">datadir</span><span class="o">=</span><span class="n">datadir</span><span class="p">,</span>
@@ -451,9 +505,9 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">process_data_set</span><span class="p">(</span><span class="n">con_file</span><span class="p">,</span> <span class="n">mag_file</span><span class="p">,</span> <span class="n">dop_file</span><span class="p">,</span> <span class="n">aia_file</span><span class="p">,</span> 
                      <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                      <span class="n">datadir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the full processing pipeline and persist per-epoch outputs.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Run the full processing pipeline and persist per-epoch outputs."""</span>
     <span class="n">iso</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">con_file</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running epoch </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Running epoch </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
 
     <span class="c1"># start the timer</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -463,15 +517,17 @@
 
     <span class="c1"># name output files</span>
     <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fname1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;thresholds.csv&quot;</span><span class="p">)</span>
-        <span class="n">fname2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;region_output.csv&quot;</span><span class="p">)</span>
+        <span class="n">fname1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">"thresholds.csv"</span><span class="p">)</span>
+        <span class="n">fname2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">"region_output.csv"</span><span class="p">)</span>
+        <span class="n">fname3</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">"feature_output.csv"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># make tmp directory</span>
-        <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="p">)</span>
+        <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s2">"tmp"</span><span class="p">)</span>
 
         <span class="c1"># filenames</span>
-        <span class="n">fname1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">&quot;thresholds_&quot;</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-        <span class="n">fname2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">&quot;region_output_&quot;</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+        <span class="n">fname1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">"thresholds_"</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">".csv"</span><span class="p">)</span>
+        <span class="n">fname2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">"region_output_"</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">".csv"</span><span class="p">)</span>
+        <span class="n">fname3</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">"feature_output_"</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">".csv"</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># reduce the data set; skip cleanly (no disk touched) on a known issue</span>
@@ -485,7 +541,7 @@
         <span class="n">quality_flag</span> <span class="o">=</span> <span class="n">combine_quality</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">mag</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">dop</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">aia</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span>
 
         <span class="c1"># now that we have results, create the output files if needed</span>
-        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">(</span><span class="n">fname1</span><span class="p">,</span> <span class="n">fname2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="p">(</span><span class="n">fname1</span><span class="p">,</span> <span class="n">fname2</span><span class="p">,</span> <span class="n">fname3</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
                 <span class="n">create_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
@@ -507,7 +563,8 @@
         <span class="n">flat_int</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flat_v_corr</span> <span class="o">=</span> <span class="n">dop</span><span class="o">.</span><span class="n">v_corr</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flat_v_rot</span> <span class="o">=</span> <span class="n">dop</span><span class="o">.</span><span class="n">v_rot</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="n">flat_abs_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mag</span><span class="o">.</span><span class="n">B_obs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">flat_abs_mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mag</span><span class="o">.</span><span class="n">B_obs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>       <span class="c1"># line-of-sight |B_obs|</span>
+        <span class="n">flat_abs_mag_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mag</span><span class="o">.</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>   <span class="c1"># radial |B_obs|/mu (foreshortening-corrected)</span>
         <span class="n">flat_iflat</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">iflat</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flat_ld</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">ldark</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="c1"># compute the quiet-sun mask once (a full-frame comparison); reuse the 2D</span>
@@ -524,19 +581,26 @@
         <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span> <span class="o">=</span> <span class="n">shared_products</span><span class="p">(</span><span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span>
                                                  <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">)</span>
 
-        <span class="c1"># dense region indices (computed once and shared; both region aggregations</span>
-        <span class="c1"># below would otherwise rebuild this 16.8M-element int64 gather independently)</span>
-        <span class="n">reg_idx</span> <span class="o">=</span> <span class="n">_region_index</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">)</span>
+        <span class="c1"># shared per-epoch selection and disk totals; the aggregations below build</span>
+        <span class="c1"># their fused accumulators from it instead of each rebuilding the valid</span>
+        <span class="c1"># mask, ring index and disk sums (see aggregate.py)</span>
+        <span class="n">flat_flags</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">agg</span> <span class="o">=</span> <span class="n">build_agg_inputs</span><span class="p">(</span><span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">)</span>
 
         <span class="c1"># create arrays to hold velocity, magnetic field, and pixel fraction results</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># calculate disk-integrataed quantities</span>
-        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compute_disk_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span>
-                                            <span class="n">flat_v_rot</span><span class="p">,</span> <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span>
-                                            <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span>
-                                            <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
-                                            <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">))</span>
+        <span class="n">disk_row</span> <span class="o">=</span> <span class="n">compute_disk_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span>
+                                        <span class="n">flat_v_rot</span><span class="p">,</span> <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span>
+                                        <span class="n">flat_w_quiet</span><span class="p">,</span> <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span>
+                                        <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
+                                        <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">,</span>
+                                        <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">disk_row</span><span class="p">)</span>
+        <span class="c1"># the disk-integrated quiet-Sun velocity (v_quiet column) is the reference</span>
+        <span class="c1"># the disk-level flag rows subtract to form v_conv</span>
+        <span class="n">quiet_ref_disk</span> <span class="o">=</span> <span class="n">disk_row</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
 
         <span class="c1"># calculate velocities for regions, not binning by mu</span>
         <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_only_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span>
@@ -547,22 +611,63 @@
                                                    <span class="n">flat_reg</span><span class="p">,</span> <span class="n">region_codes</span><span class="p">,</span>
                                                    <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
                                                    <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">,</span>
-                                                   <span class="n">reg_idx</span><span class="o">=</span><span class="n">reg_idx</span><span class="p">))</span>
+                                                   <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">))</span>
 
-        <span class="c1"># calculate disk-resovled quantities</span>
-        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span> <span class="n">flat_v_corr</span><span class="p">,</span>
-                                              <span class="n">flat_v_rot</span><span class="p">,</span> <span class="n">flat_ld</span><span class="p">,</span> <span class="n">flat_iflat</span><span class="p">,</span>
-                                              <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span>
+        <span class="c1"># calculate disk-resovled quantities (also returns the per-ring quiet-Sun</span>
+        <span class="c1"># reference and ring edges, reused by the feature catalog below)</span>
+        <span class="n">region_rows</span><span class="p">,</span> <span class="n">v_q_quiet</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">compute_region_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span>
+                                              <span class="n">flat_v_corr</span><span class="p">,</span> <span class="n">flat_v_rot</span><span class="p">,</span> <span class="n">flat_ld</span><span class="p">,</span>
+                                              <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span> <span class="n">flat_w_quiet</span><span class="p">,</span>
                                               <span class="n">flat_w_active</span><span class="p">,</span> <span class="n">flat_reg</span><span class="p">,</span>
                                               <span class="n">region_codes</span><span class="p">,</span> <span class="n">mu_thresh</span><span class="p">,</span>
                                               <span class="n">n_rings</span><span class="p">,</span> <span class="n">k_hat_con</span><span class="p">,</span>
                                               <span class="n">p_vhat</span><span class="o">=</span><span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="o">=</span><span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="o">=</span><span class="n">p_mag</span><span class="p">,</span>
-                                              <span class="n">reg_idx</span><span class="o">=</span><span class="n">reg_idx</span><span class="p">))</span>
+                                              <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">region_rows</span><span class="p">)</span>
+
+        <span class="c1"># non-exclusive feature-flag rows (moat, penumbra velocity split, and the</span>
+        <span class="c1"># plage/network minus-moat variants). These overlap the base region rows</span>
+        <span class="c1"># by design: a moat pixel that is also plage contributes to both.</span>
+        <span class="c1"># built on the compacted arrays: flag_selections is elementwise, so this</span>
+        <span class="c1"># equals the full-frame selection restricted to valid pixels, and lets the</span>
+        <span class="c1"># aggregations skip a full-frame boolean AND per selection</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="n">flag_selections</span><span class="p">(</span><span class="n">flat_reg</span><span class="p">,</span> <span class="n">flat_flags</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_only_flag_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span>
+                                                        <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">selections</span><span class="p">,</span>
+                                                        <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">quiet_ref_disk</span><span class="p">,</span>
+                                                        <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="p">,</span>
+                                                        <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">))</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">compute_region_flag_results</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span>
+                                                   <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">selections</span><span class="p">,</span>
+                                                   <span class="n">mu_thresh</span><span class="p">,</span> <span class="n">n_rings</span><span class="p">,</span> <span class="n">v_q_quiet</span><span class="p">,</span>
+                                                   <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span> <span class="n">p_mag</span><span class="p">,</span>
+                                                   <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">))</span>
+
+        <span class="c1"># map each pixel to its mu-ring's quiet-Sun reference (the exact scalar the</span>
+        <span class="c1"># region v_conv subtracts); pixels below mu_thresh never enter a feature</span>
+        <span class="n">flat_v_quiet_ref</span> <span class="o">=</span> <span class="n">v_q_quiet</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">flat_mu</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)]</span>
+
+        <span class="c1"># per-feature umbra/penumbra catalog (one row per connected blob); field</span>
+        <span class="c1"># strength binning is deferred to downstream analysis. Reuses the same</span>
+        <span class="c1"># flattened arrays and weighted products as the region aggregations.</span>
+        <span class="n">feature_rows</span> <span class="o">=</span> <span class="n">compute_feature_catalog</span><span class="p">(</span><span class="n">mjd</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span> <span class="n">flat_int</span><span class="p">,</span>
+                                               <span class="n">flat_iflat</span><span class="p">,</span> <span class="n">flat_mu</span><span class="p">,</span> <span class="n">flat_abs_mag</span><span class="p">,</span>
+                                               <span class="n">flat_abs_mag_rad</span><span class="p">,</span>
+                                               <span class="n">dop</span><span class="o">.</span><span class="n">pix_area</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                               <span class="n">dop</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                               <span class="n">dop</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+                                               <span class="n">p_vhat</span><span class="p">,</span> <span class="n">p_vphot</span><span class="p">,</span>
+                                               <span class="n">flat_v_quiet_ref</span><span class="o">=</span><span class="n">flat_v_quiet_ref</span><span class="p">)</span>
 
         <span class="c1"># tag every region row with the per-epoch quality flag, then write to disk</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
             <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quality_flag</span><span class="p">)</span>
         <span class="n">write_results_to_file</span><span class="p">(</span><span class="n">fname2</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+        <span class="c1"># tag and write the per-feature catalog</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">feature_rows</span><span class="p">:</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quality_flag</span><span class="p">)</span>
+        <span class="n">write_results_to_file</span><span class="p">(</span><span class="n">fname3</span><span class="p">,</span> <span class="n">feature_rows</span><span class="p">)</span>
 
         <span class="c1"># do some memory cleanup (success path: all names are bound)</span>
         <span class="k">del</span> <span class="n">con</span>
@@ -577,16 +682,17 @@
         <span class="k">del</span> <span class="n">flat_iflat</span>
         <span class="k">del</span> <span class="n">flat_v_corr</span>
         <span class="k">del</span> <span class="n">flat_abs_mag</span>
+        <span class="k">del</span> <span class="n">flat_abs_mag_rad</span>
         <span class="k">del</span> <span class="n">flat_w_quiet</span>
 
         <span class="c1"># end the timer</span>
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 
         <span class="c1"># report success and return</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">%s</span><span class="s2"> reduced successfully in </span><span class="si">%.2f</span><span class="s2"> seconds&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Epoch </span><span class="si">%s</span><span class="s2"> reduced successfully in </span><span class="si">%.2f</span><span class="s2"> seconds"</span><span class="p">,</span> <span class="n">iso</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">status_ok</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Epoch </span><span class="si">%s</span><span class="s2"> failed unexpectedly&quot;</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">"Epoch </span><span class="si">%s</span><span class="s2"> failed unexpectedly"</span><span class="p">,</span> <span class="n">iso</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">skip_unknown</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span></div>
@@ -646,8 +752,8 @@ By Michael Palumbo
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

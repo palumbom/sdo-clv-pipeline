@@ -27,20 +27,20 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=4418a689" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=810fe235" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="_static/documentation_options.js?v=4861a642"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -51,12 +51,13 @@
     <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api-velocities';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://michaelpalumbo.me/sdo-clv-pipeline/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Ancillary Utilities" href="api-utilities.html" />
@@ -64,20 +65,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -103,7 +110,51 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
     </header>
   
 
@@ -295,11 +346,18 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -327,10 +385,11 @@
                 <h2> Contents </h2>
             </div>
             <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_disk_results"><code class="docutils literal notranslate"><span class="pre">compute_disk_results()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_region_only_results"><code class="docutils literal notranslate"><span class="pre">compute_region_only_results()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_region_results"><code class="docutils literal notranslate"><span class="pre">compute_region_results()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_feature_catalog"><code class="docutils literal notranslate"><span class="pre">compute_feature_catalog()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.legendre.gen_leg_vec"><code class="docutils literal notranslate"><span class="pre">gen_leg_vec()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.legendre.gen_leg_x_vec"><code class="docutils literal notranslate"><span class="pre">gen_leg_x_vec()</span></code></a></li>
 </ul>
@@ -352,7 +411,7 @@
 <span class="sd-summary-text">sdo_clv_pipeline.sdo_vels</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <dl class="py function">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_vels.compute_disk_results">
-<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_disk_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_ld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_quiet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_hat_con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_disk_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_disk_results" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_disk_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_ld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_quiet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_hat_con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_disk_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_disk_results" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Compute disk-integrated velocity and intensity metrics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -376,14 +435,59 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_vels.compute_region_only_results">
-<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_region_only_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_ld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_quiet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_hat_con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_region_only_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_region_only_results" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_region_only_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_ld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_quiet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_hat_con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_region_only_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_region_only_results" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Compute region-aggregated metrics across the full disk.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_vels.compute_region_results">
-<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_region_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_ld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_quiet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_hat_con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_region_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_region_results" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_region_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_ld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_quiet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_w_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_reg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_hat_con</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_region_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_region_results" title="Link to this definition">#</a></dt>
 <dd><p class="sd-card-text">Compute region-aggregated metrics in mu rings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sdo_clv_pipeline.sdo_vels.compute_feature_catalog">
+<span class="sig-prename descclassname"><span class="pre">sdo_clv_pipeline.sdo_vels.</span></span><span class="sig-name descname"><span class="pre">compute_feature_catalog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_iflat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_abs_mag_rad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_pix_area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vhat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_vphot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat_v_quiet_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_codes_to_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">2)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdo_clv_pipeline/sdo_vels.html#compute_feature_catalog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sdo_clv_pipeline.sdo_vels.compute_feature_catalog" title="Link to this definition">#</a></dt>
+<dd><p class="sd-card-text">Per-feature catalog of connected umbra/penumbra blobs.</p>
+<p class="sd-card-text">Each connected component (8-connectivity) of a region-type mask is one
+feature; field strength can then be split downstream without re-running the
+pipeline. Velocities and field means use the same intensity-weighted
+estimator as the region curves; area and unsigned flux use the per-pixel
+solar area (microhemispheres). <code class="docutils literal notranslate"><span class="pre">regions</span></code> is the 2D region-code map (NaN
+off-disk / sub-threshold); all other per-pixel inputs are flattened in the
+same C-order.</p>
+<p class="sd-card-text">Two magnetic-field conventions are recorded, matching how the literature uses
+each (see Haywood et al. 2016 vs Yeo et al. 2013 / Milbourne et al. 2019):
+<code class="docutils literal notranslate"><span class="pre">flat_abs_mag</span></code> is the line-of-sight field <code class="docutils literal notranslate"><span class="pre">|B_obs|</span></code> (the Haywood unsigned-
+flux proxy, matching the pipeline’s <code class="docutils literal notranslate"><span class="pre">mag_unsigned</span></code>), reported in the <code class="docutils literal notranslate"><span class="pre">_los</span></code>
+columns; <code class="docutils literal notranslate"><span class="pre">flat_abs_mag_rad</span></code> is the foreshortening-corrected radial field
+<code class="docutils literal notranslate"><span class="pre">|B_obs|/mu</span></code> (the canonical field for magnetic-strength classification),
+reported in the <code class="docutils literal notranslate"><span class="pre">_rad</span></code> columns and used for the unsigned flux. NOTE the
+radial field amplifies noise at low mu (x10 at mu=0.1), so <code class="docutils literal notranslate"><span class="pre">max_abs_b_rad</span></code>
+is spike-prone near the limb.</p>
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">flat_lon</span></code>/<code class="docutils literal notranslate"><span class="pre">flat_lat</span></code> are plain degree arrays (caller extracts <code class="docutils literal notranslate"><span class="pre">.value</span></code>
+from the astropy Quantities). <code class="docutils literal notranslate"><span class="pre">flat_lat</span></code> is the pipeline’s internal
+heliographic colatitude (0=N pole, 90=equator); <code class="docutils literal notranslate"><span class="pre">centroid_lat</span></code> is converted
+to standard Stonyhurst latitude in [-90, 90] (lat - 90).</p>
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">unsigned_flux_rad_g_uhem</span></code> = sum(<a href="#id1"><span class="problematic" id="id2">|B_rad|</span></a> * pix_area) in Gauss*microhemisphere
+– proportional to the true vertical flux (multiply by ~3.0e16 cm^2/uHem, i.e.
+1e-6 * 2*pi*R_sun^2, for Maxwells).</p>
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">flat_v_quiet_ref</span></code> is the per-pixel quiet-Sun velocity reference of each
+pixel’s mu-ring (<code class="docutils literal notranslate"><span class="pre">v_q[ring,</span> <span class="pre">quiet_idx]</span></code> from compute_region_results, mapped
+to pixels). When supplied, <code class="docutils literal notranslate"><span class="pre">v_quiet</span></code> is its intensity-weighted mean over the
+feature and <code class="docutils literal notranslate"><span class="pre">v_conv</span> <span class="pre">=</span> <span class="pre">v_hat</span> <span class="pre">-</span> <span class="pre">v_quiet</span></code> – the exact per-pixel-ring analogue
+of the region-level convective term, correct even when a feature straddles
+rings. When omitted (e.g. unit tests), both columns are NaN.</p>
+<dl class="simple">
+<dt>Returns one row per feature (quality_flag appended by the caller):</dt><dd><dl class="simple">
+<dt>[mjd, region, feature_id, n_pix, area_uhem, mean_mu_iw, min_mu, max_mu,</dt><dd><p class="sd-card-text">centroid_lon, centroid_lat, mean_abs_b_iw_los, mean_abs_b_aw_los,
+max_abs_b_los, mean_abs_b_iw_rad, mean_abs_b_aw_rad, max_abs_b_rad,
+unsigned_flux_rad_g_uhem, v_hat, v_phot, avg_int, avg_int_flat,
+v_conv, v_quiet]</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -399,7 +503,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p class="sd-card-text"><strong>lmax</strong> (<em>int</em>) – Maximum degree of the Legendre series.</p></li>
-<li><p class="sd-card-text"><strong>theta</strong> (<em>astropy.units.Quantity</em>) – Colatitude in degrees.</p></li>
+<li><p class="sd-card-text"><strong>theta</strong> (<em>astropy.units.Quantity</em>) – Colatitude in degrees (polar angle from the north pole, 90 - latitude;
+note <code class="docutils literal notranslate"><span class="pre">SDOImage.lat</span></code> stores latitude + 90 and must be converted).</p></li>
 </ul>
 </dd>
 </dl>
@@ -473,10 +578,11 @@ the fit_cbs=True normal-equations system singular; cond ~3e18.)</p></li>
     <i class="fa-solid fa-list"></i> Contents
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_disk_results"><code class="docutils literal notranslate"><span class="pre">compute_disk_results()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_region_only_results"><code class="docutils literal notranslate"><span class="pre">compute_region_only_results()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_region_results"><code class="docutils literal notranslate"><span class="pre">compute_region_results()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.sdo_vels.compute_feature_catalog"><code class="docutils literal notranslate"><span class="pre">compute_feature_catalog()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.legendre.gen_leg_vec"><code class="docutils literal notranslate"><span class="pre">gen_leg_vec()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdo_clv_pipeline.legendre.gen_leg_x_vec"><code class="docutils literal notranslate"><span class="pre">gen_leg_x_vec()</span></code></a></li>
 </ul>
@@ -520,8 +626,8 @@ By Michael Palumbo
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>

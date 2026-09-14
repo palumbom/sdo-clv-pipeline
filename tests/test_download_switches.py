@@ -4,6 +4,12 @@ import inspect
 
 import pytest
 
+# sdo_download pulls in numpy, astropy and sunpy at module load, none of which the
+# --no-deps CI job installs; without these guards the import is a collection error
+# that fails the whole run rather than skipping this module.
+pytest.importorskip("sunpy")
+pytest.importorskip("astropy")
+
 from sdo_clv_pipeline.sdo_download import download_data
 
 

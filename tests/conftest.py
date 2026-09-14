@@ -1,6 +1,11 @@
-"""Shared numerical gates for the equivalence tests."""
+"""Shared numerical gates for the equivalence tests.
 
-import numpy as np
+pytest imports this file before collecting anything, so it must stay importable
+with only the standard library: the --no-deps CI job installs neither numpy nor
+numba, and an import error here aborts the whole session instead of letting the
+pure-Python tests run. numpy is therefore imported inside the gates, which are
+only reached from modules that have already cleared ``importorskip("numba")``.
+"""
 
 
 def assert_within_gate(new, old, name, rtol=1e-12, ulp_floor=False):
@@ -17,6 +22,8 @@ def assert_within_gate(new, old, name, rtol=1e-12, ulp_floor=False):
     precision than the array can represent. Fused rewrites of a single algorithm
     do not need it -- they should be bit-identical and pass any tolerance.
     """
+    import numpy as np
+
     new = np.asarray(new)
     old = np.asarray(old)
     assert new.shape == old.shape, \
@@ -39,6 +46,8 @@ def assert_within_gate(new, old, name, rtol=1e-12, ulp_floor=False):
 
 def assert_bit_identical(new, old, name):
     """Stricter gate for paths that only reorder work, never the arithmetic."""
+    import numpy as np
+
     new = np.asarray(new)
     old = np.asarray(old)
     assert new.dtype == old.dtype, \
